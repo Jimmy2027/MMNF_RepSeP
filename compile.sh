@@ -17,9 +17,16 @@ if [[ "$TARGET" = "all" ]] || [[ "$TARGET" == "" ]]; then
 	done
 else
 	pdflatex -shell-escape "${TARGET}.tex" || { echo "Initial pdflatex failed"; exit $ERRCODE; }
-	pythontex.py "${TARGET}.tex" || { echo "PythonTeX failed"; exit $ERRCODE; }
+	pythontex "${TARGET}.tex" || { echo "PythonTeX failed"; exit $ERRCODE; }
 	pdflatex -shell-escape "${TARGET}.tex" || { echo "pdflatex failed after PythonTeX"; exit $ERRCODE; }
 	bibtex "${TARGET}" || { echo "bibtex failed"; exit $ERRCODE; }
 	pdflatex -shell-escape "${TARGET}.tex" || { echo "pdflatex failed after bibtex"; exit $ERRCODE; }
 	pdflatex -shell-escape "${TARGET}.tex"
+	if [ ! -d logs ]; then
+	  mkdir logs
+	fi
+
+	for CLEAN_TARGET in "*.aux" "*.log" "*.out" "*.bbl" "*.pytxcode" "*blx.bib" "*.blg" "*.run.xml"; do
+	  mv $CLEAN_TARGET logs/
+  done
 fi
