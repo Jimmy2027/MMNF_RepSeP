@@ -1,0 +1,283 @@
+\documentclass[english]{scrartcl}
+\usepackage[utf8]{inputenc}
+\input{common_header.tex}
+
+\usepackage{bm}
+
+\usepackage[backend=bibtex,style=authoryear,natbib=true]{biblatex}
+\usepackage{mathtools}
+
+\addbibresource{bib.bib}
+
+
+\title{Multi Modal Generative Learning with Normalizing Flows}
+\subtitle{Master Thesis Project Proposal}
+\author{Hendrik Klug}
+
+%\date{}
+\begin{document}
+    \maketitle
+
+
+    \section{Introduction}
+    The availability of multiple data types provides a rich source of information and holds promise for learning representations that generalize well across multiple modalities \cite{baltrusaitis_multimodal_2019}.
+    Multimodal data naturally grants additional self-supervision in the form of shared information connecting the different data types.
+    Further, the understanding of different modalities and the interplay between data types are non-trivial research questions and longstanding goals in machine learning research.
+    While fully-supervised approaches have been applied successfully \parencite{karpathy_deep_2015,tsai_learning_2018}, the labeling of multiple data types remains time-consuming and expensive.
+    Therefore, it requires models that efficiently learn from multiple data types in a self-supervised fashion.
+    Self-supervised, generative models are suitable for learning the joint distribution of multiple data types without supervision.
+    We focus on VAEs \parencite{kingma_auto-encoding_2014,rezende_stochastic_2014} which are able to jointly infer representations and generate new observations.
+    Despite their success on unimodal datasets, there are additional challenges associated with multimodal data \parencite{suzuki_joint_2016, vedantam_generative_2018}.
+    In particular, multimodal generative models need to represent both modality-specific and shared factors and generate semantically coherent samples across modalities.
+    Semantically coherent samples are connected by the information which is shared between data types \parencite{shi_variational_2019}.
+    These requirements are not inherent to the objective: the evidence lower bound (ELBO) of uni-modal VAEs.
+    Hence, adaptions to the original formulation are required to cater to and benefit from multiple data types.
+
+    Normalizing flows represent an approach for specifying flexible, arbitrarily complex and scalable approximate posterior distributions, introduced for variational inference by \cite{rezende_variational_2016}.
+    They consist of transforming a simple initial density into a more complex one by applying a sequence of invertible transformations until a desired level of complexity is attained.
+    The goal of this project is to use normalizing flows as a parameterizable function $f_\psi$ which combines the latent variables of multiple data types.
+    Normalizing flows are optimal for this task since they can transform simple initial densities into arbitrarily complex ones and vice versa.
+    The transformation being invertible, it is possible to sample from the constructed joint posterior distribution to acquire the latent variables for each modality that can then be fed into the corresponding decoders of a VAE.
+
+    Normalizing flows became very popular in the past years, and many methods already exist for different applications, however they have not yet been used to create a joint latent representation from multiple data types for VAEs.
+    The task in this project is to find an adequate implementation of normalizing flows, i.e. the best tradeoff between the complexity of the achieved joint latent representation and the computational feasibility, and evaluate it on existing multimodal datasets.
+    To this end, I would first compare simpler methods, with a less good approximation of the true joint posterior but less computationally expensive, with more complex methods on toy datasets.
+    The ultimate goal being to construct a method that can learn a separable \footnote{separable in the sense that the joint latent representation can be separated into the different classes that span the dataset} joint latent representation from which coherent \footnote{coherent in the sense that all generated samples belong to the same class} samples can be generated on the challenging MIMIC-CXR \parencite{johnson_mimic-cxr-jpg_2019} database.
+
+
+    \section{Background}
+    %    todo: write about previous work on merging data modalities in the latent space.
+    In practice, flow-based models are typically constructed by implementing a diffeomorphic transformation T (or $T^{-1}$) with a neural network.
+    Because invertible and differentiable transforms are composable, complex transformations can be built by composing multiple instances of simples ones: $T=T_K \circ \cdots \circ T_1$.
+    Because a flow-based model can be sampled from and it's density can be evaluated, it can be easily integrated into the bottleneck of a VAE.
+    The sampling can be achieved with:
+    \begin{equation}
+        \textbf{x} = T(\textbf{u}) \where \textbf{u} \sim \udensity
+    \end{equation}
+    And the density can be obtained by a change of variables \parencite{bogachev2007measure}:
+    \begin{equation}
+        \label{eq:density}
+        \xdensity = \udensity |\det J_T(\textbf{u})|^{-1} \quad \text{where} \quad \textbf{u} = T^{-1}(x)
+    \end{equation}
+
+    Both the sampling and the evaluation of the density have different computational requirements.
+    Sampling from the model requires the ability to sample from $\udensity$ and to compute the forward transformation $T$.
+    Evaluating the model's density requires computing the inverse transformation $T^{-1}$ and its Jacobian determinant, as well as evaluating the density $\udensity$.
+
+    In \cite{papamakarios_normalizing_2019}, the authors give an overview of existing methods and applications of normalizing flows and discuss the computational tradeoffs for each.
+    Papamakarios et al. separate the field of finite compositions of flows into three categories: Autoregressive flows, Linear flows and Residual flows.
+    For this project, flows constructed with continuous-time transformations are not taken into account as they are not deemed relevant for the application.
+    One reason for that is the numerical complexity that continuous-time transformations bring when solving the equations needed for sampling and density estimation.
+
+    \subsection{Autoregressive flows}
+    The class of \textit{autoregressive flows} are a direct implementation of flows that are built such that the Jacobian in \cref{eq:density} is triangular.
+    In particular $f_{\theta}$ is specified to have the following form (as described by \cite{papamakarios_normalizing_2019}):
+    \begin{equation}
+        z_i^{\prime} = \transformer \where \textbf{h}_i = \conditioner
+    \end{equation}
+
+    where $\tau$ is termed the \textit{transformer} and $c_i$ the \textit{i}-th \textit{conditioner}.
+    The transformer is a strictly monotonic function of $z_i$ (and therefore invertible), is parameterized by $\textbf{h}_i$, and specifies how the flow acts on $z_i$ in order to output $z_i^{\prime}$.
+    The conditioner determines the parameters of the transformer, and in turn, can modify the transformer's behavior.
+    The triangularity of the Jacobian is achieved by making the \textit{i}th conditioner only dependent on previous conditioners, with indices less than \textit{i}.
+    Autoregressive flows are universal approximators provided the transformer and the conditioner are flexible enough to represent any function arbitrarily well.
+    However, one drawback of autoregressive flows is that in the inverse computation $z_i = \tau ^{-1} (z_i ^{\prime}; \textbf{h}_i)$, all $\textbf{z}_{<i}$ need to have been computed before $z_i$, so that $\textbf{z}_{<i}$ is available to the conditioner for computing $\textbf{h}_i$.
+    In their review, \cite{papamakarios_normalizing_2019} list multiple implementations of the transformer and of the conditioner.
+
+    \subsubsection{The transformer}
+
+    The \textbf{affine transformer} controls the location with $\alpha_i$ and the scale with $\beta_i$:
+    \begin{equation}
+        \transformer = \alpha_i z_i +\beta _i \where \textbf{h}_i = {\alpha_1, \beta_i}
+    \end{equation}
+    Invertibility can be easily guaranteed by making sure that $\alpha _i \neq 0$ by taking $\alpha _i = \exp \tilde{\alpha _i}$.
+    Also the log absolute Jacobian determinant is easily computable with:
+    \begin{equation}
+        \log |\det J_{f_\phi}(\textbf{z})| = \sum _{i=1} ^{D} \log |\alpha _i| = \sum _{i=1} ^{D} \tilde{\alpha _i}.
+    \end{equation}
+    Because of their simplicity, affine autoregressive flows are very popular in the literature.
+    However, their expressiveness is limited, and it is unknown whether affine autoregressive flows with multiple layers are universal approximators or not.
+
+    \textbf{Non-affine neural transformers} present a way to construct the transformer as a multi-layer perceptron, by taking conic combinations instead in addition to compositions of transformations:
+    \begin{equation}
+        \label{eq:neural_tf}
+        \tau (z) = \sum _{k=1} ^{K} \omega_k \tau _k(z) \where\omega_k > 0\ \forall\ k
+    \end{equation}
+    When constructing the transformer using a conic combination of monotonically increasing activation functions (such as the sigmoid, tanh, ReLu, \ldots), \cref{eq:neural_tf} becomes a single-layer perceptron.
+    By repeatedly combining and composing monotonic activation functions, a multi-layer perceptron that is monotonic can be constructed, with the restriction that all its weights are strictly positive.
+    Because of the universal-approximation capabilities of multi-layer perceptrons, non-affine neural transformers can represent any function arbitrarily well \parencite{huang_neural_2018}.
+    However, non-affine neural transformers cannot be inverted analytically, and can be inverted only iteratively with a bijection search for example.
+
+    \subsubsection{The conditioner} \label{subsec:conditioner}
+    In theory, the conditioner $\conditioner$ can be implemented by any function of $\textbf{z}_{<i}$.
+    However, the main limitation being the scaling, it is not feasible to build each $h_i$ with a neural network.
+    In practice this problem is addressed by sharing parameters across the conditioners $\conditioner$.
+    One way to do that is via a recurrent neural network (RNN), such as a LSTM \parencite{hochreiter_long_1997} for example.
+    The main disadvantage of RNNs however is, that they turn the calculation of the transformations into a sequential operation, such that they can no longer be parallelized.
+
+    Another way to share parameters between the conditioners is via \textbf{masked autoregressive flows}, where the conditioners are computed at once by one neural network.
+    This can be achieved with a network that takes as input $\textbf{z}$ and outputs the entire sequence ($\textbf{h}_1, \ldotp, \textbf{h}_i$).
+    To keep the autoregressive structure, one can mask all connections that make one output dependent on all inputs $\textbf{z}_{\geq i}$.
+    \Cite{papamakarios_normalizing_2019} point out two main advantage of masked autoregressive flows: they are efficient to evaluate and they are universal approximators.
+    One disadvantage is however, that they create an imbalance in the efficiency of the evaluation and the inversion: they are not as efficient to invert as to evaluate.
+    This is because all $z_i$'s need to be computed sequentially.
+
+    A way to overcome this limitation is given by \textbf{coupling layers}, by making parameters ($\textbf{h}_1, \ldotp, \textbf{h}_d$) constants.
+    The rest of the parameters a calculated with a neural network like for the masked autoregressive flows:
+    \begin{equation}
+    (\textbf{h}_{d+1}, \ldotp, \textbf{h}_D)
+        = NN(\textbf{z}_{\leq d})
+    \end{equation}
+    This gives the following special structure of the Jacobian:
+    \begin{equation}
+        J_{f_{\phi}} = \begin{bmatrix}
+                           \textbf{I} & \textbf{0}\\
+                           \textbf{A} & \textbf{D}
+        \end{bmatrix}
+    \end{equation}
+    This structure makes the Jacobian easily computable, it is simply equal to the product of derivatives of the
+    transformers $\textbf{z}^{\prime}_{d+1:D}$.
+    The efficiency of coupling layers comes at the cost of reduced expressive power: a single coupling layer can not represent
+    any autoregressive transformation, regardless of how expressive the neural network is.
+    However the expressivity of the flow can be, in theory, arbitrarily increased by composing multiple coupling layers.
+    Coupling flows are very popular in the literature and used by state of the art models such as \citep[NICE, Glow, WaveGlow, Flow++]{dinh_nice_2015,kingma_glow_2018, prenger_waveglow_2019, ho_flow_2019}.
+    Showing that it's possible to obtain an universal approximator by composing strictly fewer than $O(D)$ coupling layers is still an open problem.
+
+    \subsection{Linear Flows}
+    A linear flow is essentially an invertible linear transformation of the form:
+    \begin{equation}
+        \textbf{z}^{\prime} = \textbf{W} \textbf{z},
+    \end{equation}
+    where $\textbf{W}$ is a $D \times D$ invertible matrix that parameterizes the transformation.
+    Linear flows are essential for autoregressive flows because in order to increase their flexibility, it is needed to permute the order of the input variables $\textbf{z}_{\leq i}$.
+    This permutation can be achieved by setting $\textbf{W}$ to a permutation matrix (i.e. a binary matrix with exactly one entry of 1 in each row and column and 0's everywhere else).
+    In practice, $\textbf{W}$ is a parameterized such that it is guaranteed to be invertible.
+
+    \subsection{Residual Flows}
+    Residual flows are similar to residual neural networks, between each transformation the identity function is given and any learned transformation is added to the input:
+    \begin{equation}
+        \label{eq:res_flow_eq}
+        \textbf{z}^{\prime} = \textbf{z} + g_{\phi} (\textbf{z})
+    \end{equation}
+    $g_{\phi} (\textbf{z})$ can be implemented by a neural network with parameters $\phi$ and that outputs a $D$-dimensional translation vector.
+
+    Unlike autoregressive flows, which are based on constraining the Jacobian to be sparse, residual flows have a dense Jacobian in general, which allows all input variables to affect all output variables.
+    As a result, residual flows can be very flexible and have demonstrated good results in practice \citep{chen_residual_2020}.
+
+    The invertibility of the transformation can be achieved by constraining $g_{\phi} (\textbf{z})$ accordingly \citep{behrmann_invertible_2019, chen_residual_2020}.
+    \cite{papamakarios_normalizing_2019} show two constraints that provide the required invertibility: \textit{contractive maps} and methods that rely on the \textit{matrix determinant lemma}.
+
+    It has been shown that residual transformations are invertible if $g_{\phi} (\textbf{z})$ can be made \textit{contractive} with respect to some distance function \citep{behrmann_invertible_2019, chen_residual_2020}.
+    However, unlike the one-pass density evaluation and sampling offered by flows based on coupling layers, exact density evaluation is computationally expensive and sampling is done iteratively for contractive residual flows, which limits their applicability in certain tasks.
+
+    The issue of the density evaluation for residual flows can be addressed with the \textit{matrix determinant lemma}.
+    It provides a tractable way to calculate the determinant of a matrix $\textbf{B}$, if it can be factorized into a special form:
+    \begin{equation}
+        \det\textbf{B} = \det\left(\textbf{A} + \textbf{V}\textbf{W}^T\right) = \det\left(\textbf{I} + \textbf{W}^T \textbf{A}^{-1}\textbf{V} \right)\det \textbf{A},
+    \end{equation}
+    where $\textbf{A}$ is an invertible matrix of size $D \times D$ and $\textbf{V}$, $\textbf{W}$ are matrices of size $D \times M$.
+    One example where the application of the matrix determinant lemma leads to an efficient Jacobian-determinant computation are \textit{Sylvester flows} in \citet{berg_sylvester_2019}, where $g_{\phi} (\textbf{z})$ from \cref{eq:res_flow_eq} is a one-layer neural network with $\textbf{M}$ hidden units:
+    \begin{equation}
+        \textbf{z} ^{\prime} = \textbf{z} + \textbf{V} \sigma \left ( \textbf{W}^T \textbf{z} + \textbf{b}\right).
+    \end{equation}
+    the Jacobian can then be written as:
+    \begin{equation}
+        J_{f_{\phi}}(\textbf{z}) = \textbf{I} + \textbf{V}\textbf{S}(\textbf{z})\textbf{W}^T,
+    \end{equation}
+    where $\textbf{S}(\textbf{z})$ is an $M \times M$ diagonal matrix whose diagonal entries are equal to $\sigma ^{\prime} \left( \textbf{W}^T \textbf{z} + \textbf{b} \right)$.
+    The matrix determinant lemma then provides that the determinant $\det J_{f_{\phi}}(\textbf{z})$ can be computed in $\mathcal{O}\left( M^3 + DM^2 \right)$.
+    Sylvester flows have $\mathcal{O}(D)$ Jacobian determinants, and can be made invertible by suitably restricting their parameters.
+    However, each individual transformation is fairly simple, and it's not clear how the flexibility of the flow can be increased other than by increasing the number of transformations.
+    For these reasons, these types of flow have mostly been used to approximate posteriors for variational autoencoders and rarely as generative models in their own right.
+
+
+    \section{Methods}
+    \subsection{Implementing the Normalizing Flows}
+    In order to arrive to a model that can efficiently and accurately approximate the joint posterior distribution of multi-modal data, I propose to start from the codebase used in \citet{sutter_generalized_2020}.
+    However, where the "Mixture-of-Products-of-Experts-VAE" (MoPoE-VAE) computes the joint posterior approximation in two steps: % todo mach das in backgrounds und referenziere es hier nur
+    by first computing the individual posterior approximations for each subset of the powerset $\powerset$
+    \begin{equation}
+        \tilde{q}_{\phi}(\textbf{z}|\xsubset)=PoE(\{q_{\phi_j}(\textbf{z}|\textbf{x}_j) \forall \textbf{x}_j \in \xsubset\}) \propto \prod _{\textbf{x}_j \in \xsubset}q_{\phi_j}(\textbf{z}|\textbf{x}_j)
+    \end{equation}
+    which are then fused to get the joint posterior:
+    \begin{equation}
+        q_{\phi}(\textbf{z}|\mathbb{X}) = \frac{1}{2^3} \sum _{\textbf{x}_k \in \mathbb{X}} \tilde{q}_{\phi} (\textbf{z}|\mathbb{X}_k),
+    \end{equation}
+
+    I propose to merge the posterior approximations of each of the M modalities $q_{\phi_i}(\textbf{z}|\{\xseti\}_{i=1}^M)$ using a parameterizable function:
+    \begin{equation}
+        \label{eq:merge_function}
+        f_{\psi}\left( \left\{ q_{\phi _i}(\textbf{z}|\textbf{x}_i)\ \forall\ \textbf{x}_i \in \xseti \right\} \right) = q_{\phi, \psi}(\textbf{z} | \xset).
+    \end{equation}
+
+    Because this function needs to be both differentiable, invertible and transform the individual latent representations into a complex enough joint representation, normalizing flows present themselves as an evident choice:
+    they are both invertible and differentiable, and can form arbitrarily complex distributions, depending on their implementation.
+    During this project, I will thus have to find a suitable implementation of normalizing flows, that provides a good tradeoff between computational complexity and quality of the joint latent distribution.
+    Appealing choices are the coupling layer's implementation of Autoregressive Flows or the sylvester flow's implementation of Residual Flows (see \Cref{subsec:conditioner}).
+    Both trade efficiency against expressiveness of the transformation, which appears like a good tradeoff supposing that the unimodal distributions in \Cref{eq:merge_function} only need to be merged and not changed substantially.
+
+    From \Cref{eq:merge_function} follows that the evidence lower bound (ELBO) on the marginal log-likelihood will be of the form:
+    \begin{equation}
+        \label{eq:elbo}
+        \mathcal{L}(\theta, \phi, \psi; \xset) \coloneqq \mathbb{E}_{\approxdistr}[\log p_{\theta}(\xset|\textbf{z})] - D_{KL} \left( \approxdistr ||p_{\theta}(\textbf{z})\right)
+    \end{equation}
+    In order to successfully apply \Cref{eq:elbo}, several problems need to be addressed.
+    For one, it will be necessary to find ways to efficiently calculate the KL-divergence between the joint posterior approximation and the prior.
+    In \citet{papamakarios_normalizing_2019}, the authors show that the KL-divergence in \Cref{eq:elbo} can be rewritten as:
+    \begin{equation}
+        \begin{split}
+            \mathcal{L}_{D_{KL}}(\theta, \phi, \psi; \xset) & =D_{KL} \left( \approxdistr || \truedistr \right)\\
+            & = \mathbb{E}_{\approxdistr}[\log \approxdistr - \log \truedistr]\\
+            & = - \mathbb{E}_{\truedistr}[\log \approxdistr] + const.\\
+            & =  - \mathbb{E}_{\truedistr}[\log p_u \left( T^{-1}(\textbf{z};\boldsymbol{\psi});\phi \right) + \log |\det J_{T^{-1}}(\textbf{z}; \boldsymbol{\psi})|] + const.
+        \end{split}
+    \end{equation}
+    In the last step, $T(\textbf{u},\boldsymbol{\psi})$ is the transformation from $p_{u,\phi}(\textbf{u})$ to $\approxdistr$.
+    The expectation over the true distribution $\truedistr$ can then be estimated by Monte Carlo, assuming a set of samples $\{\textbf{x}_n\}^N_{n=1}$ from $\truedistr$:
+    \begin{equation}
+        \label{eq:Dkl}
+        \mathcal{L}_{D_{KL}}(\phi, \psi) \approx - \frac{1}{N} \sum ^N _{n=1} \log p_u \left( T^{-1}(\textbf{z}_n;\boldsymbol{\psi});\phi \right) + \log |\det J_{T^{-1}}(\textbf{z}{_n}; \boldsymbol{\psi})| + const.
+    \end{equation}
+    The parameters $\boldsymbol{\phi}, \boldsymbol{\psi}$ can be optimized iteratively with stochastic gradient descent.
+    An unbiased estimate of the gradient of \Cref{eq:Dkl} can be obtained with respect to the parameters with:
+    \begin{subequations}
+        \begin{align}
+            \nabla _{\psi} \mathcal{L}_{D_{KL}}(\phi, \psi) & \approx - \frac{1}{N} \sum ^N _{n=1} \nabla _{\psi} \log p_u \left( T^{-1}(\textbf{z}_n;\boldsymbol{\psi});\phi \right) +  \nabla _{\psi}\log |\det J_{T^{-1}}(\textbf{z}_n; \boldsymbol{\psi})|\\
+            \nabla _{\phi} \mathcal{L}_{D_{KL}}(\phi, \psi) & \approx - \frac{1}{N} \sum ^N _{n=1} \nabla _{\phi} \log p_u \left( T^{-1}(\textbf{z}_n;\boldsymbol{\psi});\phi \right)
+        \end{align}
+    \end{subequations}
+
+    Since $p_u(\textbf{u}; \phi)$ is a Gaussian distribution, the update with respect to $\psi$ admits a closed-form maximum likelihood estimate.
+
+    It will also be necessary to find ways to efficiently sample from the joint posterior approximation given more than one modality.
+    In addition, if the normalizing flow is implemented by one neural network, how will the unimodal latent representations be given as inputs?
+    Can this be efficiently done channel-wise, by giving each subspace as input through a channel that are then merged with a convolution?
+    Or can the latent representation vectors simply be concatenated?
+
+    \subsection{Evaluation}
+    In order to evaluate the method, I propose to apply it to the toy dataset MNIST-SVHN-TEXT intruced in \citet{shi_variational_2019}.
+    This allows for an easy comparison between the new method and previous work on multi modal data generation \citep[MoPoE, MoE, PoE]{sutter_generalized_2020, shi_variational_2019, wu_multimodal_2018}.
+    In a second step, the new method can then be applied to the challenging medical dataset MIMIC-CXR \citep{johnson_mimic-cxr-jpg_2019} in order to evaluate it on real world applications.
+
+    For comparison to previous work, I propose to evaluate the separability of the latent representation, the generation quality, and the generation coherence.
+
+    \section{Objective}
+    This Master Project will consist of deriving a theoretical foundation as well as establishing a codebase in order to successfully create and evaluate a multi-modal VAE model that makes use of normalizing flows.
+    The theoretical foundation will need to be sound, and the codebase will need to be well documented and structured such that the results can be easily reproduced, verified and improved in future work.
+
+
+    - will use model from ...
+    - will use methods from ... to evaluate coherence and separability.
+    - will use fid score to evaluate generation quality
+    - will use ... toy datasets
+    - probably will not need as big flow as used in GLOW, because we only need the flow to merge the modalities.
+    - will I use autogregressive flows that have a sparse Jacobian (maybe enough?) or residual flows that have a dense Jacobian?
+    - how to make a codebase with which one can easily switch between methods and datasets, in a reproducible and interpretable manner.
+    - how to input unimodal spaces? channelwise?
+    - can a multimodel toy dataset be generated?
+
+
+
+    \printbibliography
+
+\end{document}
