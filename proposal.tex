@@ -232,7 +232,7 @@
     Because $f_{\psi}$ needs to be both differentiable, invertible and transform the individual latent representations into a complex enough joint representation, normalizing flows present themselves as an evident choice:
     they are both invertible and differentiable, and can form arbitrarily complex distributions, depending on their implementation.
     During this project, it will be necessary to find a suitable implementation of normalizing flows, that provides a good tradeoff between computational complexity and quality of the joint latent distribution.
-    Appealing choices are the coupling layer's implementation of Autoregressive Flows or the sylvester flow's implementation of Residual Flows (see \Cref{subsec:conditioner}).
+    Appealing choices are the coupling layer's implementation of Autoregressive Flows or the Sylvester flow's implementation of Residual Flows (see \Cref{subsec:conditioner}).
     Both trade efficiency against expressiveness of the transformation, which appears like a good tradeoff supposing that the unimodal distributions in \Cref{eq:merge_function} only need to be merged and not changed substantially.
 
     It follows that the evidence lower bound (ELBO) on the marginal log-likelihood will be of the form:
@@ -253,15 +253,16 @@
     \end{equation}
     In the last step, $T(\textbf{u},\boldsymbol{\psi})$ is the transformation from $p_{u,\phi}(\textbf{u})$ to $\approxdistr$, where $p_{u,\phi}(\textbf{u})$ is the distribution given by the encoder of the VAE.
 
-    The parameters $\boldsymbol{\phi}, \boldsymbol{\psi}$ can be optimized iteratively with stochastic gradient descent.
+    The parameters $\boldsymbol{\phi}, \boldsymbol{\psi}$ can be optimised iteratively with stochastic gradient descent.
     An unbiased estimate of the gradient of \Cref{eq:Dkl} can be obtained with respect to the parameters with:
-    \begin{equation}
+    \begin{equation}\label{eq:grad_Dkl}
         \nabla _{\psi} \mathcal{L}_{D_{KL}}(\phi, \psi) \approx - \frac{1}{N} \sum ^N _{n=1}   \nabla _{\psi}\log |\det J_{T}(\textbf{u}_n; \boldsymbol{\psi})| + \nabla _{\psi} \log p_{\theta}(T(\textbf{u}; \boldsymbol{\psi})).
     \end{equation}
-
+    
+    In order to apply normalising flows to multimodal data, it will be necessary to derive \cref{eq:Dkl} and \cref{eq:grad_Dkl} with $\textbf{u}$ being multimodal: $p_{u,\phi}(\textbf{u}) = \left\{ q_{\phi _i}(\textbf{z}|\textbf{x}_i)\ \forall\ \textbf{x}_i \in \xseti \right\}_{i=1}^M$.
 
     \subsection{Evaluation}
-    In order to evaluate the method, I propose to apply it to the toy dataset MNIST-SVHN-TEXT intruced in \citet{shi_variational_2019}.
+    In order to evaluate the method, I propose to apply it to the toy dataset MNIST-SVHN-TEXT introduced in \citet{shi_variational_2019}.
     This allows for an easy comparison between the new method and previous work on multi modal data generation \citep[MoPoE, MoE, PoE][]{sutter_generalized_2020, shi_variational_2019, wu_multimodal_2018}.
     In a second step, the new method can then be applied to the challenging medical dataset MIMIC-CXR \citep{johnson_mimic-cxr-jpg_2019} in order to evaluate it on real world applications.
 
