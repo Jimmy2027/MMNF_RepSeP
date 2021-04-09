@@ -1,0 +1,60 @@
+\documentclass[english]{article}
+\usepackage[utf8]{inputenc}
+\input{common_header.tex}
+
+\usepackage{bm}
+
+\usepackage{mathtools}
+\usepackage{amsthm}
+%\theoremstyle{definition}
+\newtheorem{definition}{Definition}
+\newtheorem{lemma}{Lemma}
+\usepackage[backend=bibtex,style=authoryear,natbib=true]{biblatex}
+
+\addbibresource{bib.bib}
+
+\title{Work in Progress}
+
+\date{}
+\begin{document}
+    \maketitle
+    
+
+    We want to merge the latent representations of each modality $\approxdistri$ with a parameterisable generalised f-mean $\pFmean$:
+        \begin{equation}\label{eq:merge_function}
+        q_{\phi, \psi}(\textbf{z} | \xset) = \mathcal{M}_{f_{\psi}}\left( \left\{ q_{\phi _i}(\textbf{z}|\textbf{x}_i)\ \forall\ \textbf{x}_i \in \xseti \right\} \right) = f_{\psi}^{-1}\left( \frac{1}{N} \sum ^N _{i=1} f_{\psi}(q_{\phi _i}(\textbf{z}|\textbf{x}_i)) \right)
+    \end{equation}
+    
+    How to compute the KL-divergence between the joint posterior approximation and the prior $\DklTrueApprox$?
+    
+    \subsection*{Arithmetic Mean}
+    If we take $f_{\psi}(\textbf{z}) = a\textbf{z} + b$, then \cref{eq:merge_function} becomes an arithmetic mean:
+    \begin{equation}
+    \begin{split}
+    \Cref{eq:merge_function} & = \frac{\frac{1}{N} \sum ^N _{i=1} (a \cdot \approxdistri + b) -b }{a}\\
+    & = \frac{1}{N} \sum ^N _{i=1} \approxdistri
+    \end{split}
+    \end{equation}
+    \begin{lemma}[Joint Approximation Function \citep{sutter_multimodal_2020}]\label{lemma:DklLowerBound}
+    The KL-divergence of the multimodal variational posterior approximation is a lower bound for the weighted sum of the KL-divergences of the unimodal variational approximation functions:
+    \begin{equation}
+        D_{KL} \left( \sum _{i=1} ^N \frac{1}{N}\approxdistri\ ||\ \truedistr \right) \leq \sum _{i=1} ^N \frac{1}{N} D_{KL} \left( \approxdistri\ ||\ \truedistr \right)
+    \end{equation}
+    \end{lemma}
+    
+    From \Cref{lemma:DklLowerBound} follows that the multimodal ELBO can be approximated with:
+    \begin{equation}
+        \mathcal{L}(\theta, \phi; \xset) \geq \mathbb{E}_{q_{\phi}(\textbf{z}|\xset)}[\log p_{\theta}(\xset|\textbf{z})] - \sum _{i=1} ^N \frac{1}{N} D_{KL} \left( \approxdistri\ ||\ \truedistr \right)
+    \end{equation}
+    The sum of KL-divergences can then be calculated in closed form if prior distribution $\truedistr$ and unimodal posterior approximations $\approxdistri$ are both Gaussian distributed \citep{sutter_multimodal_2020}.
+    
+    \subsection*{Planar Flow}
+    If we take for $f_{\psi}$ a planar flow, i.e. $f_{\psi}(\textbf{z}) = \textbf{z} + \textbf{v}\sigma (\textbf{w}^T\textbf{z} + b)$, then:
+    \begin{equation}
+        \DklTrueApprox = D_{KL} \left(f_{\psi}^{-1}\left( \frac{1}{N} \sum ^N _{i=1} \textbf{z}_i +\textbf{v} \sigma (\textbf{w}^T \textbf{z}_i +b) \right) ||\ \truedistr \right)
+    \end{equation}
+    
+\newpage
+
+\printbibliography
+\end{document}
