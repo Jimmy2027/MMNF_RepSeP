@@ -6,6 +6,9 @@
 
 \usepackage[backend=bibtex,style=authoryear,natbib=true]{biblatex}
 \usepackage{mathtools}
+\usepackage{amsthm}
+%\theoremstyle{definition}
+\newtheorem{definition}{Definition}
 
 \addbibresource{bib.bib}
 
@@ -20,7 +23,7 @@
 
 
     \section{Introduction}
-    The availability of multiple data types provides a rich source of information and holds promise for learning representations that generalize well across multiple modalities \cite{baltrusaitis_multimodal_2019}.
+    The availability of multiple data types provides a rich source of information and holds promise for learning representations that generalize well across multiple modalities \parencite{baltrusaitis_multimodal_2019}.
     Multimodal data naturally grants additional self-supervision in the form of shared information connecting the different data types.
     Further, the understanding of different modalities and the interplay between data types are non-trivial research questions and longstanding goals in machine learning research.
     While fully-supervised approaches have been applied successfully \parencite{karpathy_deep_2015,tsai_learning_2018}, the labeling of multiple data types remains time-consuming and expensive.
@@ -33,23 +36,39 @@
     These requirements are not inherent to the objective: the evidence lower bound (ELBO) of uni-modal VAEs.
     Hence, adaptions to the original formulation are required to cater to and benefit from multiple data types.
 
-    Normalizing flows represent an approach for specifying flexible, arbitrarily complex and scalable approximate posterior distributions, introduced for variational inference by \cite{rezende_variational_2016}.
+    Normalizing flows represent an approach for specifying flexible, arbitrarily complex and scalable approximate posterior distributions \parencite{papamakarios_normalizing_2019,rezende_variational_2016}.
     They consist of transforming a simple initial density into a more complex one by applying a sequence of invertible transformations until a desired level of complexity is attained.
-    The goal of this project is to use normalizing flows as a parameterizable function $f_\psi$ which combines the latent variables of multiple data types.
+    For this project, I propose to use normalizing flows as a parameterizable function $f_\psi$ which combines the latent variables of multiple data types.
     Normalizing flows are optimal for this task since they can transform simple initial densities into arbitrarily complex ones and vice versa.
-    The transformation being invertible, it is possible to sample from the constructed joint posterior distribution to acquire the latent variables for each modality that can then be fed into the corresponding decoders of a VAE.
+%    The transformation being invertible, it is possible to sample from the constructed joint posterior distribution to acquire the latent variables for each modality that can then be fed into the corresponding decoders of a VAE.
 
     Normalizing flows became very popular in the past years, and many methods already exist for different applications, however they have not yet been used to create a joint latent representation from multiple data types for VAEs.
-    The task in this project is to find an adequate implementation of normalizing flows, i.e. the best tradeoff between the complexity of the achieved joint latent representation and the computational feasibility, and evaluate it on existing multimodal datasets.
+    The task in this project is to find an adequate implementation of normalizing flows, i.e. the best tradeoff between the complexity of the resulting joint latent representation and the computational feasibility, and evaluate it on existing multimodal datasets.
     To this end, I would first compare simpler methods, with a less good approximation of the true joint posterior but less computationally expensive, with more complex methods on toy datasets.
     The ultimate goal being to construct a method that can learn a separable \footnote{separable in the sense that the joint latent representation can be separated into the different classes that span the dataset} joint latent representation from which coherent \footnote{coherent in the sense that all generated samples belong to the same class} samples can be generated on the challenging MIMIC-CXR \parencite{johnson_mimic-cxr-jpg_2019} database.
 
 
     \section{Background}
-    %    todo: write about previous work on merging data modalities in the latent space.
+
+    \subsection{Previous work on Multimodal Generative Learning} \label{subsec:prevwork_mopoe}
+    Previous work on self-supervised multimodal generative models has shown that the class of generalized f-means provides a good tool for combining multiple modalities in a dataset.
+    In \citep[PoE]{wu_multimodal_2018}, the Product of Experts uses of a geometric mean and in \citep[MoE]{shi_variational_2019}, the Mixture of Experts uses an arithmetic mean.
+    More recently, the authors of \citep[MoPoE]{sutter_generalized_2020} improved on previous results by using a combination of a geometric mean and an arithmetic mean.
+    Their Mixture of Product of Experts (MoPoE) computes the joint posterior approximation in two steps:\\
+    By first computing the individual posterior approximations for each subset of the powerset $\powerset$:
+    \begin{equation}
+        \tilde{q}_{\phi}(\textbf{z}|\xsubset)=PoE(\{q_{\phi_j}(\textbf{z}|\textbf{x}_j) \forall \textbf{x}_j \in \xsubset\}) \propto \prod _{\textbf{x}_j \in \xsubset}q_{\phi_j}(\textbf{z}|\textbf{x}_j)
+    \end{equation}
+    which are then fused to get the joint posterior:
+    \begin{equation}
+        q_{\phi}(\textbf{z}|\mathbb{X}) = \frac{1}{2^3} \sum _{\textbf{x}_k \in \mathbb{X}} \tilde{q}_{\phi} (\textbf{z}|\mathbb{X}_k),
+    \end{equation}
+    The MoPoE achieves state of the art results on the datasets PolyMNIST (introduced in \citet{sutter_multimodal_2020}) and the celebA faces dataset \citep{liu_deep_2015}.
+
+    \subsection{Previous work on Normalizing Flows}
     In practice, flow-based models are typically constructed by implementing a diffeomorphic transformation T (or $T^{-1}$) with a neural network.
     Because invertible and differentiable transforms are composable, complex transformations can be built by composing multiple instances of simples ones: $T=T_K \circ \cdots \circ T_1$.
-    Because a flow-based model can be sampled from and it's density can be evaluated, it can be easily integrated into the bottleneck of a VAE.
+    A flow-based model can be sampled from, and it's density can be evaluated, such that it can be easily integrated into the bottleneck of a VAE.
     The sampling can be achieved with:
     \begin{equation}
         \textbf{x} = T(\textbf{u}) \where \textbf{u} \sim \udensity
@@ -66,12 +85,10 @@
 
     In \cite{papamakarios_normalizing_2019}, the authors give an overview of existing methods and applications of normalizing flows and discuss the computational tradeoffs for each.
     Papamakarios et al. separate the field of finite compositions of flows into three categories: Autoregressive flows, Linear flows and Residual flows.
-    For this project, flows constructed with continuous-time transformations are not taken into account as they are not deemed relevant for the application.
-    One reason for that is the numerical complexity that continuous-time transformations bring when solving the equations needed for sampling and density estimation.
 
     \subsection{Autoregressive flows}
     The class of \textit{autoregressive flows} are a direct implementation of flows that are built such that the Jacobian in \cref{eq:density} is triangular.
-    In particular $f_{\theta}$ is specified to have the following form (as described by \cite{papamakarios_normalizing_2019}):
+    In particular, $f_{\theta}$ is specified to have the following form (as described by \cite{papamakarios_normalizing_2019}):
     \begin{equation}
         z_i^{\prime} = \transformer \where \textbf{h}_i = \conditioner
     \end{equation}
@@ -98,7 +115,7 @@
     Because of their simplicity, affine autoregressive flows are very popular in the literature.
     However, their expressiveness is limited, and it is unknown whether affine autoregressive flows with multiple layers are universal approximators or not.
 
-    \textbf{Non-affine neural transformers} present a way to construct the transformer as a multi-layer perceptron, by taking conic combinations instead in addition to compositions of transformations:
+    \textbf{Non-affine neural transformers} present a way to construct the transformer as a multi-layer perceptron, by taking conic combinations in addition to compositions of transformations:
     \begin{equation}
         \label{eq:neural_tf}
         \tau (z) = \sum _{k=1} ^{K} \omega_k \tau _k(z) \where\omega_k > 0\ \forall\ k
@@ -118,7 +135,7 @@
     Another way to share parameters between the conditioners is via \textbf{masked autoregressive flows}, where the conditioners are computed at once by one neural network.
     This can be achieved with a network that takes as input $\textbf{z}$ and outputs the entire sequence ($\textbf{h}_1, \ldotp, \textbf{h}_i$).
     To keep the autoregressive structure, one can mask all connections that make one output dependent on all inputs $\textbf{z}_{\geq i}$.
-    \Cite{papamakarios_normalizing_2019} point out two main advantage of masked autoregressive flows: they are efficient to evaluate and they are universal approximators.
+    \Cite{papamakarios_normalizing_2019} point out two main advantages of masked autoregressive flows: they are efficient to evaluate and they are universal approximators.
     One disadvantage is however, that they create an imbalance in the efficiency of the evaluation and the inversion: they are not as efficient to invert as to evaluate.
     This is because all $z_i$'s need to be computed sequentially.
 
@@ -140,7 +157,7 @@
     The efficiency of coupling layers comes at the cost of reduced expressive power: a single coupling layer can not represent
     any autoregressive transformation, regardless of how expressive the neural network is.
     However the expressivity of the flow can be, in theory, arbitrarily increased by composing multiple coupling layers.
-    Coupling flows are very popular in the literature and used by state of the art models such as \citep[NICE, Glow, WaveGlow, Flow++]{dinh_nice_2015,kingma_glow_2018, prenger_waveglow_2019, ho_flow_2019}.
+    Coupling flows are very popular in the literature and used by state of the art models such as \citep[NICE, Glow, WaveGlow, Flow++][]{dinh_nice_2015,kingma_glow_2018, prenger_waveglow_2019, ho_flow_2019}.
     Showing that it's possible to obtain an universal approximator by composing strictly fewer than $O(D)$ coupling layers is still an open problem.
 
     \subsection{Linear Flows}
@@ -192,31 +209,33 @@
 
 
     \section{Methods}
-    \subsection{Implementing the Normalizing Flows}
-    In order to arrive to a model that can efficiently and accurately approximate the joint posterior distribution of multi-modal data, I propose to start from the codebase used in \citet{sutter_generalized_2020}.
-    However, where the "Mixture-of-Products-of-Experts-VAE" (MoPoE-VAE) computes the joint posterior approximation in two steps: % todo mach das in backgrounds und referenziere es hier nur
-    by first computing the individual posterior approximations for each subset of the powerset $\powerset$
-    \begin{equation}
-        \tilde{q}_{\phi}(\textbf{z}|\xsubset)=PoE(\{q_{\phi_j}(\textbf{z}|\textbf{x}_j) \forall \textbf{x}_j \in \xsubset\}) \propto \prod _{\textbf{x}_j \in \xsubset}q_{\phi_j}(\textbf{z}|\textbf{x}_j)
-    \end{equation}
-    which are then fused to get the joint posterior:
-    \begin{equation}
-        q_{\phi}(\textbf{z}|\mathbb{X}) = \frac{1}{2^3} \sum _{\textbf{x}_k \in \mathbb{X}} \tilde{q}_{\phi} (\textbf{z}|\mathbb{X}_k),
+
+    \subsection{Implementation of the Normalizing Flow}
+    In order to arrive to a model that can efficiently and accurately approximate the joint posterior distribution of multimodal data, I propose to start from the codebase used in \citet{sutter_generalized_2020}.
+    However, where the "Mixture-of-Products-of-Experts-VAE" (MoPoE-VAE) computes the joint posterior approximation in two steps as shown in \cref{subsec:prevwork_mopoe}, the task of this project is to merge the posterior approximations of each of the M modalities $q_{\phi_i}(\textbf{z}|\{\xseti\}_{i=1}^M)$ using a parameterizable function.
+    A possible implementation of the fusion of the posterior approximations are generalized f-means \citep{niculescu_convex_2018}.
+    In previous work, the arithmetic mean and the geometric mean have been used  \citep[PoE,MoE,MoPoE]{wu_multimodal_2018,shi_variational_2019,sutter_generalized_2020}, which belong to the class of generalized f-means.
+    In this sense, using a parameterizable generalized f-means extends and generalizes previous work.
+    \begin{definition}
+        If f is both continuous and injective, the f-mean $\mathcal{M}_f$ is defined as:
+        \begin{equation}
+             \mathcal{M}_{f}\left( \textbf{x} \right) = f^{-1}\left( \frac{1}{N} \sum ^N _{i=1} f(\textbf{x}_i)) \right)
+        \end{equation}
+    \end{definition}
+
+    Applying a f-mean with parameters $\psi$ to the unimodal posterior approximations $q_{\phi _i}(\textbf{z}|\textbf{x}_i)$ gives:
+
+    \begin{equation}\label{eq:merge_function}
+        q_{\phi, \psi}(\textbf{z} | \xset) = \mathcal{M}_{f_{\psi}}\left( \left\{ q_{\phi _i}(\textbf{z}|\textbf{x}_i)\ \forall\ \textbf{x}_i \in \xseti \right\} \right) = f_{\psi}^{-1}\left( \frac{1}{N} \sum ^N _{i=1} f_{\psi}(q_{\phi _i}(\textbf{z}|\textbf{x}_i)) \right)
     \end{equation}
 
-    I propose to merge the posterior approximations of each of the M modalities $q_{\phi_i}(\textbf{z}|\{\xseti\}_{i=1}^M)$ using a parameterizable function:
-    \begin{equation}
-        \label{eq:merge_function}
-        f_{\psi}\left( \left\{ q_{\phi _i}(\textbf{z}|\textbf{x}_i)\ \forall\ \textbf{x}_i \in \xseti \right\} \right) = q_{\phi, \psi}(\textbf{z} | \xset).
-    \end{equation}
-
-    Because this function needs to be both differentiable, invertible and transform the individual latent representations into a complex enough joint representation, normalizing flows present themselves as an evident choice:
+    Because $f_{\psi}$ needs to be both differentiable, invertible and transform the individual latent representations into a complex enough joint representation, normalizing flows present themselves as an evident choice:
     they are both invertible and differentiable, and can form arbitrarily complex distributions, depending on their implementation.
-    During this project, I will thus have to find a suitable implementation of normalizing flows, that provides a good tradeoff between computational complexity and quality of the joint latent distribution.
+    During this project, it will be necessary to find a suitable implementation of normalizing flows, that provides a good tradeoff between computational complexity and quality of the joint latent distribution.
     Appealing choices are the coupling layer's implementation of Autoregressive Flows or the sylvester flow's implementation of Residual Flows (see \Cref{subsec:conditioner}).
     Both trade efficiency against expressiveness of the transformation, which appears like a good tradeoff supposing that the unimodal distributions in \Cref{eq:merge_function} only need to be merged and not changed substantially.
 
-    From \Cref{eq:merge_function} follows that the evidence lower bound (ELBO) on the marginal log-likelihood will be of the form:
+    It follows that the evidence lower bound (ELBO) on the marginal log-likelihood will be of the form:
     \begin{equation}
         \label{eq:elbo}
         \mathcal{L}(\theta, \phi, \psi; \xset) \coloneqq \mathbb{E}_{\approxdistr}[\log p_{\theta}(\xset|\textbf{z})] - D_{KL} \left( \approxdistr ||p_{\theta}(\textbf{z})\right)
@@ -225,59 +244,52 @@
     For one, it will be necessary to find ways to efficiently calculate the KL-divergence between the joint posterior approximation and the prior.
     In \citet{papamakarios_normalizing_2019}, the authors show that the KL-divergence in \Cref{eq:elbo} can be rewritten as:
     \begin{equation}
+        \label{eq:Dkl}
         \begin{split}
             \mathcal{L}_{D_{KL}}(\theta, \phi, \psi; \xset) & =D_{KL} \left( \approxdistr || \truedistr \right)\\
             & = \mathbb{E}_{\approxdistr}[\log \approxdistr - \log \truedistr]\\
-            & = - \mathbb{E}_{\truedistr}[\log \approxdistr] + const.\\
-            & =  - \mathbb{E}_{\truedistr}[\log p_u \left( T^{-1}(\textbf{z};\boldsymbol{\psi});\phi \right) + \log |\det J_{T^{-1}}(\textbf{z}; \boldsymbol{\psi})|] + const.
+            & = \mathbb{E}_{p_{u,\phi}(\textbf{u})}[\log p_{u,\phi} \left(\textbf{u} \right) - \log |\det J_{T}(\textbf{u}; \boldsymbol{\psi})|- \log p_{\theta}(T(\textbf{u}; \boldsymbol{\psi}))].
         \end{split}
     \end{equation}
-    In the last step, $T(\textbf{u},\boldsymbol{\psi})$ is the transformation from $p_{u,\phi}(\textbf{u})$ to $\approxdistr$.
-    The expectation over the true distribution $\truedistr$ can then be estimated by Monte Carlo, assuming a set of samples $\{\textbf{x}_n\}^N_{n=1}$ from $\truedistr$:
-    \begin{equation}
-        \label{eq:Dkl}
-        \mathcal{L}_{D_{KL}}(\phi, \psi) \approx - \frac{1}{N} \sum ^N _{n=1} \log p_u \left( T^{-1}(\textbf{z}_n;\boldsymbol{\psi});\phi \right) + \log |\det J_{T^{-1}}(\textbf{z}{_n}; \boldsymbol{\psi})| + const.
-    \end{equation}
+    In the last step, $T(\textbf{u},\boldsymbol{\psi})$ is the transformation from $p_{u,\phi}(\textbf{u})$ to $\approxdistr$, where $p_{u,\phi}(\textbf{u})$ is the distribution given by the encoder of the VAE.
+
     The parameters $\boldsymbol{\phi}, \boldsymbol{\psi}$ can be optimized iteratively with stochastic gradient descent.
     An unbiased estimate of the gradient of \Cref{eq:Dkl} can be obtained with respect to the parameters with:
-    \begin{subequations}
-        \begin{align}
-            \nabla _{\psi} \mathcal{L}_{D_{KL}}(\phi, \psi) & \approx - \frac{1}{N} \sum ^N _{n=1} \nabla _{\psi} \log p_u \left( T^{-1}(\textbf{z}_n;\boldsymbol{\psi});\phi \right) +  \nabla _{\psi}\log |\det J_{T^{-1}}(\textbf{z}_n; \boldsymbol{\psi})|\\
-            \nabla _{\phi} \mathcal{L}_{D_{KL}}(\phi, \psi) & \approx - \frac{1}{N} \sum ^N _{n=1} \nabla _{\phi} \log p_u \left( T^{-1}(\textbf{z}_n;\boldsymbol{\psi});\phi \right)
-        \end{align}
-    \end{subequations}
+    \begin{equation}
+        \nabla _{\psi} \mathcal{L}_{D_{KL}}(\phi, \psi) \approx - \frac{1}{N} \sum ^N _{n=1}   \nabla _{\psi}\log |\det J_{T}(\textbf{u}_n; \boldsymbol{\psi})| + \nabla _{\psi} \log p_{\theta}(T(\textbf{u}; \boldsymbol{\psi})).
+    \end{equation}
 
-    Since $p_u(\textbf{u}; \phi)$ is a Gaussian distribution, the update with respect to $\psi$ admits a closed-form maximum likelihood estimate.
-
-    It will also be necessary to find ways to efficiently sample from the joint posterior approximation given more than one modality.
-    In addition, if the normalizing flow is implemented by one neural network, how will the unimodal latent representations be given as inputs?
-    Can this be efficiently done channel-wise, by giving each subspace as input through a channel that are then merged with a convolution?
-    Or can the latent representation vectors simply be concatenated?
 
     \subsection{Evaluation}
     In order to evaluate the method, I propose to apply it to the toy dataset MNIST-SVHN-TEXT intruced in \citet{shi_variational_2019}.
-    This allows for an easy comparison between the new method and previous work on multi modal data generation \citep[MoPoE, MoE, PoE]{sutter_generalized_2020, shi_variational_2019, wu_multimodal_2018}.
+    This allows for an easy comparison between the new method and previous work on multi modal data generation \citep[MoPoE, MoE, PoE][]{sutter_generalized_2020, shi_variational_2019, wu_multimodal_2018}.
     In a second step, the new method can then be applied to the challenging medical dataset MIMIC-CXR \citep{johnson_mimic-cxr-jpg_2019} in order to evaluate it on real world applications.
 
     For comparison to previous work, I propose to evaluate the separability of the latent representation, the generation quality, and the generation coherence.
 
+
     \section{Objective}
-    This Master Project will consist of deriving a theoretical foundation as well as establishing a codebase in order to successfully create and evaluate a multi-modal VAE model that makes use of normalizing flows.
+    This Master Project will consist of deriving a theoretical foundation as well as establishing a codebase in order to successfully create and evaluate a multimodal VAE model that makes use of normalizing flows.
     The theoretical foundation will need to be sound, and the codebase will need to be well documented and structured such that the results can be easily reproduced, verified and improved in future work.
-
-
-    - will use model from ...
-    - will use methods from ... to evaluate coherence and separability.
-    - will use fid score to evaluate generation quality
-    - will use ... toy datasets
-    - probably will not need as big flow as used in GLOW, because we only need the flow to merge the modalities.
-    - will I use autogregressive flows that have a sparse Jacobian (maybe enough?) or residual flows that have a dense Jacobian?
-    - how to make a codebase with which one can easily switch between methods and datasets, in a reproducible and interpretable manner.
-    - how to input unimodal spaces? channelwise?
-    - can a multimodel toy dataset be generated?
-
-
 
     \printbibliography
 
+%    \newpage
+%    \begin{equation}
+%        \textbf{z}_{Sylvester}^\prime =f(\textbf{z})=  \textbf{z} + \textbf{A}  h(\textbf{B}\textbf{z} + \textbf{b})
+%    \end{equation}
+%    \begin{equation}
+%        \det \left( \frac{d \textbf{z}_{Sylvester}^\prime}{d \textbf{z}}  \right)= \det(\textbf{I}_M + \text{diag} (h^\prime (\textbf{B} \textbf{z} + \textbf{b}))\textbf{B}\textbf{A})
+%    \end{equation}
+%    What I want:
+%    \begin{equation}
+%        \textbf{z}^\prime =f(\textbf{z}^{(0)}, \ldots, \textbf{z}^{(m)})= \sum _{i=0} ^m \textbf{z}^{(i)} + \textbf{A}^{(i)}  h^{(i)}(\textbf{B}^{(i)}\textbf{z}^{(i)} + \textbf{b}^{(i)})
+%    \end{equation}
+%    with $\textbf{z}^{(i)}, \textbf{z}^\prime \in \mathbb{R}^{D}, \textbf{A}^{(i)} \in \mathbb{R}^{D\times M},   \textbf{B}^{(i)} \in \mathbb{R}^{M\times D}, \textbf{b}^{(i)} \in \mathbb{R}^{M}$ and $M\leq D$.
+%
+%
+%
+%    $\rightarrow J(\textbf{z}^\prime) \in \mathbb{R}^{M\times M} $ not diagonal.
+%    \newline
+%    What if $\textbf{z}^{(i)}, \textbf{z}^\prime \in \mathbb{R}^{m*D}$?
 \end{document}
