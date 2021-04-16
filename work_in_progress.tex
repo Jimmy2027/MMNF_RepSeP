@@ -51,7 +51,10 @@
     \subsection*{Planar Flow}
     If we take for $f_{\psi}$ a planar flow, i.e. $f_{\psi}(\textbf{z}) = \textbf{z} + \textbf{v}\sigma (\textbf{w}^T\textbf{z} + b)$, then:
     \begin{equation}
-        \DklTrueApprox = D_{KL} \left(f_{\psi}^{-1}\left( \frac{1}{N} \sum ^N _{i=1} \textbf{z}_i +\textbf{v} \sigma (\textbf{w}^T \textbf{z}_i +b) \right) ||\ \truedistr \right)
+    \begin{split}
+               \DklTrueApprox &=D_{KL} \left( \mathcal{M}_{f_{\psi}}\left( q_{\phi _i}(\textbf{z}|\textbf{x}_i) \right) ||\ \truedistr \right)\\
+               &=D_{KL} \left(f_{\psi}^{-1}\left( \frac{1}{N} \sum ^N _{i=1} \textbf{z}_i +\textbf{v} \sigma (\textbf{w}^T \textbf{z}_i +b) \right) ||\ \truedistr \right) 
+    \end{split}
     \end{equation}
     
 \newpage

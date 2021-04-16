@@ -64,7 +64,7 @@
     \end{equation}
     The MoPoE achieves state of the art results on the datasets PolyMNIST (introduced in \citet{sutter_multimodal_2020}) and the celebA faces dataset \citep{liu_deep_2015}.
 
-    \subsection{Previous work on Normalizing Flows}
+    \subsection{Previous work on Normalizing Flows}\label{subsec:prev_work_nf}
     In practice, flow-based models are typically constructed by implementing a diffeomorphic transformation T (or $T^{-1}$) with a neural network.
     Because invertible and differentiable transforms are composable, complex transformations can be built by composing multiple instances of simpler ones: $T=T_K \circ \cdots \circ T_1$.
     A flow-based model can be sampled from, and it's density can be evaluated, such that it can be easily integrated into the bottleneck of a VAE.
@@ -85,7 +85,7 @@
     In \cite{papamakarios_normalizing_2019}, the authors give an overview of existing methods and applications of normalizing flows and discuss the computational trade-offs for each.
     Papamakarios et al. separate the field of finite compositions of flows into three categories: Autoregressive flows, Linear flows and Residual flows.
 
-    \subsection{Autoregressive flows}
+    \subsubsection{Autoregressive flows}
     The class of \textit{autoregressive flows} are a direct implementation of flows that are built such that the Jacobian in \cref{eq:density} is triangular.
     In particular, $f_{\theta}$ is specified to have the following form (as described by \cite{papamakarios_normalizing_2019}):
     \begin{equation}
@@ -99,9 +99,9 @@
     Autoregressive flows are universal approximators provided the transformer and the conditioner are flexible enough to represent any function arbitrarily well.
     However, one drawback of autoregressive flows is that in the inverse computation $z_i = \tau ^{-1} (z_i ^{\prime}; \textbf{h}_i)$, all $\textbf{z}_{<i}$ need to have been computed before $z_i$, so that $\textbf{z}_{<i}$ is available to the conditioner for computing $\textbf{h}_i$.
     In their review, \cite{papamakarios_normalizing_2019} list multiple implementations of the transformer and of the conditioner.
-
-    \subsubsection{The transformer}
-
+\newline
+    \textbf{The transformer}
+\newline
     The \textbf{affine transformer} controls the location with $\alpha_i$ and the scale with $\beta_i$:
     \begin{equation}
         \transformer = \alpha_i z_i +\beta _i \where \textbf{h}_i = {\alpha_1, \beta_i}
@@ -123,8 +123,9 @@
     By repeatedly combining and composing monotonic activation functions, a multi-layer perceptron that is monotonic can be constructed, with the restriction that all its weights are strictly positive.
     Because of the universal-approximation capabilities of multi-layer perceptrons, non-affine neural transformers can represent any function arbitrarily well \parencite{huang_neural_2018}.
     However, non-affine neural transformers cannot be inverted analytically, and can be inverted only iteratively with a bijection search for example.
-
-    \subsubsection{The conditioner} \label{subsec:conditioner}
+    \newline
+    \textbf{The conditioner}
+    \newline
     In theory, the conditioner $\conditioner$ can be implemented by any function of $\textbf{z}_{<i}$.
     However, the main limitation being the scaling, it is not feasible to build each $h_i$ with a neural network.
     In practice this problem is addressed by sharing parameters across the conditioners $\conditioner$.
@@ -159,7 +160,7 @@
     Coupling flows are very popular in the literature and used by state of the art models such as \citep[NICE, Glow, WaveGlow, Flow++][]{dinh_nice_2015,kingma_glow_2018, prenger_waveglow_2019, ho_flow_2019}.
     Showing that it's possible to obtain an universal approximator by composing strictly fewer than $O(D)$ coupling layers is still an open problem.
 
-    \subsection{Linear Flows}
+    \subsubsection{Linear Flows}
     A linear flow is essentially an invertible linear transformation of the form:
     \begin{equation}
         \textbf{z}^{\prime} = \textbf{W} \textbf{z},
@@ -169,7 +170,7 @@
     This permutation can be achieved by setting $\textbf{W}$ to a permutation matrix (i.e. a binary matrix with exactly one entry of 1 in each row and column and 0's everywhere else).
     In practice, $\textbf{W}$ is a parameterised such that it is guaranteed to be invertible.
 
-    \subsection{Residual Flows}
+    \subsubsection{Residual Flows}
     Residual flows are similar to residual neural networks, between each transformation the identity function is given and any learned transformation is added to the input:
     \begin{equation}
         \label{eq:res_flow_eq}
@@ -231,7 +232,7 @@
     Because $f_{\psi}$ needs to be both differentiable, invertible and transform the individual latent representations into a complex enough joint representation, normalizing flows present themselves as an evident choice:
     they are both invertible and differentiable, and can form arbitrarily complex distributions, depending on their implementation.
     During this project, it will be necessary to find a suitable implementation of normalizing flows, that provides a good tradeoff between computational complexity and quality of the joint latent distribution.
-    Appealing choices are the coupling layer's implementation of Autoregressive Flows or the Sylvester flow's implementation of Residual Flows (see \Cref{subsec:conditioner}).
+    Appealing choices are the coupling layer's implementation of Autoregressive Flows or the Sylvester flow's implementation of Residual Flows (see \Cref{subsec:prev_work_nf}).
     Both trade efficiency against expressiveness of the transformation, which appears like a good tradeoff supposing that the unimodal distributions in \Cref{eq:merge_function} only need to be merged and not changed substantially.
 
     It follows that the evidence lower bound (ELBO) on the marginal log-likelihood will be of the form:
