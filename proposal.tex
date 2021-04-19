@@ -98,77 +98,79 @@
     The triangularity of the Jacobian is achieved by making the \textit{i}th conditioner only dependent on previous conditioners, with indices less than \textit{i}.
     Autoregressive flows are universal approximators provided the transformer and the conditioner are flexible enough to represent any function arbitrarily well.
     However, one drawback of autoregressive flows is that in the inverse computation $z_i = \tau ^{-1} (z_i ^{\prime}; \textbf{h}_i)$, all $\textbf{z}_{<i}$ need to have been computed before $z_i$, so that $\textbf{z}_{<i}$ is available to the conditioner for computing $\textbf{h}_i$.
-    In their review, \cite{papamakarios_normalizing_2019} list multiple implementations of the transformer and of the conditioner.
-\newline
-    \textbf{The transformer}
-\newline
-    The \textbf{affine transformer} controls the location with $\alpha_i$ and the scale with $\beta_i$:
-    \begin{equation}
-        \transformer = \alpha_i z_i +\beta _i \where \textbf{h}_i = {\alpha_1, \beta_i}
-    \end{equation}
-    Invertibility can be easily guaranteed by making sure that $\alpha _i \neq 0$ by taking $\alpha _i = \exp \tilde{\alpha _i}$.
-    Also the log absolute Jacobian determinant is easily computable with:
-    \begin{equation}
-        \log |\det J_{f_\phi}(\textbf{z})| = \sum _{i=1} ^{D} \log |\alpha _i| = \sum _{i=1} ^{D} \tilde{\alpha _i}.
-    \end{equation}
-    Because of their simplicity, affine autoregressive flows are very popular in the literature.
-    However, their expressiveness is limited, and it is unknown whether affine autoregressive flows with multiple layers are universal approximators or not.
 
-    \textbf{Non-affine neural transformers} present a way to construct the transformer as a multi-layer perceptron, by taking conic combinations in addition to compositions of transformations:
-    \begin{equation}
-        \label{eq:neural_tf}
-        \tau (z) = \sum _{k=1} ^{K} \omega_k \tau _k(z) \where\omega_k > 0\ \forall\ k
-    \end{equation}
-    When constructing the transformer using a conic combination of monotonically increasing activation functions (such as the sigmoid, tanh, ReLu, \ldots), \cref{eq:neural_tf} becomes a single-layer perceptron.
-    By repeatedly combining and composing monotonic activation functions, a multi-layer perceptron that is monotonic can be constructed, with the restriction that all its weights are strictly positive.
-    Because of the universal-approximation capabilities of multi-layer perceptrons, non-affine neural transformers can represent any function arbitrarily well \parencite{huang_neural_2018}.
-    However, non-affine neural transformers cannot be inverted analytically, and can be inverted only iteratively with a bijection search for example.
-    \newline
-    \textbf{The conditioner}
-    \newline
-    In theory, the conditioner $\conditioner$ can be implemented by any function of $\textbf{z}_{<i}$.
-    However, the main limitation being the scaling, it is not feasible to build each $h_i$ with a neural network.
-    In practice this problem is addressed by sharing parameters across the conditioners $\conditioner$.
-    One way to do that is via a recurrent neural network (RNN), such as a LSTM \parencite{hochreiter_long_1997} for example.
-    The main disadvantage of RNNs however is, that they turn the calculation of the transformations into a sequential operation, such that they can no longer be parallelized.
+    State of the art methods that are using autoregressive flows include \citep[][NICE, Flow++, Glow, PixelCNN]{dinh_nice_2015, ho_flow_2019, kingma_glow_2018, oord_conditional_2016}.
 
-    Another way to share parameters between the conditioners is via \textbf{masked autoregressive flows}, where the conditioners are computed at once by one neural network.
-    This can be achieved with a network that takes as input $\textbf{z}$ and outputs the entire sequence ($\textbf{h}_1, \ldotp, \textbf{h}_i$).
-    To keep the autoregressive structure, one can mask all connections that make one output dependent on all inputs $\textbf{z}_{\geq i}$.
-    \Cite{papamakarios_normalizing_2019} point out two main advantages of masked autoregressive flows: they are efficient to evaluate and they are universal approximators.
-    One disadvantage is however, that they create an imbalance in the efficiency of the evaluation and the inversion: they are not as efficient to invert as to evaluate.
-    This is because all $z_i$'s need to be computed sequentially.
+%\newline
+%    \textbf{The transformer}
+%\newline
+%    The \textbf{affine transformer} controls the location with $\alpha_i$ and the scale with $\beta_i$:
+%    \begin{equation}
+%        \transformer = \alpha_i z_i +\beta _i \where \textbf{h}_i = {\alpha_1, \beta_i}
+%    \end{equation}
+%    Invertibility can be easily guaranteed by making sure that $\alpha _i \neq 0$ by taking $\alpha _i = \exp \tilde{\alpha _i}$.
+%    Also the log absolute Jacobian determinant is easily computable with:
+%    \begin{equation}
+%        \log |\det J_{f_\phi}(\textbf{z})| = \sum _{i=1} ^{D} \log |\alpha _i| = \sum _{i=1} ^{D} \tilde{\alpha _i}.
+%    \end{equation}
+%    Because of their simplicity, affine autoregressive flows are very popular in the literature.
+%    However, their expressiveness is limited, and it is unknown whether affine autoregressive flows with multiple layers are universal approximators or not.
+%
+%    \textbf{Non-affine neural transformers} present a way to construct the transformer as a multi-layer perceptron, by taking conic combinations in addition to compositions of transformations:
+%    \begin{equation}
+%        \label{eq:neural_tf}
+%        \tau (z) = \sum _{k=1} ^{K} \omega_k \tau _k(z) \where\omega_k > 0\ \forall\ k
+%    \end{equation}
+%    When constructing the transformer using a conic combination of monotonically increasing activation functions (such as the sigmoid, tanh, ReLu, \ldots), \cref{eq:neural_tf} becomes a single-layer perceptron.
+%    By repeatedly combining and composing monotonic activation functions, a multi-layer perceptron that is monotonic can be constructed, with the restriction that all its weights are strictly positive.
+%    Because of the universal-approximation capabilities of multi-layer perceptrons, non-affine neural transformers can represent any function arbitrarily well \parencite{huang_neural_2018}.
+%    However, non-affine neural transformers cannot be inverted analytically, and can be inverted only iteratively with a bijection search for example.
+%    \newline
+%    \textbf{The conditioner}
+%    \newline
+%    In theory, the conditioner $\conditioner$ can be implemented by any function of $\textbf{z}_{<i}$.
+%    However, the main limitation being the scaling, it is not feasible to build each $h_i$ with a neural network.
+%    In practice this problem is addressed by sharing parameters across the conditioners $\conditioner$.
+%    One way to do that is via a recurrent neural network (RNN), such as a LSTM \parencite{hochreiter_long_1997} for example.
+%    The main disadvantage of RNNs however is, that they turn the calculation of the transformations into a sequential operation, such that they can no longer be parallelized.
+%
+%    Another way to share parameters between the conditioners is via \textbf{masked autoregressive flows}, where the conditioners are computed at once by one neural network.
+%    This can be achieved with a network that takes as input $\textbf{z}$ and outputs the entire sequence ($\textbf{h}_1, \ldotp, \textbf{h}_i$).
+%    To keep the autoregressive structure, one can mask all connections that make one output dependent on all inputs $\textbf{z}_{\geq i}$.
+%    \Cite{papamakarios_normalizing_2019} point out two main advantages of masked autoregressive flows: they are efficient to evaluate and they are universal approximators.
+%    One disadvantage is however, that they create an imbalance in the efficiency of the evaluation and the inversion: they are not as efficient to invert as to evaluate.
+%    This is because all $z_i$'s need to be computed sequentially.
+%
+%    A way to overcome this limitation is given by \textbf{coupling layers}, by making parameters ($\textbf{h}_1, \ldotp, \textbf{h}_d$) constants.
+%    The rest of the parameters a calculated with a neural network like for the masked autoregressive flows:
+%    \begin{equation}
+%    (\textbf{h}_{d+1}, \ldotp, \textbf{h}_D)
+%        = NN(\textbf{z}_{\leq d})
+%    \end{equation}
+%    This gives the following special structure of the Jacobian:
+%    \begin{equation}
+%        J_{f_{\phi}} = \begin{bmatrix}
+%                           \textbf{I} & \textbf{0}\\
+%                           \textbf{A} & \textbf{D}
+%        \end{bmatrix}
+%    \end{equation}
+%    This structure makes the Jacobian easily computable, it is simply equal to the product of derivatives of the
+%    transformers $\textbf{z}^{\prime}_{d+1:D}$.
+%    The efficiency of coupling layers comes at the cost of reduced expressive power: a single coupling layer can not represent
+%    any autoregressive transformation, regardless of how expressive the neural network is.
+%    However the expressivity of the flow can be, in theory, arbitrarily increased by composing multiple coupling layers.
+%    Coupling flows are very popular in the literature and used by state of the art models such as \citep[NICE, Glow, WaveGlow, Flow++][]{dinh_nice_2015,kingma_glow_2018, prenger_waveglow_2019, ho_flow_2019}.
+%    Showing that it's possible to obtain an universal approximator by composing strictly fewer than $O(D)$ coupling layers is still an open problem.
 
-    A way to overcome this limitation is given by \textbf{coupling layers}, by making parameters ($\textbf{h}_1, \ldotp, \textbf{h}_d$) constants.
-    The rest of the parameters a calculated with a neural network like for the masked autoregressive flows:
-    \begin{equation}
-    (\textbf{h}_{d+1}, \ldotp, \textbf{h}_D)
-        = NN(\textbf{z}_{\leq d})
-    \end{equation}
-    This gives the following special structure of the Jacobian:
-    \begin{equation}
-        J_{f_{\phi}} = \begin{bmatrix}
-                           \textbf{I} & \textbf{0}\\
-                           \textbf{A} & \textbf{D}
-        \end{bmatrix}
-    \end{equation}
-    This structure makes the Jacobian easily computable, it is simply equal to the product of derivatives of the
-    transformers $\textbf{z}^{\prime}_{d+1:D}$.
-    The efficiency of coupling layers comes at the cost of reduced expressive power: a single coupling layer can not represent
-    any autoregressive transformation, regardless of how expressive the neural network is.
-    However the expressivity of the flow can be, in theory, arbitrarily increased by composing multiple coupling layers.
-    Coupling flows are very popular in the literature and used by state of the art models such as \citep[NICE, Glow, WaveGlow, Flow++][]{dinh_nice_2015,kingma_glow_2018, prenger_waveglow_2019, ho_flow_2019}.
-    Showing that it's possible to obtain an universal approximator by composing strictly fewer than $O(D)$ coupling layers is still an open problem.
-
-    \subsubsection{Linear Flows}
-    A linear flow is essentially an invertible linear transformation of the form:
-    \begin{equation}
-        \textbf{z}^{\prime} = \textbf{W} \textbf{z},
-    \end{equation}
-    where $\textbf{W}$ is a $D \times D$ invertible matrix that parameterises the transformation.
-    Linear flows are essential for autoregressive flows because in order to increase their flexibility, it is needed to permute the order of the input variables $\textbf{z}_{\leq i}$.
-    This permutation can be achieved by setting $\textbf{W}$ to a permutation matrix (i.e. a binary matrix with exactly one entry of 1 in each row and column and 0's everywhere else).
-    In practice, $\textbf{W}$ is a parameterised such that it is guaranteed to be invertible.
+%    \subsubsection{Linear Flows}
+%    A linear flow is an invertible linear transformation of the form:
+%    \begin{equation}
+%        \textbf{z}^{\prime} = \textbf{W} \textbf{z},
+%    \end{equation}
+%    where $\textbf{W}$ is a $D \times D$ invertible matrix that parameterises the transformation.
+%    Linear flows are essential for autoregressive flows because in order to increase their flexibility, it is needed to permute the order of the input variables $\textbf{z}_{\leq i}$.
+%    This permutation can be achieved by setting $\textbf{W}$ to a permutation matrix (i.e. a binary matrix with exactly one entry of 1 in each row and column and 0's everywhere else).
+%    In practice, $\textbf{W}$ is a parameterised such that it is guaranteed to be invertible.
 
     \subsubsection{Residual Flows}
     Residual flows are similar to residual neural networks, between each transformation the identity function is given and any learned transformation is added to the input:
@@ -180,30 +182,7 @@
 
     Unlike autoregressive flows, which are based on constraining the Jacobian to be sparse, residual flows have a dense Jacobian in general, which allows all input variables to affect all output variables.
     As a result, residual flows can be very flexible and have demonstrated good results in practice \citep{chen_residual_2020}.
-
-    The invertibility of the transformation can be achieved by constraining $g_{\phi} (\textbf{z})$ accordingly \citep{behrmann_invertible_2019, chen_residual_2020}.
-    \cite{papamakarios_normalizing_2019} show two constraints that provide the required invertibility: \textit{contractive maps} and methods that rely on the \textit{matrix determinant lemma}.
-
-    It has been shown that residual transformations are invertible if $g_{\phi} (\textbf{z})$ can be made \textit{contractive} with respect to some distance function \citep{behrmann_invertible_2019, chen_residual_2020}.
-    However, unlike the one-pass density evaluation and sampling offered by flows based on coupling layers, exact density evaluation is computationally expensive and sampling is done iteratively for contractive residual flows, which limits their applicability in certain tasks.
-
-    The issue of the density evaluation for residual flows can be addressed with the \textit{matrix determinant lemma}.
-    It provides a tractable way to calculate the determinant of a matrix $\textbf{B}$, if it can be factorised into a special form:
-    \begin{equation}
-        \det\textbf{B} = \det\left(\textbf{A} + \textbf{V}\textbf{W}^T\right) = \det\left(\textbf{I} + \textbf{W}^T \textbf{A}^{-1}\textbf{V} \right)\det \textbf{A},
-    \end{equation}
-    where $\textbf{A}$ is an invertible matrix of size $D \times D$ and $\textbf{V}$, $\textbf{W}$ are matrices of size $D \times M$.
-    One example where the application of the matrix determinant lemma leads to an efficient Jacobian-determinant computation are \textit{Sylvester flows} in \citet{berg_sylvester_2019}, where $g_{\phi} (\textbf{z})$ from \cref{eq:res_flow_eq} is a one-layer neural network with $\textbf{M}$ hidden units:
-    \begin{equation}
-        \textbf{z} ^{\prime} = \textbf{z} + \textbf{V} \sigma \left ( \textbf{W}^T \textbf{z} + \textbf{b}\right).
-    \end{equation}
-    the Jacobian can then be written as:
-    \begin{equation}
-        J_{f_{\phi}}(\textbf{z}) = \textbf{I} + \textbf{V}\textbf{S}(\textbf{z})\textbf{W}^T,
-    \end{equation}
-    where $\textbf{S}(\textbf{z})$ is an $M \times M$ diagonal matrix whose diagonal entries are equal to $\sigma ^{\prime} \left( \textbf{W}^T \textbf{z} + \textbf{b} \right)$.
-    The matrix determinant lemma then provides that the determinant $\det J_{f_{\phi}}(\textbf{z})$ can be computed in $\mathcal{O}\left( M^3 + DM^2 \right)$.
-    Sylvester flows have $\mathcal{O}(D)$ Jacobian determinants, and can be made invertible by suitably restricting their parameters.
+    Sylvester flows \citep{berg_sylvester_2019} in particular provide a method to have $\mathcal{O}(D)$ Jacobians and they can be made invertible by suitably restricting their parameters.
     However, each individual transformation is fairly simple, and it's not clear how the flexibility of the flow can be increased other than by increasing the number of transformations.
     For these reasons, these types of flow have mostly been used to approximate posteriors for variational autoencoders and rarely as generative models in their own right.
 
@@ -262,7 +241,7 @@
     In order to apply normalising flows to multimodal data, it will be necessary to derive \cref{eq:Dkl} and \cref{eq:grad_Dkl} with $\textbf{u}$ being multimodal: $p_{u,\phi}(\textbf{u}) = \left\{ q_{\phi _i}(\textbf{z}|\textbf{x}_i)\ \forall\ \textbf{x}_i \in \xseti \right\}_{i=1}^M$.
 
     \subsection{Evaluation}
-    In order to evaluate the method, I propose to apply it to the toy dataset MNIST-SVHN-TEXT introduced in \citet{shi_variational_2019}.
+    To evaluate the method, I propose to apply it to the toy dataset MNIST-SVHN-TEXT introduced in \citet{sutter_generalized_2020}.
     This allows for an easy comparison between the new method and previous work on multi modal data generation \citep[MoPoE, MoE, PoE][]{sutter_generalized_2020, shi_variational_2019, wu_multimodal_2018}.
     In a second step, the new method can then be applied to the challenging medical dataset MIMIC-CXR \citep{johnson_mimic-cxr-jpg_2019} in order to evaluate it on real world applications.
 
@@ -273,6 +252,7 @@
     This Master Project will consist of deriving a theoretical foundation as well as establishing a codebase in order to successfully create and evaluate a multimodal VAE model that makes use of normalizing flows.
     The theoretical foundation will need to be sound, and the codebase will need to be well documented and structured such that the results can be easily reproduced, verified and improved in future work.
 
+    \newpage
     \printbibliography
 
 %    \newpage
