@@ -1,0 +1,78 @@
+% Preamble
+\documentclass[11pt]{article}
+
+% Packages
+\usepackage{amsmath}
+\usepackage[backend=bibtex,style=authoryear,natbib=true]{biblatex}
+\usepackage{amsfonts}
+\usepackage{wasysym}
+
+\addbibresource{bib.bib}
+
+\newcommand{\logposterior}{ \log Q(z|X)}
+
+\title{Flow of Mixture}
+
+\date{}
+
+% Document
+\begin{document}
+    \maketitle
+    For variational inference, we want to find a function $Q(z|X)$ that can map any input X to a distribution over latent
+    variables z, that are likely to produce X.
+    From those, $P(X)$ can then be evaluated.
+    To find the $Q(z|X)$ which approximates best the true probability $P(z|X)$ we write:
+
+    \begin{equation}
+        \begin{split}
+            & D(Q(z|X) || P(z|X)) = \mathbb{E}_q [\logposterior - \log P(z|X)]\\
+            & = \mathbb{E}_q [\logposterior - \log \frac{P(X,z)}{P(X)}]\\
+            & \Rightarrow D(Q(z|X) || P(z|X)) - P(X) = \mathbb{E}_q [\logposterior - \log P(X,z)]\\
+            & = \mathbb{E}_q [\logposterior - \log P(X|z)P(z)]
+        \end{split}
+    \end{equation}
+
+    The likelihood of X can then be bounded with:
+
+    \begin{equation}
+        \begin{split}
+            & P(X) = D(Q(X|z) || P(z|X)) - \mathbb{E}_q [\logposterior] + \mathbb{E}_q [\log P(X|z)+\log P(z)]\\
+            & = D(Q(X|z) || P(z|X)) + \mathbb{E}_q [\log \frac{\log P(X|z) \log P(z)}{Q(z|X) }]\\
+            & \geq \mathbb{E}_q [\log \frac{\log P(X|z) \log P(z)}{Q(z|X) }] \quad \text{because} \quad D_{KL} \geq 0\\
+            & = \mathbb{E}_q [\log P(X|z)] - D(Q(z|X) ||P(z))
+        \end{split}
+    \end{equation}
+
+    In a multimodal setting, with N modalities, one can try to merge the posteriors with a parameterizable function
+    $f_{\psi}$, such as a normalizing flow which takes as input a mixture of the gaussian posteriors, inferred by
+    encoder networks.
+    This results in a divergence that can be estimated with:
+    \begin{equation}
+        \begin{split}
+            & D\left(f_{\psi}(\tilde{q}(z|X)) || P(z) \right) \quad \text{where} \quad \tilde{q}(z|X)) = \sum ^N q_{\phi_{i}} (z | X_i)\\
+            &  = \mathbb{E}_{\tilde{q_{0}}} \left[ \log \tilde{q_{0}}(\textbf{z}_0|X) -\log P(z) \right] - \mathbb{E}_{\tilde{q_{0}}}\left[ \sum_{k=1}^{N} \log \left| \det \left( \frac{d f_k (\textbf{z}_{k-1}; \lambda_k (\textbf{x}))}{d\textbf{z}_{k-1}} \right) \right| \right]
+        \end{split}
+    \end{equation}
+
+    Due to the convexity of the KL-Divergence, the first term can be approximated with:
+    \begin{equation}
+        D \left(\sum ^N q_{\phi_{i}} (z | X_i) || P(z) \right) \leq \sum ^N D \left( q_{\phi_{i}} (z | X_i) || P(z) \right)
+    \end{equation}
+
+    Which provides a tractable way to compute the evidence lower bound:
+
+    \begin{equation}
+        \begin{split}
+            &P(X) \geq \mathbb{E}_q [\log P(X|z)] - D(f_{\psi}(\tilde{q}(z|X)) ||P(z))\\
+            & \geq \mathbb{E}_q [\log P(X|z)] - \left(  \sum ^N D \left( q_{\phi_{i}} (z | X_i) || P(z) \right) - \mathbb{E}_{\tilde{q_{0}}}\left[ \sum_{k=1}^{N} \log \left| \det \left( \frac{d f_k (\textbf{z}_{k-1}; \lambda_k (\textbf{x}))}{d\textbf{z}_{k-1}} \right) \right| \right]  \right)
+        \end{split}
+    \end{equation}
+
+    $\Rightarrow$ minimize loss:
+
+    \begin{equation}
+        \mathcal{L} = - \mathbb{E}_q [\log P(X|z)] \ + \ \left(  \sum ^N D \left( q_{\phi_{i}} (z | X_i) || P(z) \right) - \mathbb{E}_{\tilde{q_{0}}}\left[ \sum_{k=1}^{N} \log \left| \det \left( \frac{d f_k (\textbf{z}_{k-1}; \lambda_k (\textbf{x}))}{d\textbf{z}_{k-1}} \right) \right| \right]  \right)
+    \end{equation}
+
+    \printbibliography
+\end{document}

@@ -1,0 +1,31 @@
+% Preamble
+\documentclass[11pt]{article}
+
+% Packages
+\usepackage{amsmath}
+
+% Document
+\begin{document}
+    I have a set of $N$ Gaussian distributions $\{\mathcal{X}_i \sim \mathcal{N}(\mu _i, \sigma _i), i \in \{1, \dots, N\}\}$ of which I want to minimize the Kullback-Leibler divergence $D_{KL}$ of their quasi arithmetic mean $\mathcal{M}$ with a standard normal distribution $Q \sim \mathcal{N}(0,I)$:
+    $$D_{KL}(\mathcal{M}) = D_{KL}\left(f^{-1}\left(\sum ^{N} _i \frac{f(\mathcal{X}_i)}{N}\right)\ ||\ Q\right)$$
+
+    Since the quasi arithmetic mean of Normal distributions is itself not Normal distributed anymore, the divergence is hard to compute.
+    So I am trying to find some upper bound that can be computed in closed form and that I can minimize instead:
+    $$D_{KL}^{\prime} \geq D_{KL}(\mathcal{M})$$
+
+    Knowing that:
+    \begin{itemize}
+        \item the KL-divergence is convex
+        \item the quasi arithmetic mean of a set is always larger than the smallest point and smaller than the largest point in the set
+    \end{itemize}
+
+    I was thinking of using Jensen's inequality to find an upper bound.
+    But I'm not sure how to deal with the fact I'm dealing with probability distributions.
+    \newline
+
+    For context, it is easy to find an upper bound of an arithmetic mean (special case of the quasi arithmetic mean where $f(z_i) = az_i +b$) of Normal distributions using Jensen's inequality:
+    $$D_{KL} \left( \sum _{i=1} ^N \frac{\mathcal{N}(\mu _i, \sigma_i^2)}{N}\ ||\ \mathcal{N}(0, I) \right) \leq \sum _{i=1} ^N \frac{1}{N} D_{KL} \left( \mathcal{N}(\mu _i, \sigma_i^2)\ ||\ \mathcal{N}(0, I) \right)$$
+    where the right hand side can be computed in closed form.
+
+
+\end{document}

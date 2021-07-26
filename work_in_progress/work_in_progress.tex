@@ -62,6 +62,22 @@
         \end{split}
     \end{equation}
 
+    \subsubsection*{Without the inverse}
+    \begin{equation}
+        \begin{split}
+            \DklTrueApprox &= D_{KL} \left(\frac{1}{N} \sum ^N _{i=1}  f_{\psi} (q_{\phi _i}(\textbf{z}|\textbf{x}_i))||\ \truedistr \right)\\
+            & \leq \frac{1}{N} \sum ^N _{i=1} D_{KL} \left(f_{\psi} (q_{\phi _i}(\textbf{z}|\textbf{x}_i))||\ \truedistr \right) \quad (\cref{lemma:DklLowerBound})\\
+            &= \frac{1}{N} \sum ^N _{i=1} D_{KL}^{(i)}
+        \end{split}
+    \end{equation}
+
+    where each individual divergence can be calculated like in \citet{berg_sylvester_2019}:
+    \begin{equation}
+        \begin{split}
+            D_{KL}^{(i)} &= \mathbb{E}_{q_{\phi _i,\psi}} \left[ \log q_{\phi _i,\psi}(\textbf{z}|\textbf{x}_i) - \log \truedistr \right]\\
+            &= \mathbb{E}_{q_{0}} \left[ \log q_{0}(\textbf{z}_0|\textbf{x}_i) -\log \truedistr \right] - \mathbb{E}_{q_0}\left[ \sum_{k=1}^{K} \log \left| \det \left( \frac{d f_k (\textbf{z}_{k-1}; \lambda_k (\textbf{x}))}{d\textbf{z}_{k-1}} \right) \right| \right]
+        \end{split}
+    \end{equation}
     \newpage
 
     \printbibliography

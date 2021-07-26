@@ -1,0 +1,43 @@
+% Preamble
+\documentclass[11pt]{article}
+
+% Packages
+\usepackage{mathtools}
+\usepackage{amsthm}
+\usepackage{amsmath}
+\usepackage[backend=bibtex,style=authoryear,natbib=true]{biblatex}
+\usepackage{amsfonts}
+\usepackage{textcomp}
+
+\addbibresource{bib.bib}
+
+\newcommand{\logposterior}{ \log Q(z|X)}
+
+\title{Generalized f-mean with planar flows}
+
+\date{}
+
+% Document
+\begin{document}
+    \maketitle
+    \textbf{Idea}: Can transform \textit{joint\_mu} and \textit{joint\_logvar} independently in order to keep a Gaussian distribution.
+
+    Planar flow: $f_{\psi}(\textbf{z}) = \textbf{z} + \textbf{v}\sigma (\textbf{w}^T\textbf{z} + b)$.
+
+    \vspace{\baselineskip}
+
+    For 3 modalities this would give:
+    \begin{equation}
+        \mathcal{M}_f(\mu _1,\mu_2, \mu _3) = f^{-1}(\frac{f(\mu _1) + f(\mu _2) + f(\mu _3)}{3})
+    \end{equation}
+
+    Problem: when using amortized planar flows, each flow's parameters are dependent on the input \textrightarrow
+    hard to compute the inverse.
+
+    \vspace{\baselineskip}
+
+    Instead of making parameters dependent on $h^{(i)}$, could use an aggregation of all $h^{(i)}$'s.
+
+
+    \printbibliography
+\end{document}
