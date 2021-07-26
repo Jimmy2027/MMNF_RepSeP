@@ -17,16 +17,24 @@ if [[ "$TARGET" = "all" ]] || [[ "$TARGET" == "" ]]; then
 	done
 else
 	pdflatex -shell-escape "${TARGET}.tex" || { echo "Initial pdflatex failed"; exit $ERRCODE; }
-	pythontex "${TARGET}.tex" || { echo "PythonTeX failed"; exit $ERRCODE; }
-	pdflatex -shell-escape "${TARGET}.tex" || { echo "pdflatex failed after PythonTeX"; exit $ERRCODE; }
-	bibtex "${TARGET}" || { echo "bibtex failed"; exit $ERRCODE; }
+
+#  Only execute pythontex if indicated in latex file
+	first_line=$(head -n 1 "${TARGET}.tex")
+  if [ "${first_line}" = "% pythontex" ]; then
+    	pythontex "${TARGET}.tex" || { echo "PythonTeX failed"; exit $ERRCODE; }
+	    pdflatex -shell-escape "${TARGET}.tex" || { echo "pdflatex failed after PythonTeX"; exit $ERRCODE; }
+  fi
+
+	bibtex "$(basename "${TARGET}")" || { echo "bibtex failed"; exit $ERRCODE; }
 	pdflatex -shell-escape "${TARGET}.tex" || { echo "pdflatex failed after bibtex"; exit $ERRCODE; }
 	pdflatex -shell-escape "${TARGET}.tex"
 	if [ ! -d logs ]; then
 	  mkdir logs
 	fi
 
-	for CLEAN_TARGET in "*.aux" "*.log" "*.out" "*.bbl" "*.pytxcode" "*blx.bib" "*.blg" "*.run.xml"; do
+	for CLEAN_TARGET in "*.aux" "*.log" "*.out" "*.bbl" "*.pytxcode" "*blx.bib" "*.blg" "*.run.xml" "*.bcf"; do
 	  mv $CLEAN_TARGET logs/
   done
+
+  python scripts/upload.py "$(pwd)/$(basename "${TARGET}.pdf")"
 fi
