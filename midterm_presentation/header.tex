@@ -1,0 +1,46 @@
+\documentclass[xcolor=table,aspectratio=169,dvipsnames,english]{beamer}
+\usepackage{bm}
+\usepackage[utf8]{inputenc}
+\usepackage{color}
+
+\input{common_header.tex}
+
+%BIBLIOGRAPHY
+% see https://mirror.foobar.to/CTAN/macros/latex/contrib/biblatex/doc/biblatex.pdf for available styles
+\usepackage[backend=bibtex,style=authoryear,natbib=true]{biblatex}
+\addbibresource{bib.bib}
+
+% Article-specific configuration
+\begin{pythontexcustomcode}[begin]{py}
+DOC_STYLE="midterm_presentation/main.conf"
+pytex.add_dependencies(
+	DOC_STYLE,
+	)
+\end{pythontexcustomcode}
+
+% Custom beamer styling and colors
+\setbeamersize{text margin left=0.8em,text margin right=0.8em}
+\setbeamertemplate{bibliography item}{\insertbiblabel}
+
+\usecolortheme[RGB={199,199,199}]{structure}
+\usetheme{default}
+
+\captionsetup[figure]{labelformat=empty}
+
+\definecolor{dy}{RGB}{202,202,0}
+\definecolor{rsblue}{HTML}{00a3cc}
+\definecolor{mg}{gray}{0.30}
+\definecolor{lg}{gray}{0.60}
+\definecolor{vlg}{gray}{0.78}
+\definecolor{tlg}{gray}{0.88}
+
+\setbeamercolor{caption name}{fg=lg}
+\setbeamercolor{caption}{fg=lg}
+\setbeamercolor{author}{fg=lg}
+\setbeamercolor{institute}{fg=lg}
+\setbeamercolor{date}{fg=lg}
+\setbeamercolor{title}{fg=mg}
+\setbeamertemplate{caption}{\centering\insertcaption\par}
+\setbeamertemplate{navigation symbols}{}
+
+

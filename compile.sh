@@ -21,7 +21,8 @@ else
 #  Only execute pythontex if indicated in latex file
 	first_line=$(head -n 1 "${TARGET}.tex")
   if [ "${first_line}" = "% pythontex" ]; then
-    	pythontex "${TARGET}.tex" || { echo "PythonTeX failed"; exit $ERRCODE; }
+    	pythontex "$(basename "${TARGET}").tex" || { echo "PythonTeX failed"; exit $ERRCODE; }
+#    	pythontex "${TARGET}.tex" || { echo "PythonTeX failed"; exit $ERRCODE; }
 	    pdflatex -shell-escape "${TARGET}.tex" || { echo "pdflatex failed after PythonTeX"; exit $ERRCODE; }
   fi
 
@@ -36,5 +37,5 @@ else
 	  mv $CLEAN_TARGET logs/
   done
 
-  python scripts/upload.py "$(pwd)/$(basename "${TARGET}.pdf")"
+  python scripts_/upload.py "$(pwd)/$(basename "${TARGET}.pdf")"
 fi

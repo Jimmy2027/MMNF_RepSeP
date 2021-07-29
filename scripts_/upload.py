@@ -6,7 +6,8 @@ from pathlib import Path
 
 filename2zotkey = {
     "proposal": "UFJLUPV7",
-    "work_in_progress": "VQKH6WID"
+    "work_in_progress": "VQKH6WID",
+    "midterm_slides": "IW6HY8IC",
 }
 
 zot_storage_path = Path('~/Zotero/storage').expanduser()
