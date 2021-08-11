@@ -1,0 +1,68 @@
+
+\begin{frame}{Parameters}
+    \py{
+        pytex_tab(
+        script='midterm_presentation/scripts/params_tab.py',
+        options_pre='\\centering \\resizebox{0.9\\textwidth}{!}{',
+        options_post='}',
+        caption='Hyperparameters that were selected using a hyperparameter search with Optuna \citep{akiba_optuna_2019}.',
+        )
+    }
+
+\end{frame}
+
+
+
+\begin{frame}{The mixture of $f$-mean}
+\begin{equation*}
+        \begin{split}
+        & \mathbb{E}_{q_{\phi}(\textbf{z}|\mathbb{X})}[\log (p_{\theta}(\mathbb{X}|\textbf{z}))] - D_{KL}\biggl( \frac{1}{2^M} \sum _{\mathbb{X}_k \in \mathcal{P}(\mathbb{X})} \tilde{q}_{\phi}(\textbf{z}|\mathbb{X}_k)\ ||\ p_{\theta}(\textbf{z})\biggr)\\
+        & \geq \mathbb{E}_{q_{\phi}(\textbf{z}|\mathbb{X})}[\log (p_{\theta}(\mathbb{X}|\textbf{z}))] - \frac{1}{2^M} \sum _{\mathbb{X}_k \in \mathcal{P}(\mathbb{X})}  D_{KL}\biggl(  \tilde{q}_{\phi}(\textbf{z}|\mathbb{X}_k)\ ||\ p_{\theta}(\textbf{z})\biggr) \\
+        & \approx \mathbb{E}_{q_{\phi}(\textbf{z}|\mathbb{X})}[\log (p_{\theta}(\mathbb{X}|\textbf{z}))] -\frac{1}{2^M} \sum _{\mathbb{X}_k \in \mathcal{P}(\mathbb{X})}\text{mean}(\left\{ l_1,\ldots,l_N \right\}) \\
+        & \text{with } l_n=y_n\cdot(\log y_n -x_n) \text{ and } x_n \sim q_{\phi}(z|\mathbb{X}_k);\ y_n \sim q_{\theta}\\
+        & \text{and } \textbf{z} ^{\prime} = MoE(\{\frac{1}{K} \sum ^K _{i=1} (z_i \sim \tilde{q}_{\phi}(z|\mathbb{X}_k))\ \forall\ \mathbb{X}_k \in \mathcal{P}(\mathbb{X})\})
+    \end{split}
+\end{equation*}
+\end{frame}
+
+
+
+\begin{frame}{Preliminary Results}{Qualitative Evaluation}
+    \begin{figure}
+        \centering
+        \resizebox{0.9\textwidth}{!}{%
+            \py{boilerplate.make_cond_gen_fig(which='m1_m2__m0', methods=['mopoe','mopgfm', 'mogfm'])}
+        }
+    \end{figure}
+\end{frame}
+
+\begin{frame}{Preliminary Results}{Qualitative Evaluation}
+    \begin{figure}
+        \centering
+        \resizebox{0.85\textwidth}{!}{%
+            \py{boilerplate.make_cond_gen_fig(which='m0_m1_m2__m2', methods=['mopoe','mopgfm', 'mogfm'])}
+        }
+    \end{figure}
+\end{frame}
+
+
+
+\begin{frame}{Preliminary Results}{Qualitative Evaluation}
+    \begin{figure}
+        \centering
+        \resizebox{0.9\textwidth}{!}{%
+            \py{boilerplate.make_cond_gen_fig(which='m1_m2__m1', methods=['mopoe','mopgfm', 'mogfm'])}
+        }
+    \end{figure}
+\end{frame}
+
+
+
+\begin{frame}
+    The KL-divergence of the sum of random variables is not convex.\\
+
+    \textit{Proof:}\\
+    Let $q_1, q_2, q_p \sim \mathcal{N}(0, \textbf{I})$.\\
+    Then $D_{KL}(q_1||q_p) = D_{KL}(q_2||q_p) = 0$.\\
+    But $D_{KL}(\frac{q_1 + q_2}{2}||q_p) = D_{KL}(q_{12}||q_p) > 0$ with $q_{12} \sim \mathcal{N}(\frac{1}{2}(\mu_1 + \mu_2), (\frac{\sigma_1}{4})^2+(\frac{\sigma_2}{4})^2))$
+\end{frame}

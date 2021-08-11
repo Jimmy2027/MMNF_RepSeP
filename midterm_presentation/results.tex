@@ -1,0 +1,86 @@
+\begin{frame}{Preliminary Results}{Log-likelihoods}
+    \py{
+        pytex_tab(
+        script='midterm_presentation/scripts/lhood_tab.py',
+        options_pre='\\centering \\resizebox{0.9\\textwidth}{!}{',
+        options_post='}',
+        caption='Test set log-likelihoods.',
+        )
+    }
+\end{frame}
+
+\begin{frame}{Preliminary Results}{Latent Representation Evaluation}
+    \py{
+        pytex_tab(
+        script='midterm_presentation/scripts/lr_eval_tab.py',
+        options_pre='\\centering \\resizebox{0.9\\textwidth}{!}{',
+        options_post='}',
+        caption='Linear classification accuracy of latent representations for the Test set.\\
+        ',
+        )
+    }
+\end{frame}
+
+\begin{frame}{Preliminary Results}{Generation Coherence Evaluation}
+    \py{
+        pytex_tab(
+        script='midterm_presentation/scripts/gen_eval_tab.py',
+        options_pre='\\centering \\resizebox{0.9\\textwidth}{!}{',
+        options_post='}',
+        caption='Generation coherence for the Test set.
+        ',
+        )
+    }
+\end{frame}
+
+
+\begin{frame}{Preliminary Results}{Generation Quality Evaluation}
+    \py{
+        pytex_tab(
+        script='midterm_presentation/scripts/prd_tab.py',
+        options_pre='\\centering \\resizebox{0.9\\textwidth}{!}{',
+        options_post='}',
+        caption='Area under the Precision and Recall curve of the PRD score \citep{precision_recall_distributions}.
+        ',
+        )
+    }
+\end{frame}
+
+
+%\begin{frame}{Preliminary Results}{Qualitative Evaluation}
+%    \begin{figure}
+%        \centering
+%        \resizebox{0.9\textwidth}{!}{%
+%            \py{boilerplate.make_cond_gen_fig(which='m1_m2__m1', methods=['mopoe','mopgfm', 'mogfm'])}
+%        }
+%    \end{figure}
+%\end{frame}
+
+\begin{frame}{Preliminary Results}{Qualitative Evaluation}
+    \begin{figure}
+        \centering
+        \resizebox{0.9\textwidth}{!}{%
+            \py{boilerplate.make_cond_gen_fig(which='m1_m2__m2', methods=['mopoe','mopgfm', 'mogfm'])}
+        }
+    \end{figure}
+\end{frame}
+
+\begin{frame}{Preliminary Results}{Qualitative Evaluation}
+    \begin{figure}
+        \centering
+        \resizebox{0.9\textwidth}{!}{%
+            \py{boilerplate.make_cond_gen_fig(which='m0_m1__m2', methods=['mopoe','mopgfm', 'mogfm'])}
+        }
+    \end{figure}
+\end{frame}
+
+
+
+%\begin{frame}{Preliminary Results}{Qualitative Evaluation}
+%    \begin{figure}
+%        \centering
+%        \resizebox{0.9\textwidth}{!}{%
+%            \py{boilerplate.make_cond_gen_fig(which='m0_m1__m0', methods=['mopoe','mopgfm', 'mogfm'])}
+%        }
+%    \end{figure}
+%\end{frame}

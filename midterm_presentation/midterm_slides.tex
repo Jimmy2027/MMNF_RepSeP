@@ -5,156 +5,69 @@
 \subtitle{Midterm Presentation}
 \author[Hendrik Klug]{Hendrik Klug}
 
+\AtBeginEnvironment{frame}{\setcounter{footnote}{0}}
+
 \begin{document}
-    \begin{frame}
-        \titlepage
+
+    \include{midterm_presentation/intro}
+
+    \include{midterm_presentation/methods}
+
+    \include{midterm_presentation/results}
+
+    \begin{frame}{Mixture of Flow of Product of Experts VAE}
+        Normalizing Flows can also be used to construct \textbf{flexible} and \textbf{arbitrarily complex} latent distributions, by passing the latent distribution through a series of $F$ invertible transformations \citep{rezende_variational_2016, berg_sylvester_2019}:
+        \begin{equation*}
+            z_F = f_F \circ \ldots \circ f_2 \circ f_1(z_0 \sim q_{\phi}(z|X))
+        \end{equation*}
+        \begin{equation*}
+            \ln q_F(z_F) = \ln q_0 (z_0) - \sum _{f=1} ^{F}\ln \left|  \det \frac{df_f}{dz_{f-1}}\right|
+        \end{equation*}
+        such that:
+        \begin{small}
+
+            \begin{equation*}
+                \mathcal{L}_{mofop} := \mathbb{E}_{q_{\phi}(\textbf{z}|\mathbb{X})}[\log (p_{\theta}(\mathbb{X}|\textbf{z}))] - D_{KL}\biggl( \frac{1}{2^M} \sum _{\mathbb{X}_k \in \mathcal{P}(\mathbb{X})} \tilde{q}_{\phi}(\textbf{z}|\mathbb{X}_k)\ ||\ p_{\theta}(\textbf{z})\biggr)
+            \end{equation*}
+
+            \begin{equation*}
+                D_{KL}(\tilde{q}_{F; \phi_i}(\textbf{z}_{F,i}|X)\ ||\ P_{\theta}(z)) =
+                \mathbb{E}_{\tilde{q}_{0; \phi_i}} \left[ \log \tilde{q}_{0; \phi_i}(\textbf{z}_0|X) -\log p_{\theta}(z) \right] - \mathbb{E}_{\tilde{q}_{0; \phi_i}}\left[ \sum_{f=1}^{F} \log \left| \det \left( \frac{d f_f (\textbf{z}_{f-1}; \lambda_f)}{d\textbf{z}_{f-1}} \right) \right| \right]
+            \end{equation*}
+        \end{small}
+
     \end{frame}
 
-    \begin{frame}{Global Theme}
-        \centering
-        \textbf{Finding a model that can learn a joint distribution of multiple data types.}
-
+    \begin{frame}{Mixture of Flow of Product of Experts VAE}
         \begin{figure}
+            \centering
             \resizebox{0.9\textwidth}{!}{%
-                \py{pytex_printonly(script='midterm_presentation/scripts/generalidea_graph.py', data = '')}
+                \py{pytex_printonly(script='midterm_presentation/scripts/mofop_graph.py', data = '')}
             }
         \end{figure}
+        \begin{footnotesize}
+            \begin{equation*}
+                \mathcal{L}_{mofop} := \mathbb{E}_{q_{\phi}(\textbf{z}|\mathbb{X})}[\log (p_{\theta}(\mathbb{X}|\textbf{z}))] - \frac{1}{2^M} \left( \sum_{\mathbb{X}_k \in \mathcal{P}(\mathbb{X})} D_{KL}(q_{0; \phi}(\textbf{z}_0|X)\ ||\ p_{\theta}(\textbf{z})) - \mathbb{E}_{\tilde{q}_{0}}\left[ \sum_{f=1}^{F} \log \left| \det \left( \frac{d f_f (\textbf{z}_{f-1}; \lambda_f)}{d\textbf{z}_{f-1}} \right) \right| \right] \right)
+            \end{equation*}
+        \end{footnotesize}
     \end{frame}
 
-    \begin{frame}{Why is this useful ?}
+    \begin{frame}{To Do}
         \begin{itemize}
-            \item Can leverage the multiple data types present in the medical domain
-            \item The training is self supervised $\rightarrow$ no labels required
-            \item The latent representation can be used for classification
-            \item Classes can be generated across modalities
+            \item Continue the work in progress of the current methods
+            \item Implement and test Importance Weighted MoPoE
+            \item Find an upper bound of the KL-Divergence
+            \item Evaluate methods on other datasets (MNIST-SVHN-Text, MIMIC-CXR)
+            \vspace{3cm}
+            \pause
+%            \item Implement and test a method where the joint latent distribution is passed through a normalizing flow
+            \item Write Thesis
         \end{itemize}
     \end{frame}
 
-    \begin{frame}{Background}
-        The multimodal aspect has many advantages, but \textbf{combining the learned distributions for each modality into a joint latent distribution is still an open problem}.
-        \begin{figure}
-            \centering
-            \resizebox{0.7\textwidth}{!}{%
-                \begin{tikzpicture}[Mod1/.style={rectangle, draw=blue!60, fill=blue!5, very thick, minimum size=5mm},Mod2/.style={rectangle, draw=green!60, fill=green!5, very thick, minimum size=5mm},enc_mods/.style={circle, draw=gray!60, fill=gray!5, very thick, minimum size=10mm},magic/.style={rectangle, draw=red!60, fill=red!5, very thick, minimum size=20mm},]
-                    \node[Mod1] (mod1) {$Mod_1$};
-                    \node[below of=mod1] (points) {\ldots};
-                    \node[enc_mods, right of=mod1, xshift=1.5cm] (q1) {$q_1$};
-                    \node[Mod2, below of=points] (modn) {$Mod_n$};
-                    \node[enc_mods, right of=modn, xshift=1.5cm] (q2) {$q_n$};
-                    \node[below of=q1] (points) {\ldots};
-                    \node[magic, right of=q1, yshift=-1cm, xshift=1.5cm] (magic) {\textbf{Magic!}};
-                    \node[enc_mods, right of=magic, xshift=1.7cm] (joint) {Joint Distr};
-                    \node[Mod1, right of=joint, xshift=1.7cm,yshift=+1cm] (rec_mod1) {$Mod_1$};
-                    \node[right of=joint,xshift=1.7cm] (points) {\ldots};
-                    \node[Mod2, right of=joint, xshift=1.7cm,yshift=-1cm] (rec_mod2) {$Mod_n$};
-                    \draw[->] (mod1) -- node[anchor=south] {$enc_1$} (q1);
-                    \draw[->] (q1) -- (magic);
-                    \draw[->] (modn) -- node[anchor=south] {$enc_n$} (q2);
-                    \draw[->] (q2) -- (magic);
-                    \draw[->] (magic) -- (joint);
-                    \draw[->] (joint) edge[bend left=20] node[anchor=south] {$dec_1$} (rec_mod1);
-                    \draw[->] (joint) edge[bend right=20] node[anchor=north] {$dec_n$} (rec_mod2);
-                \end{tikzpicture}
-            }
-        \end{figure}
-    \end{frame}
 
-    \begin{frame}{The Mixture-of-Products-of-Experts-VAE (MoPoE)}
-        The MoPoE is a method from \cite{thomas_gener-ELBO}, which is a combination of:
-        \begin{itemize}
-            \item The Product-of-Experts (PoE) from \cite{wu2018multimodal}
-            \item The Mixture-of-Experts (MoE) from \cite{shi2019variational}
-        \end{itemize}
-    \end{frame}
 
-    \begin{frame}{The Mixture-of-Products-of-Experts-VAE (MoPoE)}
-        \begin{figure}
-            \centering
-            \resizebox{0.7\textwidth}{!}{%
-                \py{pytex_printonly(script='midterm_presentation/scripts/mopoe_graph.py', data = '')}
-            }
-        \end{figure}
-    \end{frame}
-
-    \begin{frame}{Generalizing with the generalized $f$-mean}
-        Both the PoE and the MoE can be generalized since both are special cases of the generalized f-mean:
-        $$\mathcal{M}_{f}\left( \textbf{p} \right) = f^{-1}\left( \frac{1}{N} \sum ^N _{i=1} f(\textbf{p}_i)) \right)$$
-
-        \textbf{Basic idea:}
-        Make the fusion of the uni modal latent spaces more flexible by using an f-mean.
-    \end{frame}
-
-    \begin{frame}{Generalizing with the generalized $f$-mean}
-        \begin{figure}
-            \centering
-            \resizebox{0.7\textwidth}{!}{%
-                \begin{tikzpicture}[Mod1/.style={rectangle, draw=blue!60, fill=blue!5, very thick, minimum size=5mm},Mod2/.style={rectangle, draw=green!60, fill=green!5, very thick, minimum size=5mm},enc_mods/.style={circle, draw=gray!60, fill=gray!5, very thick, minimum size=10mm},magic/.style={rectangle, draw=red!60, fill=red!5, very thick, minimum size=20mm},]
-                    \node[Mod1] (mod1) {$Mod_1$};
-                    \node[below of=mod1] (points) {\ldots};
-                    \node[enc_mods, right of=mod1, xshift=1.5cm] (q1) {$q_1$};
-                    \node[Mod2, below of=points] (modn) {$Mod_n$};
-                    \node[enc_mods, right of=modn, xshift=1.5cm] (q2) {$q_n$};
-                    \node[below of=q1] (points) {\ldots};
-                    \node[magic, right of=q1, yshift=-1cm, xshift=1.5cm] (magic) {\textbf{Magic!}};
-                    \node[enc_mods, right of=magic, xshift=1.7cm] (joint) {Joint Distr};
-                    \node[Mod1, right of=joint, xshift=1.7cm,yshift=+1cm] (rec_mod1) {$Mod_1$};
-                    \node[right of=joint,xshift=1.7cm] (points) {\ldots};
-                    \node[Mod2, right of=joint, xshift=1.7cm,yshift=-1cm] (rec_mod2) {$Mod_n$};
-                    \draw[->] (mod1) -- node[anchor=south] {$enc_1$} (q1);
-                    \draw[->] (q1) -- (magic);
-                    \draw[->] (modn) -- node[anchor=south] {$enc_n$} (q2);
-                    \draw[->] (q2) -- (magic);
-                    \draw[->] (magic) -- (joint);
-                    \draw[->] (joint) edge[bend left=20] node[anchor=south] {$dec_1$} (rec_mod1);
-                    \draw[->] (joint) edge[bend right=20] node[anchor=north] {$dec_n$} (rec_mod2);
-                \end{tikzpicture}
-            }
-        \end{figure}
-    \end{frame}
-
-    \begin{frame}{Generalizing with the generalized $f$-mean}
-        \begin{figure}
-            \centering
-            \resizebox{0.7\textwidth}{!}{%
-                \begin{tikzpicture}[Mod1/.style={rectangle, draw=blue!60, fill=blue!5, very thick, minimum size=5mm},Mod2/.style={rectangle, draw=green!60, fill=green!5, very thick, minimum size=5mm},enc_mods/.style={circle, draw=gray!60, fill=gray!5, very thick, minimum size=10mm},magic/.style={rectangle, draw=red!60, fill=red!5, very thick, minimum size=20mm},]
-                    \node[Mod1] (mod1) {$Mod_1$};
-                    \node[below of=mod1] (points) {\ldots};
-                    \node[enc_mods, right of=mod1, xshift=1.5cm] (q1) {$q_1$};
-                    \node[Mod2, below of=points] (modn) {$Mod_n$};
-                    \node[enc_mods, right of=modn, xshift=1.5cm] (q2) {$q_n$};
-                    \node[below of=q1] (points) {\ldots};
-                    \node[magic, right of=q1, yshift=-1cm, xshift=1.5cm] (magic) {\textbf{$f$-Mean}};
-                    \node[enc_mods, right of=magic, xshift=1.7cm] (joint) {Joint Distr};
-                    \node[Mod1, right of=joint, xshift=1.7cm,yshift=+1cm] (rec_mod1) {$Mod_1$};
-                    \node[right of=joint,xshift=1.7cm] (points) {\ldots};
-                    \node[Mod2, right of=joint, xshift=1.7cm,yshift=-1cm] (rec_mod2) {$Mod_n$};
-                    \draw[->] (mod1) -- node[anchor=south] {$enc_1$} (q1);
-                    \draw[->] (q1) -- (magic);
-                    \draw[->] (modn) -- node[anchor=south] {$enc_n$} (q2);
-                    \draw[->] (q2) -- (magic);
-                    \draw[->] (magic) -- (joint);
-                    \draw[->] (joint) edge[bend left=20] node[anchor=south] {$dec_1$} (rec_mod1);
-                    \draw[->] (joint) edge[bend right=20] node[anchor=north] {$dec_n$} (rec_mod2);
-                \end{tikzpicture}
-            }
-        \end{figure}
-    \end{frame}
-
-    \begin{frame}{Generalizing with the generalized $f$-mean}
-        $f$ can be anything as long as it is injective.
-        $\rightarrow$ $f$ can be parameterized as a normalizing flow $f_{\psi}$
-        $$\mathcal{M}_{f_{\psi}}\left( \textbf{p} \right) = f_{\psi}^{-1}\left( \frac{1}{N} \sum ^N _{i=1} f_{\psi}(\textbf{p}_i)) \right)$$
-    \end{frame}
-
-    \begin{frame}{Normalizing flows}
-        Normalizing flows represent an approach for defining invertible and differentiable transformations of probability distributions.
-        They are widely used for:
-        \begin{itemize}
-            \item generative modeling (\cite[\textbf{GLOW}, \textbf{Real NVP}]{kingma_glow_2018, dinh_density_2017})
-            \item variational inference (\cite{rezende_variational_2016, berg_sylvester_2019})
-        \end{itemize}
-    \end{frame}
-
+    % Disadvantages: slow
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
     \begin{frame}
@@ -170,5 +83,6 @@
         \printbibliography
     \end{frame}
 
+    \include{midterm_presentation/supplementary}
 
 \end{document}

@@ -656,17 +656,70 @@ thomas_gener-ELBO,
 
 
 @article{dinh_density_2017,
-	title = {Density estimation using Real {NVP}},
-	url = {http://arxiv.org/abs/1605.08803},
-	abstract = {Unsupervised learning of probabilistic models is a central yet challenging problem in machine learning. Specifically, designing models with tractable learning, sampling, inference and evaluation is crucial in solving this task. We extend the space of such models using real-valued non-volume preserving (real {NVP}) transformations, a set of powerful invertible and learnable transformations, resulting in an unsupervised learning algorithm with exact log-likelihood computation, exact sampling, exact inference of latent variables, and an interpretable latent space. We demonstrate its ability to model natural images on four datasets through sampling, log-likelihood evaluation and latent variable manipulations.},
-	journaltitle = {{arXiv}:1605.08803 [cs, stat]},
-	author = {Dinh, Laurent and Sohl-Dickstein, Jascha and Bengio, Samy},
-	urldate = {2021-07-29},
-	date = {2017-02-27},
-	eprinttype = {arxiv},
-	eprint = {1605.08803},
-	keywords = {Computer Science - Artificial Intelligence, Computer Science - Machine Learning, Computer Science - Neural and Evolutionary Computing, Statistics - Machine Learning}
+    title = {Density estimation using Real {NVP}},
+    url = {http://arxiv.org/abs/1605.08803},
+    abstract = {Unsupervised learning of probabilistic models is a central yet challenging problem in machine learning. Specifically, designing models with tractable learning, sampling, inference and evaluation is crucial in solving this task. We extend the space of such models using real-valued non-volume preserving (real {NVP}) transformations, a set of powerful invertible and learnable transformations, resulting in an unsupervised learning algorithm with exact log-likelihood computation, exact sampling, exact inference of latent variables, and an interpretable latent space. We demonstrate its ability to model natural images on four datasets through sampling, log-likelihood evaluation and latent variable manipulations.},
+    journaltitle = {{arXiv}:1605.08803 [cs, stat]},
+    author = {Dinh, Laurent and Sohl-Dickstein, Jascha and Bengio, Samy},
+    urldate = {2021-07-29},
+    date = {2017-02-27},
+    eprinttype = {arxiv},
+    eprint = {1605.08803},
+    keywords = {Computer Science - Artificial Intelligence, Computer Science - Machine Learning, Computer Science - Neural and Evolutionary Computing, Statistics - Machine Learning}
 }
 
+
+
+
+@article{burda_importance_2016,
+    title = {Importance Weighted Autoencoders},
+    url = {http://arxiv.org/abs/1509.00519},
+    abstract = {The variational autoencoder ({VAE}; Kingma, Welling (2014)) is a recently proposed generative model pairing a top-down generative network with a bottom-up recognition network which approximates posterior inference. It typically makes strong assumptions about posterior inference, for instance that the posterior distribution is approximately factorial, and that its parameters can be approximated with nonlinear regression from the observations. As we show empirically, the {VAE} objective can lead to overly simplified representations which fail to use the network's entire modeling capacity. We present the importance weighted autoencoder ({IWAE}), a generative model with the same architecture as the {VAE}, but which uses a strictly tighter log-likelihood lower bound derived from importance weighting. In the {IWAE}, the recognition network uses multiple samples to approximate the posterior, giving it increased flexibility to model complex posteriors which do not fit the {VAE} modeling assumptions. We show empirically that {IWAEs} learn richer latent space representations than {VAEs}, leading to improved test log-likelihood on density estimation benchmarks.},
+    journaltitle = {{arXiv}:1509.00519 [cs, stat]},
+    author = {Burda, Yuri and Grosse, Roger and Salakhutdinov, Ruslan},
+    urldate = {2021-07-29},
+    date = {2016-11-07},
+    eprinttype = {arxiv},
+    eprint = {1509.00519},
+    keywords = {Computer Science - Machine Learning, Statistics - Machine Learning, \_tablet, to\_read},
+    file = {arXiv.org Snapshot:/Users/Hendrik/Zotero/storage/NGP9N8LJ/1509.html:text/html;Burda et al_2016_Importance Weighted Autoencoders.pdf:/Users/Hendrik/zotfile/Burda et al_2016_Importance Weighted Autoencoders.pdf:application/pdf}
+}
+
+
+@inproceedings{nowozin_debiasing_2018,
+    title = {Debiasing Evidence Approximations: On Importance-weighted Autoencoders and Jackknife Variational Inference},
+    url = {https://www.microsoft.com/en-us/research/publication/debiasing-evidence-approximations-importance-weighted-autoencoders-jackknife-variational-inference/},
+    shorttitle = {Debiasing Evidence Approximations},
+    abstract = {The importance-weighted autoencoder ({IWAE}) approach of Burda et al. defines a sequence of increasingly tighter bounds on the marginal likelihood of latent variable models. Recently, Cremer et al. reinterpreted the {IWAE} bounds as ordinary variational evidence lower bounds ({ELBO}) applied to increasingly accurate variational distributions. In this work, we provide yet another perspective on the […]},
+    eventtitle = {{ICLR} 2018 Conference},
+    author = {Nowozin, Sebastian},
+    urldate = {2021-07-30},
+    date = {2018-02-15},
+    langid = {american},
+    keywords = {\_tablet},
+    file = {Nowozin_2018_Debiasing Evidence Approximations.pdf:/Users/Hendrik/zotfile/Nowozin_2018_Debiasing Evidence Approximations.pdf:application/pdf;Snapshot:/Users/Hendrik/Zotero/storage/2P4TKEGT/debiasing-evidence-approximations-importance-weighted-autoencoders-jackknife-variational-infere.html:text/html}
+}
+
+@inproceedings{precision_recall_distributions,
+    title = {{Assessing Generative Models via Precision and Recall}},
+    author = {Sajjadi, Mehdi~S.~M. and Bachem, Olivier and Lu{\v c}i{\'c}, Mario and Bousquet, Olivier and Gelly, Sylvain},
+    booktitle = {{Advances in Neural Information Processing Systems (NeurIPS)}},
+    year = {2018} }
+
+
+@article{akiba_optuna_2019,
+    title = {Optuna: A Next-generation Hyperparameter Optimization Framework},
+    url = {http://arxiv.org/abs/1907.10902},
+    shorttitle = {Optuna},
+    abstract = {The purpose of this study is to introduce new design-criteria for next-generation hyperparameter optimization software. The criteria we propose include (1) define-by-run {API} that allows users to construct the parameter search space dynamically, (2) efficient implementation of both searching and pruning strategies, and (3) easy-to-setup, versatile architecture that can be deployed for various purposes, ranging from scalable distributed computing to light-weight experiment conducted via interactive interface. In order to prove our point, we will introduce Optuna, an optimization software which is a culmination of our effort in the development of a next generation optimization software. As an optimization software designed with define-by-run principle, Optuna is particularly the first of its kind. We will present the design-techniques that became necessary in the development of the software that meets the above criteria, and demonstrate the power of our new design through experimental results and real world applications. Our software is available under the {MIT} license (https://github.com/pfnet/optuna/).},
+    journaltitle = {{arXiv}:1907.10902 [cs, stat]},
+    author = {Akiba, Takuya and Sano, Shotaro and Yanase, Toshihiko and Ohta, Takeru and Koyama, Masanori},
+    urldate = {2021-08-08},
+    date = {2019-07-25},
+    eprinttype = {arxiv},
+    eprint = {1907.10902},
+    keywords = {Computer Science - Machine Learning, Statistics - Machine Learning},
+    file = {Akiba et al_2019_Optuna.pdf:/Users/Hendrik/zotfile/Akiba et al_2019_Optuna.pdf:application/pdf}
+}
 
 

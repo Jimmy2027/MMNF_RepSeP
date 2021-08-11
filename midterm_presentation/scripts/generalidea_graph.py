@@ -12,7 +12,7 @@ class Nodes:
     input_m0: str = '$M_0$'
     input_mK: str = '$M_K$'
     encoder: str = 'Encoder'
-    lr: str = 'Latent Representation'
+    lr: str = 'Joint Distribution'
     decoder: str = 'Decoder'
     out_m0: str = '$M_0$'
     out_mK: str = '$M_K$'

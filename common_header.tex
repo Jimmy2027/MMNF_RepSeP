@@ -16,6 +16,7 @@
 
 \usepackage{hyperref}
 \usepackage{amsmath}
+\usepackage[normalem]{ulem}
 % Needs to be loaded after hyperref and amsmath
 \usepackage{cleveref}
 
@@ -34,6 +35,12 @@
 \newcommand{\elbo}{\mathcal{L}(\theta, \phi; \xseti)}
 \newcommand{\xsubset}{\mathbb{X}_k}
 \newcommand{\lmopoe}{\mathcal{L}_{MoPoE}(\theta, \phi; \xset)}
+\newcommand{\eqlmopoe}{\lmopoe:= \mathbb{E}_{q_{\phi}(\textbf{z}|\mathbb{X})}[\log (p_{\theta}(\mathbb{X}|\textbf{z}))] - D_{KL}\biggl( \frac{1}{2^M} \sum _{\mathbb{X}_k \in \mathcal{P}(\mathbb{X})} \tilde{q}_{\phi}(\textbf{z}|\mathbb{X}_k)\ ||\ p_{\theta}(\textbf{z})\biggr)}
+
+\newcommand{\eqlpgfm}{\mathcal{L}_{pgfm}(\theta, \phi; \xset):= \mathbb{E}_{\tilde{q}_{\phi_{12}}(\textbf{z}|\mathbb{X})}[\log (p_{\theta}(\mathbb{X}|\textbf{z}))] - D_{KL}\biggl(  \tilde{q}_{\phi_{12}}(\textbf{z}|\mathbb{X})\ ||\ p_{\theta}(\textbf{z})\biggr)}
+
+\newcommand{\eqlmopgfm}{\mathcal{L}_{Mopgfm}(\theta, \phi; \xset):= \mathbb{E}_{q_{\phi}(\textbf{z}|\mathbb{X})}[\log (p_{\theta}(\mathbb{X}|\textbf{z}))] - D_{KL}\biggl( \frac{1}{2^M} \sum _{\mathbb{X}_k \in \mathcal{P}(\mathbb{X})} \tilde{q}_{\phi_k}(\textbf{z}|\mathbb{X}_k)\ ||\ p_{\theta}(\textbf{z})\biggr)}
+
 \newcommand{\powerset}{\mathcal{P}(\xset)}
 \newcommand{\pFmean}{\mathcal{M}_{f_{\psi}}}
 \newcommand{\DklTrueApprox}{D_{KL} \left( \approxdistr || \truedistr \right)}

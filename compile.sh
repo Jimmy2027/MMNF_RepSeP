@@ -2,10 +2,7 @@
 
 TARGET="${1}"
 WHITELIST="
-	pitch.tex
-	article.tex
-	poster.tex
-	slides.tex
+  midterm_presentation/midterm_slides.tex
 	"
 
 if [[ "$TARGET" = "all" ]] || [[ "$TARGET" == "" ]]; then
@@ -33,7 +30,7 @@ else
 	  mkdir logs
 	fi
 
-	for CLEAN_TARGET in "*.aux" "*.log" "*.out" "*.bbl" "*.pytxcode" "*blx.bib" "*.blg" "*.run.xml" "*.bcf"; do
+	for CLEAN_TARGET in "*.aux *.log *.out *.bbl *.pytxcode *blx.bib *.blg *.run.xml *.bcf *.nav *.snm *.toc" ; do
 	  mv $CLEAN_TARGET logs/
   done
 

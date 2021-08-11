@@ -3,7 +3,7 @@ from pathlib import Path
 
 from scripts_ import tikz
 
-cond_samples_path = Path('data/mopoe/cond_gen_examples')
+cond_samples_path = Path('data/mofop/cond_gen_examples')
 input_samples_dir = cond_samples_path / 'input_samples'
 
 
@@ -20,6 +20,9 @@ class Nodes:
     q1_tilde: str = r'$\tilde{q}_{\phi_1}$'
     q2_tilde: str = r'$\tilde{q}_{\phi_2}$'
     q12_tilde: str = r'$\tilde{q}_{\phi_{12}}$'
+    zk1: str = '$z_{k,1}$'
+    zk12: str = '$z_{k,12}$'
+    zk2: str = '$z_{k,2}$'
     poe: str = r'\textbf{PoE}'
     moe: str = r'\textbf{MoE}'
     z: str = r'joint\\ posterior'
@@ -52,7 +55,11 @@ pic.set_node(text=nodes.q1_tilde, options='m0_dis, right of=poe1, xshift=0.5cm',
 pic.set_node(text=nodes.q2_tilde, options='m1_distr, right of=poe2, xshift=0.5cm', name='q2_tilde')
 pic.set_node(text=nodes.q12_tilde, options='subset, right of=poe3, xshift=0.5cm', name='q12_tilde')
 
-pic.set_node(text=nodes.moe, options='MoE, right of=q12_tilde, xshift=1cm, align=center', name='moe')
+pic.set_node(text=nodes.zk1, options='m0_dis, right of=q1_tilde, xshift=1cm', name='zk1')
+pic.set_node(text=nodes.zk12, options='subset, right of=q12_tilde, xshift=1cm', name='zk12')
+pic.set_node(text=nodes.zk2, options='m1_distr, right of=q2_tilde, xshift=1cm', name='zk2')
+
+pic.set_node(text=nodes.moe, options='MoE, right of=zk12, xshift=1cm, align=center', name='moe')
 pic.set_node(text=nodes.z, options='lr,right of=moe, xshift=1cm, align=center', name='z')
 
 pic.set_node(text=nodes.output__m1m2_m2, options='right of=z, xshift=2cm,yshift=-1.5cm', name='output__m1m2_m2')
@@ -73,9 +80,13 @@ pic.set_line('poe1', 'q1_tilde')
 pic.set_line('poe2', 'q2_tilde')
 pic.set_line('poe3', 'q12_tilde')
 
-pic.set_line('q1_tilde', 'moe')
-pic.set_line('q12_tilde', 'moe')
-pic.set_line('q2_tilde', 'moe')
+pic.set_line('q1_tilde', 'zk1', label='flow', label_pos='south')
+pic.set_line('q12_tilde', 'zk12', label='flow', label_pos='south')
+pic.set_line('q2_tilde', 'zk2', label='flow', label_pos='south')
+
+pic.set_line('zk1', 'moe')
+pic.set_line('zk12', 'moe')
+pic.set_line('zk2', 'moe')
 
 pic.set_line('moe', 'z')
 
