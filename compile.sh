@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 
 TARGET="${1}"
+#  midterm_presentation/midterm_slides.tex
 WHITELIST="
-  midterm_presentation/midterm_slides.tex
+  thesis/thesis.tex
 	"
 
 if [[ "$TARGET" = "all" ]] || [[ "$TARGET" == "" ]]; then
@@ -23,16 +24,16 @@ else
 	    pdflatex -shell-escape "${TARGET}.tex" || { echo "pdflatex failed after PythonTeX"; exit $ERRCODE; }
   fi
 
-	bibtex "$(basename "${TARGET}")" || { echo "bibtex failed"; exit $ERRCODE; }
+	bibtex "$(basename "${TARGET}")" || { echo "bibtex failed";ƒ exit $ERRCODE; }
 	pdflatex -shell-escape "${TARGET}.tex" || { echo "pdflatex failed after bibtex"; exit $ERRCODE; }
 	pdflatex -shell-escape "${TARGET}.tex"
 	if [ ! -d logs ]; then
 	  mkdir logs
 	fi
 
-	for CLEAN_TARGET in "*.aux *.log *.out *.bbl *.pytxcode *blx.bib *.blg *.run.xml *.bcf *.nav *.snm *.toc" ; do
-	  mv $CLEAN_TARGET logs/
-  done
+#	for CLEAN_TARGET in "*.aux *.log *.out *.bbl *.pytxcode *blx.bib *.blg *.run.xml *.bcf *.nav *.snm *.toc" ; do
+#	  mv $CLEAN_TARGET logs/
+#  done
 
   python scripts_/upload.py "$(pwd)/$(basename "${TARGET}.pdf")"
 fi

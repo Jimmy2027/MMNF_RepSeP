@@ -8,6 +8,7 @@ filename2zotkey = {
     "proposal": "UFJLUPV7",
     "work_in_progress": "VQKH6WID",
     "midterm_slides": "IW6HY8IC",
+    "thesis": "93P5LGQ9",
 }
 
 zot_storage_path = Path('~/Zotero/storage').expanduser()

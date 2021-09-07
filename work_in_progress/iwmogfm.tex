@@ -1,0 +1,34 @@
+%! Author = Hendrik
+%! Date = 30.08.21
+
+% Preamble
+\documentclass[11pt]{article}
+
+% Packages
+\usepackage{amsmath}
+\usepackage{amsfonts}
+
+\title{Importance Weighted Mixture of F-Mean}
+
+% Document
+\begin{document}
+    \begin{equation}
+        \begin{split}
+            & \mathbb{E}_{z_1,\ldots,z_k \sim q_{\phi}(z|X)}\left[ \log \sum_{i=1}^{K} \frac{p_{\theta}(X, z_i)}{q_{\phi}(z_i|X)} \right]\\
+            & \geq \mathbb{E}_{z_1,\ldots,z_k \sim q_{\phi}(z|X)} \left[ \sum_{i=1}^{K} \log  \frac{p_{\theta}(X, z_i)}{q_{\phi}(z_i|X)} \right]\\
+            & = \mathbb{E}_{z_1,\ldots,z_k \sim q_{\phi}(z|X)} \left[ \sum_{i=1}^{K} \log p_{\theta}(X|z_i) - \log \frac{q_{\phi}(z_i| X)}{p_{\theta}(z)}\right]\\
+            & = \mathbb{E}_{z_1,\ldots,z_k \sim q_{\phi}(z|X)} \left[ \sum_{i=1}^{K} \log p_{\theta}(X|z_i)\right] - \mathbb{E}_{z_1,\ldots,z_k \sim q_{\phi}(z|X)} \left[ \sum_{i=1}^{K}\log q_{\phi}(z_i| X) - \log p_{\theta}(z)\right]\\
+            & = A - B
+        \end{split}
+    \end{equation}
+
+    \begin{equation}
+        \begin{split}
+            & B = \mathbb{E}_{z_1,\ldots,z_k \sim q_{\phi}(z|X)} \left[ \sum_{i=1}^{K}\log q_{\phi}(z_i| X) - \log p_{\theta}(z)\right]\\
+            & = \sum_{i=1}^{K} \mathbb{E}_{z_1,\ldots,z_k \sim q_{\phi}(z|X)} \left[ \log q_{\phi}(z_i| X) - \log p_{\theta}(z)\right]\\
+            & \approx \sum_{i=1}^{K}  \sum_{X \in batch} q_{\phi}(z|X) (\log q_{\phi}(z_i| X) - \log p_{\theta}(z))
+        \end{split}
+    \end{equation}
+
+
+\end{document}

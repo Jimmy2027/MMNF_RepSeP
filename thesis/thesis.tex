@@ -1,0 +1,37 @@
+% Preamble
+\documentclass[11pt,english]{article}
+\input{common_header.tex}
+
+% Packages
+\usepackage{amsmath}
+
+%BIBLIOGRAPHY
+\usepackage[backend=bibtex,style=authoryear,natbib=true]{biblatex}
+\usepackage{color}
+\addbibresource{bib.bib}
+
+\title{%
+    Multi Modal Generative Learning\\ with Normalizing Flows \\
+    \vspace{1em}
+    \large \color{gray}{Master Thesis}}
+
+\author{Hendrik Klug}
+
+% Document
+\begin{document}
+    \maketitle
+    \newpage
+    \tableofcontents
+    \newpage
+
+    \input{thesis/intro.tex}
+    \input{thesis/background.tex}
+    \input{thesis/methods.tex}
+
+
+
+
+    \newpage
+    \printbibliography
+
+\end{document}
