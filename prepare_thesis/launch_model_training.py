@@ -52,19 +52,28 @@ mogfm_args = {
 }
 
 if __name__ == '__main__':
-    experiment_uids_path = Path('../data/experiment_uids.json')
+    experiment_uids_path = Path('../data/thesis/experiment_uids.json')
     if experiment_uids_path.exists():
         exp_uids = json2dict(experiment_uids_path)
     else:
         exp_uids = {}
 
     for params in [mopoe_args]:
-        for _ in range(nbr_repeats):
-            experiment_uid = get_experiment_uid('polymnist', method=params['method'])
-            params["experiment_uid"] = experiment_uid
-            if 'method' not in exp_uids:
-                exp_uids["method"] = []
-            exp_uids['method'].append(experiment_uid)
-            launch_leomed_jobs(which_dataset='polymnist', params=params)
+        method = params['method']
+        exp_uids[method] = {}
 
-            dict2json(experiment_uids_path, d=exp_uids)
+        for num_mods in range(1, 6):
+            params['num_mods'] = num_mods
+            # more evaluation steps are needed for 3 mods
+            if num_mods == 3:
+                params['eval_freq'] = 10
+            exp_uids[method][f'{num_mods}_mods'] = []
+
+            for _ in range(nbr_repeats):
+                experiment_uid = get_experiment_uid('polymnist', method=method)
+                params["experiment_uid"] = experiment_uid
+
+                exp_uids[method][f'{num_mods}_mods'].append(experiment_uid)
+                launch_leomed_jobs(which_dataset='polymnist', params=params)
+
+    dict2json(experiment_uids_path, d=exp_uids)

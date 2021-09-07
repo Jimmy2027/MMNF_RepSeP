@@ -14,6 +14,8 @@ Semantically coherent samples are connected by the information which is shared b
 These requirements are not inherent to the objective: the evidence lower bound (ELBO) of uni-modal VAEs.
 Hence, adaptions to the original formulation are required to cater to and benefit from multiple data types.
 
+% todo introduce that previous methods use the geometric or the arithmetic mean and that we are generalizing this here
+
 Normalizing flows represent an approach for specifying flexible, arbitrarily complex and scalable approximate posterior distributions \parencite{papamakarios_normalizing_2019,rezende_variational_2016}.
 They consist of transforming a simple initial density into a more complex one by applying a sequence of invertible transformations until a desired level of complexity is attained.
 For this project, I propose to use normalizing flows as a parameterisable function $f_\psi$ which combines the latent variables of multiple data types.
