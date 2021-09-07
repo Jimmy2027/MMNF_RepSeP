@@ -63,8 +63,8 @@ if __name__ == '__main__':
             experiment_uid = get_experiment_uid('polymnist', method=params['method'])
             params["experiment_uid"] = experiment_uid
             if 'method' not in exp_uids:
-                params["method"] = []
+                exp_uids["method"] = []
             exp_uids['method'].append(experiment_uid)
             launch_leomed_jobs(which_dataset='polymnist', params=params)
 
-    dict2json(experiment_uids_path, d=exp_uids)
+            dict2json(experiment_uids_path, d=exp_uids)
