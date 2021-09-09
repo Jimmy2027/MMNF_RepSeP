@@ -6,7 +6,20 @@ from mmvae_hub.utils.utils import json2dict, dict2json
 
 end_epoch = 150
 eval_freq = 1000
-nbr_repeats = 5
+nbr_repeats = 1
+
+moe_args = {
+    'method': 'moe',
+    "initial_learning_rate": 0.0005,
+    'class_dim': 640,
+    "min_beta": 0,
+    "max_beta": 2.0,
+    "beta_warmup": 50,
+    "num_gfm_flows": 3,
+    "num_mods": 3,
+    "end_epoch": end_epoch,
+    "eval_freq": eval_freq,
+}
 
 mopoe_args = {
     'method': 'mopoe',
@@ -31,8 +44,8 @@ mopgfm_args = {
     "num_mods": 3,
     "end_epoch": end_epoch,
     "eval_freq": eval_freq,
-    "coupling_dim": 32,
-    "num_gfm_flows": 3,
+    "coupling_dim": 64,
+    "num_gfm_flows": 11,
 
 }
 
@@ -58,7 +71,7 @@ if __name__ == '__main__':
     else:
         exp_uids = {}
 
-    for params in [mopoe_args]:
+    for params in [mopgfm_args, moe_args]:
         method = params['method']
         exp_uids[method] = {}
 
