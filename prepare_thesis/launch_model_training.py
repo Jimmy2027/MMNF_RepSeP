@@ -73,7 +73,9 @@ if __name__ == '__main__':
 
     for params in [mopgfm_args, moe_args]:
         method = params['method']
-        exp_uids[method] = {}
+
+        if method not in exp_uids:
+            exp_uids[method] = {}
 
         for num_mods in range(1, 6):
             params['num_mods'] = num_mods
