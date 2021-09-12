@@ -5,5 +5,38 @@
 % try other datasets also (mimic,..)
 % Train 5 times: mopoe, mopgfm, mogfm
 
+% also compare training times
+
 
 My results.
+
+
+\begin{sansmath}
+    \py{pytex_subfigs(
+        [
+            {'script':'thesis/scripts/plots/epoch_comparison_lr.py', 'label':'vccv','conf':'thesis/4*2.conf', 'options_pre':'{.48\\textwidth}',
+        'options_pre_caption':'\\vspace{-1.5em}\\',
+        'options_post':'\\vspace{1em}',
+        'caption':''
+        ,},
+            {'script':'thesis/scripts/plots/epoch_comparison_gen.py', 'label':'sccv','conf':'thesis/4*2.conf', 'options_pre':'{.48\\textwidth}',
+        'options_pre_caption':'\\vspace{-1.5em}\\',
+        'options_post':'\\vspace{1em}',
+        'caption':''
+        ,},
+            {'script':'thesis/scripts/plots/nbr_mods_comparison_lr.py', 'label':'vcfb','conf':'thesis/4*2.conf', 'options_pre':'{.48\\textwidth}',
+        'options_pre_caption':'\\vspace{-1.5em}\\',
+        'options_post':'\\vspace{1em}',
+        'caption':''
+        ,},
+            {'script':'thesis/scripts/plots/nbr_mods_comparison_gen.py', 'label':'scfb','conf':'thesis/4*2.conf', 'options_pre':'{.48\\textwidth}',
+        'options_pre_caption':'\\vspace{-1.5em}\\',
+        'options_post':'\\vspace{1em}',
+        'caption':''
+        ,},
+        ],
+        caption='
+        ',
+        label='fig:vc',
+        )}
+\end{sansmath}

@@ -190,7 +190,7 @@
     file = {arXiv Fulltext PDF:/Users/Hendrik/Zotero/storage/KB67TLNP/Vedantam et al. - 2018 - Generative Models of Visually Grounded Imagination.pdf:application/pdf;arXiv.org Snapshot:/Users/Hendrik/Zotero/storage/39Y5UK8T/1705.html:text/html}
 }
 
-@article{wu_multimodal_2018,
+@article{poe,
     title = {Multimodal Generative Models for Scalable Weakly-Supervised Learning},
     url = {http://arxiv.org/abs/1802.05335},
     abstract = {Multiple modalities often co-occur when describing natural phenomena. Learning a joint representation of these modalities should yield deeper and more useful representations. Previous generative approaches to multi-modal input either do not learn a joint distribution or require additional computation to handle missing data. Here, we introduce a multimodal variational autoencoder ({MVAE}) that uses a product-of-experts inference network and a sub-sampled training paradigm to solve the multi-modal inference problem. Notably, our model shares parameters to efficiently learn under any combination of missing modalities. We apply the {MVAE} on four datasets and match state-of-the-art performance using many fewer parameters. In addition, we show that the {MVAE} is directly applicable to weakly-supervised learning, and is robust to incomplete supervision. We then consider two case studies, one of learning image transformations---edge detection, colorization, segmentation---as a set of modalities, followed by one of machine translation between two languages. We find appealing results across this range of tasks.},
@@ -201,7 +201,6 @@
     eprinttype = {arxiv},
     eprint = {1802.05335},
     keywords = {Computer Science - Machine Learning, Statistics - Machine Learning},
-    file = {arXiv Fulltext PDF:/Users/Hendrik/Zotero/storage/LVSFF454/Wu and Goodman - 2018 - Multimodal Generative Models for Scalable Weakly-S.pdf:application/pdf;arXiv.org Snapshot:/Users/Hendrik/Zotero/storage/48FDVEUH/1802.html:text/html}
 }
 
 
@@ -723,3 +722,90 @@ thomas_gener-ELBO,
 }
 
 
+
+@inproceedings{rezende_stochastic_2014,
+    title = {Stochastic Backpropagation and Approximate Inference in Deep Generative Models},
+    url = {http://proceedings.mlr.press/v32/rezende14.html},
+    abstract = {We marry ideas from deep neural networks and approximate Bayesian inference to derive a generalised class of deep, directed generative models, endowed with a new algorithm for scalable inference an...},
+    eventtitle = {International Conference on Machine Learning},
+    pages = {1278--1286},
+    booktitle = {International Conference on Machine Learning},
+    publisher = {{PMLR}},
+    author = {Rezende, Danilo Jimenez and Mohamed, Shakir and Wierstra, Daan},
+    urldate = {2021-03-30},
+    date = {2014-06-18},
+    langid = {english},
+    note = {{ISSN}: 1938-7228},
+
+}
+
+
+@article{beta_vae,
+	title = {beta-{VAE}: Learning Basic Visual Concepts with a Constrained Variational Framework},
+	url = {https://openreview.net/forum?id=Sy2fzU9gl},
+	shorttitle = {beta-{VAE}},
+	abstract = {We introduce beta-{VAE}, a new state-of-the-art framework for automated discovery of interpretable factorised latent representations from raw image data in a completely unsupervised manner.},
+	author = {Higgins, Irina and Matthey, Loic and Pal, Arka and Burgess, Christopher and Glorot, Xavier and Botvinick, Matthew and Mohamed, Shakir and Lerchner, Alexander},
+	urldate = {2021-05-21},
+	date = {2016-11-04},
+	langid = {english},
+}
+
+
+@article{chen_isolating_2019,
+	title = {Isolating Sources of Disentanglement in Variational Autoencoders},
+	url = {http://arxiv.org/abs/1802.04942},
+	abstract = {We decompose the evidence lower bound to show the existence of a term measuring the total correlation between latent variables. We use this to motivate our \${\textbackslash}beta\$-{TCVAE} (Total Correlation Variational Autoencoder), a refinement of the state-of-the-art \${\textbackslash}beta\$-{VAE} objective for learning disentangled representations, requiring no additional hyperparameters during training. We further propose a principled classifier-free measure of disentanglement called the mutual information gap ({MIG}). We perform extensive quantitative and qualitative experiments, in both restricted and non-restricted settings, and show a strong relation between total correlation and disentanglement, when the latent variables model is trained using our framework.},
+	journaltitle = {{arXiv}:1802.04942 [cs, stat]},
+	author = {Chen, Ricky T. Q. and Li, Xuechen and Grosse, Roger and Duvenaud, David},
+	urldate = {2021-09-11},
+	date = {2019-04-23},
+	eprinttype = {arxiv},
+	eprint = {1802.04942},
+	keywords = {Computer Science - Artificial Intelligence, Computer Science - Machine Learning, disentanglement, Statistics - Machine Learning},
+	file = {arXiv.org Snapshot:/Users/Hendrik/Zotero/storage/ZBXAG9JF/1802.html:text/html;Chen et al_2019_Isolating Sources of Disentanglement in Variational Autoencoders.pdf:/Users/Hendrik/zotfile/Chen et al_2019_Isolating Sources of Disentanglement in Variational Autoencoders.pdf:application/pdf}
+}
+
+
+@article{locatello_challenging_2019,
+	title = {Challenging Common Assumptions in the Unsupervised Learning of Disentangled Representations},
+	url = {http://arxiv.org/abs/1811.12359},
+	abstract = {The key idea behind the unsupervised learning of disentangled representations is that real-world data is generated by a few explanatory factors of variation which can be recovered by unsupervised learning algorithms. In this paper, we provide a sober look at recent progress in the field and challenge some common assumptions. We first theoretically show that the unsupervised learning of disentangled representations is fundamentally impossible without inductive biases on both the models and the data. Then, we train more than 12000 models covering most prominent methods and evaluation metrics in a reproducible large-scale experimental study on seven different data sets. We observe that while the different methods successfully enforce properties ``encouraged'' by the corresponding losses, well-disentangled models seemingly cannot be identified without supervision. Furthermore, increased disentanglement does not seem to lead to a decreased sample complexity of learning for downstream tasks. Our results suggest that future work on disentanglement learning should be explicit about the role of inductive biases and (implicit) supervision, investigate concrete benefits of enforcing disentanglement of the learned representations, and consider a reproducible experimental setup covering several data sets.},
+	journaltitle = {{arXiv}:1811.12359 [cs, stat]},
+	author = {Locatello, Francesco and Bauer, Stefan and Lucic, Mario and Rätsch, Gunnar and Gelly, Sylvain and Schölkopf, Bernhard and Bachem, Olivier},
+	urldate = {2021-09-11},
+	date = {2019-06-18},
+	eprinttype = {arxiv},
+	eprint = {1811.12359},
+	keywords = {Computer Science - Artificial Intelligence, Computer Science - Machine Learning, Statistics - Machine Learning, disentanglement}
+}
+
+
+@article{hinton_training_2002,
+	title = {Training products of experts by minimizing contrastive divergence},
+	volume = {14},
+	issn = {0899-7667},
+	doi = {10.1162/089976602760128018},
+	abstract = {It is possible to combine multiple latent-variable models of the same data by multiplying their probability distributions together and then renormalizing. This way of combining individual "expert" models makes it hard to generate samples from the combined model but easy to infer the values of the latent variables of each expert, because the combination rule ensures that the latent variables of different experts are conditionally independent when given the data. A product of experts ({PoE}) is therefore an interesting candidate for a perceptual system in which rapid inference is vital and generation is unnecessary. Training a {PoE} by maximizing the likelihood of the data is difficult because it is hard even to approximate the derivatives of the renormalization term in the combination rule. Fortunately, a {PoE} can be trained using a different objective function called "contrastive divergence" whose derivatives with regard to the parameters can be approximated accurately and efficiently. Examples are presented of contrastive divergence learning using several types of expert on several types of data.},
+	pages = {1771--1800},
+	number = {8},
+	journaltitle = {Neural Computation},
+	shortjournal = {Neural Comput},
+	author = {Hinton, Geoffrey E.},
+	date = {2002-08},
+	pmid = {12180402}
+}
+
+
+@article{wu_multimodal_2019,
+	title = {Multimodal Generative Models for Compositional Representation Learning},
+	url = {http://arxiv.org/abs/1912.05075},
+	abstract = {As deep neural networks become more adept at traditional tasks, many of the most exciting new challenges concern multimodality---observations that combine diverse types, such as image and text. In this paper, we introduce a family of multimodal deep generative models derived from variational bounds on the evidence (data marginal likelihood). As part of our derivation we find that many previous multimodal variational autoencoders used objectives that do not correctly bound the joint marginal likelihood across modalities. We further generalize our objective to work with several types of deep generative model ({VAE}, {GAN}, and flow-based), and allow use of different model types for different modalities. We benchmark our models across many image, label, and text datasets, and find that our multimodal {VAEs} excel with and without weak supervision. Additional improvements come from use of {GAN} image models with {VAE} language models. Finally, we investigate the effect of language on learned image representations through a variety of downstream tasks, such as compositionally, bounding box prediction, and visual relation prediction. We find evidence that these image representations are more abstract and compositional than equivalent representations learned from only visual data.},
+	journaltitle = {{arXiv}:1912.05075 [cs, stat]},
+	author = {Wu, Mike and Goodman, Noah},
+	urldate = {2021-09-11},
+	date = {2019-12-10},
+	eprinttype = {arxiv},
+	eprint = {1912.05075},
+	keywords = {Computer Science - Machine Learning, Statistics - Machine Learning}
+}

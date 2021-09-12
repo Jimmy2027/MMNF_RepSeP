@@ -1,2 +1,28 @@
 \section{Methods}
-My methods.
+As introduced in previous sections, we are working with a multi modal VAE (mmVAE), which learns a joint distribution that contains the combined information of each learned uni modal latent distribution.
+In order to generalize previous methods and to increase the flexibility of the combination of the modalities, we implement the fusion of the uni modal latent distributions with a generalized $f$-mean.
+
+The main difficulty in this approach comes from the fact that the $f$-mean of the uni modal distributions follows an unknown distribution.
+While this makes the joint distribution more flexible, this also makes the computation of the regularization term in the ELBO, the KL-divergence, more difficult to compute.
+In fact, if the density of the joint distribution is unknown, it is impossible to compute the KL-divergence in closed form.
+
+An intuitive workaround would be to find an upper bound of the KL-divergence which can be computed in closed from, such that it can be minimized in order to minimize the true divergence
+
+We propose three workarounds to this problem:
+\begin{itemize}
+    \item todo
+\end{itemize}
+
+\subsection{Models}
+
+\subsubsection{Mixture of parameter- Generalized $f$-Mean}
+
+\subsubsection{Mixture of importance weighted Generalized $f$-Mean}
+
+\subsection{Datasets}
+
+\subsubsection{PolyMNIST} \label{polymnist}
+\begin{figure}
+    \centering
+    \includegraphics[width=0.9\textwidth]{data/polymnist_example}
+\end{figure}

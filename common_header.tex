@@ -27,15 +27,18 @@
 \newcommand{\conditioner}{c_i(\textbf{z}_{<1})}
 \newcommand{\where}{\quad \text{where} \quad}
 \newcommand{\xset}{\mathbb{X}}
+\newcommand{\xsubset}{\mathbb{X}_s}
 \newcommand{\xseti}{\mathbb{X}^{(i)}}
 \newcommand{\approxdistri}{q_{\phi_i}(\textbf{z}|\xseti)}
 \newcommand{\approxdistr}{q_{\phi, \psi}(\textbf{z}|\xset)}
+\newcommand{\jointpost}{q_{\phi}(\textbf{z}|\xset)}
+\newcommand{\subsetpost}{\tilde{q}_{\phi}(\textbf{z}|\xsubset)}
 \newcommand{\truedistri}{p_{\theta}(\textbf{z}|\xseti)}
 \newcommand{\truedistr}{p_{\theta}(\textbf{z}|\textbf{X})}
 \newcommand{\elbo}{\mathcal{L}(\theta, \phi; \xseti)}
-\newcommand{\xsubset}{\mathbb{X}_k}
+
 \newcommand{\lmopoe}{\mathcal{L}_{MoPoE}(\theta, \phi; \xset)}
-\newcommand{\eqlmopoe}{\lmopoe:= \mathbb{E}_{q_{\phi}(\textbf{z}|\mathbb{X})}[\log (p_{\theta}(\mathbb{X}|\textbf{z}))] - D_{KL}\biggl( \frac{1}{2^M} \sum _{\mathbb{X}_k \in \mathcal{P}(\mathbb{X})} \tilde{q}_{\phi}(\textbf{z}|\mathbb{X}_k)\ ||\ p_{\theta}(\textbf{z})\biggr)}
+\newcommand{\eqlmopoe}{\lmopoe:= \mathbb{E}_{q_{\phi}(\textbf{z}|\mathbb{X})}[\log (p_{\theta}(\mathbb{X}|\textbf{z}))] - D_{KL}\biggl( \frac{1}{2^M} \sum _{\mathbb{X}_s \in \mathcal{P}(\mathbb{X})} \tilde{q}_{\phi}(\textbf{z}|\mathbb{X}_s)\ ||\ p_{\theta}(\textbf{z})\biggr)}
 
 \newcommand{\eqlpgfm}{\mathcal{L}_{pgfm}(\theta, \phi; \xset):= \mathbb{E}_{\tilde{q}_{\phi_{12}}(\textbf{z}|\mathbb{X})}[\log (p_{\theta}(\mathbb{X}|\textbf{z}))] - D_{KL}\biggl(  \tilde{q}_{\phi_{12}}(\textbf{z}|\mathbb{X})\ ||\ p_{\theta}(\textbf{z})\biggr)}
 

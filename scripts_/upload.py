@@ -24,7 +24,7 @@ def main():
 
     dest_dir = zot_storage_path / filename2zotkey[file_name]
     dest_filename = Path(glob(str(dest_dir / "*"))[0]).name
-
+    print(f'copying {file_path} to {dest_dir / dest_filename}')
     shutil.copy(file_path, dest_dir / dest_filename)
 
 

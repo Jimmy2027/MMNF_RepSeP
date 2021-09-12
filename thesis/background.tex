@@ -1,5 +1,106 @@
 \section{Background}
-In this sections, we introduce concepts and previous work on variational autoencoders, self supervised multi modal generative learning and normalizing flows, on which this work builds on.
-
+In this section, we introduce concepts and previous work on VAEs, self supervised multi modal generative learning and normalizing flows, on which this work builds on.
 
 \subsection{Variational Autoencoder}
+The VAE, first introduced by \cite{kingma_auto-encoding_2014} and \cite{rezende_stochastic_2014}, consists of an encoder network and a decoder network.
+In contrast to a typical auto encoder network, the VAE is trained such that it's learned representation has the structure of a prior distribution.
+The most popular choice for a prior is the standard Gaussian distribution $\mathcal{N}(0,\textbf{I})$, which we also use in this work.
+The latent representation being a distribution, the decoder part can generate unseen data by sampling from it.
+The model is trained such that it maximizes the log-likelihood ($\log p(x)$) of the data by maximizing the Evidence Lower BOund (ELBO):
+
+\begin{equation}
+    \label{vaeelbo}
+    \begin{split}
+        \log p(x) &= \log \int p(x,z) dz\\
+        &=  \log \int p(x,z) \frac{q(z|x)}{q(z|x)}dz\\
+        &\geq \mathbb{E} _{q(z|x)}[\log \frac{p(x|z)p(z)}{q(z|x)}]\\
+        &= \mathbb{E} _{q(z|x)}[\log p(x|z)] - \mathbb{E} _{q(z|x)}[\log \frac{q(z|x)}{p(z)}]\\
+        &= \mathbb{E} _{q(z|x)}[\log p(x|z)] - D_{KL}\left( q(z|x)\ ||\ p(z)\right)
+    \end{split}
+\end{equation}
+
+The ELBO consists of two parts: the reconstruction loss which pushes the generated samples to resemble the real data and a regularization term which forces the latent representation to be structured like the prior.
+In \cite{beta_vae}, the authors introduce the hyperparameter $\beta$, which allows to weight the regularization term in the VAE objective:
+\begin{equation}
+    \mathcal{L}_{ELBO} = \mathbb{E} _{q(z|x)}[\log p(x|z)] - \beta D_{KL}\left( q(z|x)\ ||\ p(z)\right)
+\end{equation}
+
+A lower $\beta$ gives the model more freedom in learning the latent representation, while a higher $\beta$ forces the model to learn a latent distribution that is disentangled, like the prior.
+"Disentangled" here means that each dimension in the learned latent representation is independent of each other, and represents a latent factor that corresponds to a different attribute in the data.
+In images of animals for example, one dimension in the latent representation could represent the color of the fur, while another might correspond to the color of the eyes.
+Both the color of the fur and the color of the eyes are independent, and so should be the corresponding latent variables.
+
+
+%todo benefits of disentanglement? no shared information between dimension -> maximum information in latent representation?
+
+%It is widely believed that disentanglement leads to a better latent representation
+Disentanglement is a popular objective in representation learning and has been addressed in recent works \parencite{chen_isolating_2019, locatello_challenging_2019}.
+
+\subsection{Multi Modal VAEs}
+In order for the VAE model to learn a representation which captures the underlying factors of multiple modalities, several adaptations to the objective in \cref{vaeelbo} need to be made.
+The first approach that scales with the number of modalities, allows for a coherent joint generation over all modalities and cross-generation across individual modalities, the MVAE, was introduced in \cite{poe}.
+The MVAE makes the assumption that the joint posterior is a product of uni modal posteriors, also called a Product-of-Experts (PoE) \parencite{hinton_training_2002}:
+
+\begin{equation}
+    p(z|x_1,\ldots,x_M) \propto \prod ^M _{i=1} q(z|x_i)
+\end{equation}
+
+The PoE has the advantage of aggregating information across any subset of uni modal posteriors which allows for missing modalities.
+However, the product of experts does not train the individual inference networks and they don't learn to handle missing data at test time.
+To address this issue, the MVAE requires a sub-sampling of uni modal log-likelihoods, which no longer guarantees a valid lower bound on the joint log-likelihood \parencite{wu_multimodal_2019}.
+
+Another approach was proposed with the MMVAE in \cite{shi2019variational}, which models the joint posterior as a mixture of uni modal posteriors, i.e. a mixture of experts (MoE):
+
+\begin{equation}
+    p(z|x_1,\ldots,x_M) = \frac{1}{M} \sum _{i=1} q(z|x_i)
+\end{equation}
+
+The MoE has the advantage of optimizing each inference network individually, however it does not merge the information between posteriors since only uni modal posteriors are considered during training.
+
+Both the advantage of the PoE, which results in a good approximation of the joint distribution and the MoE which optimizes each uni modal posterior individually are combined in the MoPoE \parencite{thomas_gener-ELBO}.
+The MoPoE-VAE takes advantage of both methods by merging the uni modal posteriors into $2^M$ subsets, which are then combined with a MoE (see \cref{mopoeGraph}).
+
+\begin{figure}[h!]
+    \centering
+    \resizebox{0.9\textwidth}{!}{%
+        \py{pytex_printonly(script='scripts_/mopoe_graph.py', data = '')}
+    }
+    \caption{\textbf{The MoPoE makes use of the PoE to create $2^M$ subsets, which are then merged with a MoE.} Here $M=2$, the empty subset is not shown. On the left side are the two input modalities from the polymnist dataset (see \cref{polymnist}), on the right side are the generated samples. In the header of each generated sample is described from which subset the decoder sampled for the generation (left side of the $\rightarrow$) and which modality was generated (right side of the $\rightarrow$).}
+    \label{mopoeGraph}
+\end{figure}
+
+Similar to the MoE, the MoPoE models the joint posterior as a mixture, however of subsets instead of uni modal posteriors.
+For multi modal data $\mathbb{X}$ with M modalities, and $2^M$ subsets of modalities $\mathbb{X}_s \in \mathbb{X}$, the objective of the MoPoE, which is an evidence lower bound (ELBO) on the joint log-likelihood $\og p_{\theta}(\xset)$, can be written as follows:
+
+\begin{equation}
+    \eqlmopoe
+\end{equation}
+
+with $\jointpost$ the joint posterior:
+\begin{equation}
+    \jointpost = \frac{1}{2^M} \sum _{\xsubset \in \powerset} \subsetpost
+\end{equation}
+
+and $\subsetpost$ the posterior approximation of subset $\xsubset$:
+\begin{equation}
+    \label{eq:subsetmopoe}
+    \subsetpost=PoE(\{q_{\phi_j}(\textbf{z}|\textbf{x}_j) \forall \textbf{x}_j \in \xsubset\}) \propto \prod _{\textbf{x}_j \in \xsubset}q_{\phi_j}(\textbf{z}|\textbf{x}_j)
+\end{equation}
+
+For gaussian posteriors, the PoE in \cref{eq:subsetmopoe} can be computed in closed from.
+
+In this work, the MoPoE is taken as the current state of the art for scalable, self supervised, multi modal generative models and used as baseline.
+
+\subsection{Normalizing Flows}
+Normalizing flows \parencite{papamakarios_normalizing_2019} represent an approach for defining invertible and differentiable transformations of probability distributions.
+They are widely used for generative modeling \citep[\textbf{GLOW}, \textbf{Real NVP}]{kingma_glow_2018, dinh_density_2017} and variational inference \parencite{rezende_variational_2016, berg_sylvester_2019}.
+In this work, we make use of normalizing flows both as a simple parameterizable invertible function for the $f$-mean, as well as a transformation of the joint posterior into an arbitrary complexity in order to improve its ability to capture the underlying factors of multiple modalities.
+
+In practice, flow-based models are typically constructed by implementing a diffeomorphic transformation T (or $T^{-1}$) with a neural network.
+Because invertible and differentiable transforms are composable, complex transformations can be built by composing multiple instances of simpler ones: $T=T_K \circ \cdots \circ T_1$.
+
+In generative modeling, normalizing flows are used to learn a diffeomorphic mapping $T$ from images to a prior, like Gaussian noise.
+Since $T$ is invertible, one can then transform samples from the prior into new images with $T^{-1}$.
+
+
+

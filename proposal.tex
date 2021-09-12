@@ -51,7 +51,7 @@
 
     \subsection{Previous work on Multimodal Generative Learning} \label{subsec:prevwork_mopoe}
     Previous work on self-supervised multimodal generative models has shown that the class of generalised f-means provides a good tool for combining multiple modalities in a dataset.
-    In \citep[PoE]{wu_multimodal_2018}, the Product of Experts uses of a geometric mean and in \citep[MoE]{shi_variational_2019}, the Mixture of Experts uses an arithmetic mean.
+    In \citep[PoE]{poe}, the Product of Experts uses of a geometric mean and in \citep[MoE]{shi_variational_2019}, the Mixture of Experts uses an arithmetic mean.
     More recently, the authors of \citep[MoPoE]{sutter_generalized_2020} improved on previous results by using a combination of a geometric mean and an arithmetic mean.
     Their Mixture of Product of Experts (MoPoE) computes the joint posterior approximation in two steps:\\
     By first computing the individual posterior approximations for each subset of the powerset $\powerset$:
@@ -194,7 +194,7 @@
     In order to arrive to a model that can efficiently and accurately approximate the joint posterior distribution of multimodal data, I propose to start from the codebase used in \citet{sutter_generalized_2020}.
     However, where the "Mixture-of-Products-of-Experts-VAE" (MoPoE-VAE) computes the joint posterior approximation in two steps as shown in \cref{subsec:prevwork_mopoe}, the task of this project is to merge the posterior approximations of each of the M modalities $q_{\phi_i}(\textbf{z}|\{\xseti\}_{i=1}^M)$ using a parameterisable function.
     A possible implementation of the fusion of the posterior approximations are generalised f-means \citep{niculescu_convex_2018}.
-    In previous work, the arithmetic mean and the geometric mean have been used  \citep[PoE,MoE,MoPoE]{wu_multimodal_2018,shi_variational_2019,sutter_generalized_2020}, which belong to the class of generalised f-means.
+    In previous work, the arithmetic mean and the geometric mean have been used  \citep[PoE,MoE,MoPoE]{poe,shi_variational_2019,sutter_generalized_2020}, which belong to the class of generalised f-means.
     In this sense, using a parameterisable generalised f-means extends and generalises previous work.
     \begin{definition}
         If f is both continuous and injective, the f-mean $\mathcal{M}_f$ is defined as:
@@ -243,7 +243,7 @@
 
     \subsection{Evaluation}
     To evaluate the method, I propose to apply it to the toy dataset MNIST-SVHN-TEXT introduced in \citet{sutter_generalized_2020}.
-    This allows for an easy comparison between the new method and previous work on multi modal data generation \citep[MoPoE, MoE, PoE][]{sutter_generalized_2020, shi_variational_2019, wu_multimodal_2018}.
+    This allows for an easy comparison between the new method and previous work on multi modal data generation \citep[MoPoE, MoE, PoE][]{sutter_generalized_2020, shi_variational_2019, poe}.
     In a second step, the new method can then be applied to the challenging medical dataset MIMIC-CXR \citep{johnson_mimic-cxr-jpg_2019} in order to evaluate it on real world applications.
 
     For comparison to previous work, I propose to evaluate the separability of the latent representation, the generation quality, and the generation coherence.

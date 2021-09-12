@@ -1,9 +1,36 @@
+% pythontex
 % Preamble
 \documentclass[11pt,english]{article}
+
+% Set PDF meta-information
+%\hypersetup{
+%    pdftitle={Multi Modal Generative Learning with Normalizing Flows - Master Thesis},
+%    pdfauthor={Hendrik Johannes Klug}
+%}
+
 \input{common_header.tex}
 
 % Packages
 \usepackage{amsmath}
+\usepackage{cleveref}
+%\usepackage{showframe} %This line can be used to clearly show the new margins
+\usepackage{geometry}
+
+\newgeometry{vmargin={25mm}, hmargin={25mm,25mm}}   % set the margins
+
+% pythontex dependencies
+\begin{pythontexcustomcode}[begin]{py}
+    DOC_STYLE="thesis/main.conf"
+    pytex.add_dependencies(
+    'thesis/scripts/plots/epoch_comparison_lr.py',
+    'thesis/scripts/plots/epoch_comparison_gen.py',
+    'thesis/scripts/plots/nbr_mods_comparison_gen.py',
+    'thesis/scripts/plots/nbr_mods_comparison_lr.py',
+    'thesis/scripts/plots/utils.py',
+    'scripts_/mopoe_graph.py',
+    DOC_STYLE
+    )
+\end{pythontexcustomcode}
 
 %BIBLIOGRAPHY
 \usepackage[backend=bibtex,style=authoryear,natbib=true]{biblatex}
@@ -25,8 +52,12 @@
     \newpage
 
     \input{thesis/intro.tex}
+    \newpage
     \input{thesis/background.tex}
+    \newpage
     \input{thesis/methods.tex}
+    \newpage
+    \input{thesis/results.tex}
 
 
 
