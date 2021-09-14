@@ -22,6 +22,7 @@ The model is trained such that it maximizes the log-likelihood ($\log p(x)$) of 
 The ELBO consists of two parts: the reconstruction loss which pushes the generated samples to resemble the real data and a regularization term which forces the latent representation to be structured like the prior.
 In \cite{beta_vae}, the authors introduce the hyperparameter $\beta$, which allows to weight the regularization term in the VAE objective:
 \begin{equation}
+    \label{eq:vaeelbo}
     \mathcal{L}_{ELBO} = \mathbb{E} _{q(z|x)}[\log p(x|z)] - \beta D_{KL}\left( q(z|x)\ ||\ p(z)\right)
 \end{equation}
 
@@ -70,7 +71,7 @@ The MoPoE-VAE takes advantage of both methods by merging the uni modal posterior
 \end{figure}
 
 Similar to the MoE, the MoPoE models the joint posterior as a mixture, however of subsets instead of uni modal posteriors.
-For multi modal data $\mathbb{X}$ with M modalities, and $2^M$ subsets of modalities $\mathbb{X}_s \in \mathbb{X}$, the objective of the MoPoE, which is an evidence lower bound (ELBO) on the joint log-likelihood $\og p_{\theta}(\xset)$, can be written as follows:
+For multi modal data $\mathbb{X}$ with M modalities, and $2^M$ subsets of modalities $\mathbb{X}_s \in \mathbb{X}$, the objective of the MoPoE, which is an evidence lower bound (ELBO) on the joint log-likelihood $\log p_{\theta}(\xset)$, can be written as follows:
 
 \begin{equation}
     \eqlmopoe
@@ -87,20 +88,51 @@ and $\subsetpost$ the posterior approximation of subset $\xsubset$:
     \subsetpost=PoE(\{q_{\phi_j}(\textbf{z}|\textbf{x}_j) \forall \textbf{x}_j \in \xsubset\}) \propto \prod _{\textbf{x}_j \in \xsubset}q_{\phi_j}(\textbf{z}|\textbf{x}_j)
 \end{equation}
 
-For gaussian posteriors, the PoE in \cref{eq:subsetmopoe} can be computed in closed from.
+For gaussian posteriors, the PoE in \cref{eq:subsetmopoe} can be computed in closed form.
 
 In this work, the MoPoE is taken as the current state of the art for scalable, self supervised, multi modal generative models and used as baseline.
+
+\subsection{Importance Weighted Autoencoder}
+It has been shown that the tightness of the ELBO in \cref{eq:vaeelbo} can be improved by sampling multiple samples form the posterior at each step \parencite{burda_importance_2016}, which results in the following lower bound:
+\begin{equation}
+    \label{eq:iwelbo}
+    \log p(x) \geq \mathbb{E}_{z_1,\ldots,z_K \sim q_{\phi}(z|x)}\left[ \log \frac{1}{K} \sum ^K _{k=1} \frac{p_{\theta}(x|z_k)p_{\theta}(z)}{q_{\phi}(z_k| x)} \right]\\
+    := \mathcal{L}_K
+\end{equation}
+
+\Cref{eq:iwelbo} yields useful properties summarized in \parencite{nowozin_debiasing_2018}, namely that one recovers the ELBO for $K=1$, $\mathcal{L}_K$ approaches the true $\log p(x)$ for larger Ks ($\lim _{K \rightarrow \inf} \mathcal{L}_K = \log p(x)$) and $\mathcal{L}_1, \ldots, \mathcal{L}_K$ provide stochastic monotonicity ($\mathcal{L}_E = \mathcal{L}_1 \leq \mathcal{L}_2 \leq \ldots \leq \log p(x)$).
+The MMVAE from \parencite{shi2019variational} adapts this for multi modal data:
+\begin{equation}
+    \label{eq:iwelbommvae}
+    \mathcal{L}^{MoE}_K(\textbf{x}_{1:M}) =
+    \frac{1}{M} \sum _{m=1} ^M \mathbb{E}_{z_m^{1:K} \sim q_{\phi_m}(z|x_m)}\left[ \log \frac{1}{K} \sum ^K _{k=1} \frac{p_{\theta}(x_{1:M}|z_m^k)p_{\theta}(z^k_m)}{q_{\phi}(z_m^k| x_{1:M})} \right]
+\end{equation}
+which is a valid lower bound of the multi modal log likelihood $\log p(\xset)$.
+
+In our work, we make use of this importance sampling training paradigm to improve the tightness of the ELBO and to approximate the KL-divergence between the posterior and the prior by comparing samples from both (see \cref{sec:methods})).
 
 \subsection{Normalizing Flows}
 Normalizing flows \parencite{papamakarios_normalizing_2019} represent an approach for defining invertible and differentiable transformations of probability distributions.
 They are widely used for generative modeling \citep[\textbf{GLOW}, \textbf{Real NVP}]{kingma_glow_2018, dinh_density_2017} and variational inference \parencite{rezende_variational_2016, berg_sylvester_2019}.
 In this work, we make use of normalizing flows both as a simple parameterizable invertible function for the $f$-mean, as well as a transformation of the joint posterior into an arbitrary complexity in order to improve its ability to capture the underlying factors of multiple modalities.
 
-In practice, flow-based models are typically constructed by implementing a diffeomorphic transformation T (or $T^{-1}$) with a neural network.
-Because invertible and differentiable transforms are composable, complex transformations can be built by composing multiple instances of simpler ones: $T=T_K \circ \cdots \circ T_1$.
-
 In generative modeling, normalizing flows are used to learn a diffeomorphic mapping $T$ from images to a prior, like Gaussian noise.
 Since $T$ is invertible, one can then transform samples from the prior into new images with $T^{-1}$.
+
+In practice, flow-based models are typically constructed by implementing a diffeomorphic transformation T (or $T^{-1}$) with a neural network.
+Because invertible and differentiable transforms are composable, complex transformations can be built by composing multiple instances of simpler ones: $T=T_K \circ \cdots \circ T_1$.
+The density of the transformed posterior $\tilde{q_{\phi}}$ can easily be obtained with the change of variable formula \parencite{bogachev2007measure}:
+\begin{equation}
+    \tilde{q_{\phi}} = T(q_{\phi}) \where q_{\phi} \sim p_{q_{\phi}}(q_{\phi}) = \mathcal{N}(\mu_{\phi}, \sigma^2_{\phi})
+\end{equation}
+\begin{equation}
+    \label{eq:changeofvariables}
+    p_{\tilde{q}_{\phi}}(\tilde{q}_{\phi}) = p_{q_{\phi}}(q_{\phi})|\det J_T(q_{\phi})|^{-1}
+\end{equation}
+
+
+
+
 
 
 

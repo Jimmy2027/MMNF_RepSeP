@@ -1,28 +1,129 @@
 \section{Methods}
-As introduced in previous sections, we are working with a multi modal VAE (mmVAE), which learns a joint distribution that contains the combined information of each learned uni modal latent distribution.
-In order to generalize previous methods and to increase the flexibility of the combination of the modalities, we implement the fusion of the uni modal latent distributions with a generalized $f$-mean.
-
+\label{sec:methods}
+As introduced herein, we are working with a multi modal VAE (mmVAE), which learns a joint distribution that contains the combined information of each learned uni modal latent distribution.
+In order to generalize previous methods and to increase the flexibility of the combination of the modalities, we implement the fusion of the uni modal latent distributions with a mixture of generalized $f$-mean.
+Instead of merging the uni modal posteriors into subset-posteriors with a PoE, like is done in the MoPoE, we merge them with a trainable $f_{\psi}$-mean, with parameters $\psi$.
 The main difficulty in this approach comes from the fact that the $f$-mean of the uni modal distributions follows an unknown distribution.
 While this makes the joint distribution more flexible, this also makes the computation of the regularization term in the ELBO, the KL-divergence, more difficult to compute.
-In fact, if the density of the joint distribution is unknown, it is impossible to compute the KL-divergence in closed form.
+In fact, if the density of the joint distribution is unknown and it is impossible to compute the KL-divergence in closed form.
 
-An intuitive workaround would be to find an upper bound of the KL-divergence which can be computed in closed from, such that it can be minimized in order to minimize the true divergence
+An intuitive workaround would be to find an upper bound of the KL-divergence which can be computed in closed from, such that it can be minimized in order to minimize the true divergence:
+\begin{equation}
+    \label{eq:kldivbound}
+    D_{KL}^{\prime} \geq D_{KL}(\mathcal{M}_f(\{\unimodalpost\ \forall\ \xsetm \in \xsubset\})) =  D_{KL}\left(f^{-1}\left(\sum _{\xsetm \in \xsubset} \frac{f(\unimodalpost)}{|\xsubset|}\right)\ ||\ \prior\right)
+\end{equation}
 
-We propose three workarounds to this problem:
-\begin{itemize}
-    \item todo
-\end{itemize}
+Using the change of variable formula (\cref{eq:changeofvariables}), the $f$-mean can be rewritten as follows:
+\begin{equation}
+    \mathcal{M}_f = f^{-1}(Q)|J_{f^{-1}}(Q)|
+\end{equation}
+with
+\begin{equation}
+    Q= \sum _{\xsetm \in \xsubset} \frac{\unimodalpost|J_f(\unimodalpost)|}{|\xsubset|}
+\end{equation}
+
+Here Q is a sum of random variables, which can be rewritten as chained convolutions \footnote{\url{https://en.wikipedia.org/wiki/Sum_of_normally_distributed_random_variables}} and is hard to evaluate.
+
+Instead, we propose three workarounds to the computation of the KL-divergence in \cref{eq:kldivbound}.
+\begin{enumerate}
+
+    \item For one, \cref{eq:kldivbound} can be simplified by skipping the backwards transformation $f^{-1}$.
+    This leads to a mixture of transformed posteriors, which divergence can bounded using \cref{lemma:DklLowerBound} from \parencite{sutter_multimodal_2020}.
+    \begin{lemma}[Joint Approximation Function \citep{sutter_multimodal_2020}]
+        \label{lemma:DklLowerBound}
+
+        The KL-divergence of the multimodal variational posterior approximation is a lower bound for the weighted sum of the KL-divergences of the unimodal variational approximation functions:
+        \begin{equation}
+            D_{KL} \left( \sum _{i=1} ^M \frac{1}{M}\approxdistri\ ||\ \prior \right) \leq \sum _{i=1} ^M \frac{1}{M} D_{KL} \left( \approxdistri\ ||\ \prior \right)
+        \end{equation}
+    \end{lemma}
+    We then get an upper bound that can be minimized:
+    \begin{equation}
+        D_{KL}\left(\sum _{\xsetm \in \xsubset} \frac{f_{\psi}(\unimodalpost)}{|\xsubset|}\ ||\ \prior\right) \leq \frac{1}{|\xsubset|} \sum  _{\xsetm \in \xsubset} D_{KL} \left(f_{\psi} (\unimodalpost))||\ \prior \right) \quad (\cref{lemma:DklLowerBound})
+    \end{equation}
+
+    We implement this in the Mixture of flow of experts (mofoe) model, which is described in %todo.
+
+% todo beschreib mofop method and sag vorteile und nachteile von dieser Methods: man macht die einzelnen posterior besser aber man macht das mergen der information nicht flexibler
+    % todo sag dass weil das nicht so gut funktioniert, this hints that the true problem is not the merging method of the information but the form of the posterior.
+
+    \item Another way to simplify the Kl-divergence in \cref{eq:kldivbound} is to force the output of the $f$-mean to be a Gaussian distribution.
+    This can be done by, instead of mixing the posteriors which follow a normal distribution, mixing their parameters $\mu$ and $\sigma$.
+    The joint posterior is then described as follows:
+    \begin{equation}
+        q_{\phi, joint} \sim \mathcal{N}\left(  f_{\mu}^{-1}(\sum _{\xsetm \in \xsubset} \frac{f_{\mu}(\mu_s)}{|\xsubset|}),f_{\sigma}^{-1}(\sum  _{\xsetm \in \xsubset} \frac{f_{\sigma}(\sigma_s^2)}{|\xsubset|})\right)
+    \end{equation}
+
+    This is implemented as the mixture of parameter generalized $f$-mean (mopgfm) and described in %todo.
+
+    \item The third option is to instead of computing the KL-divergence in closed form, one can approximate it by sampling from the posterior, i.e. comparing k samples from the posterior with k samples from the prior.
+    This method is similar to the importance weighted VAE \parencite[iwVAE]{burda_importance_2016}, however since the Kl-divergence is not computed is closed form but approximated with the K samples, a higher number of K is required to obtain good results.
+    This method is implemented as the importance weighted mixture of generalized $f$-mean (iwMogfM) and described in %todo.
+\end{enumerate}
 
 \subsection{Models}
+Here we describe the models that implement the three methods introduced above and enumerate their advantages and disadvantages.
 
 \subsubsection{Mixture of parameter- Generalized $f$-Mean}
 
-\subsubsection{Mixture of importance weighted Generalized $f$-Mean}
+\subsubsection{iwMogfM}
+Like the MoPoE, the iwMogfM creates the joint posterior by creating $2^M$ subsets from the uni modal posteriors and then mixing them with a mixture of experts.
+However, instead of using a PoE to create the subsets, it uses an $f$-mean.
+The iwMogfM also makes use of the importance sampling method from the iwVAE, by sampling K samples from the posterior.
+To derive the resulting objective, we rewrite the objective from the MoPoE for K importance samples in a first step:
+\begin{equation}
+    \begin{split}
+        \mathcal{L}^{mopoe}_1&=\frac{1}{|\powerset|} \sum _{\xsubset \in \powerset} \mathbb{E}_{\subsetpost} \left[ \log \frac{p_{\theta}(\xsubset, \textbf{z})}{\subsetpost} \right]\\
+        &=\frac{1}{|\powerset|} \sum _{\xsubset \in \powerset} \mathbb{E}_{z_s \sim \subsetpost} \left[ \log \frac{p_{\theta}(\xsubset, \textbf{z}_s)}{\tilde{q}_{\phi}(\textbf{z}_s|\xsubset)} \right]\\
+        &\leq \frac{1}{|\powerset|} \sum _{\xsubset \in \powerset} \mathbb{E}_{z^{1:K}_s \sim \subsetpost} \left[ \log \frac{1}{K} \sum _{k=1}^K \frac{p_{\theta}(\xsubset, \textbf{z}^k _s)}{\tilde{q}_{\phi}(\textbf{z}^k _s|\xsubset)} \right] = \mathcal{L}^{mopoe}_K
+    \end{split}
+\end{equation}
+
+Using the fact that the logarithm is concave and Jensens inequality, $\mathcal{L}^{mopoe}_K$ can be rewritten as follows:
+\begin{equation}
+    \begin{split}
+        &\frac{1}{|\powerset|} \sum _{\xsubset \in \powerset} \mathbb{E}_{z^{1:K}_s \sim \subsetpost} \left[ \log \frac{1}{K} \sum _{k=1}^K \frac{p_{\theta}(\xsubset, \textbf{z}^k _s)}{\tilde{q}_{\phi}(\textbf{z}^k _s|\xsubset)} \right]\\
+%
+        &\geq \frac{1}{|\powerset|} \sum _{\xsubset \in \powerset} \mathbb{E}_{z^{1:K}_s \sim \subsetpost} \left[ \frac{1}{K} \sum _{k=1}^K \log  \frac{p_{\theta}(\xsubset, \textbf{z}^k _s)}{\tilde{q}_{\phi}(\textbf{z}^k _s|\xsubset)} \right]\\
+%
+        &= \frac{1}{|\powerset|} \sum _{\xsubset \in \powerset} \mathbb{E}_{z^{1:K}_s \sim \subsetpost} \left[ \frac{1}{K} \sum _{k=1}^K \log p_\theta (\xsubset|\textbf{z}^k _s) -\log  \frac{\tilde{q}_{\phi}(\textbf{z}^k _s|\xsubset)}{p_{\theta}(\textbf{z}^k _s)} \right]\\
+%
+        &= \frac{1}{|\powerset|} \sum _{\xsubset \in \powerset} \mathcal{R}^{1:K}_s - D^{1:K}_s
+    \end{split}
+\end{equation}
+
+where $\mathcal{R}$ is the reconstruction loss and D the Kl-divergence between the subset posterior and the prior.
+The subset posteriors are obtained with an $f$-mean of the uni modal posteriors:
+\begin{equation}
+    \subsetpost = f^{-1}\left(\sum _{\xsetm \in \xsubset} \frac{f(\unimodalpost)}{|\xsubset|}\right)
+\end{equation}
+
+Since the density of the subset posteriors is hard to evaluate, $D^{1:K}_s$ is calculated by comparing K samples from $\subsetpost$ with K samples from the prior $\prior$:
+\begin{equation}
+    \begin{split}
+        D^{1:K}_s &=  \mathbb{E}_{z^{1:K}_s \sim \subsetpost} \left[ \frac{1}{K} \sum _{k=1}^K \log \tilde{q}_{\phi}(\textbf{z}^k _s|\xsubset) - \log p_{\theta}(\textbf{z}^k _s) \right]\\
+        %
+        & \approx  \sum ^{\text{batch size}} \frac{1}{K} \sum _{k=1}^K \tilde{q}_{\phi}(\textbf{z}^k _s|\xsubset) \log \tilde{q}_{\phi}(\textbf{z}^k _s|\xsubset) - \log p_{\theta}(\textbf{z}^k _s)\\
+        %
+        &= \sum ^{\text{batch size}} \frac{1}{K} \sum _{k=1}^K \tilde{q}_{\phi}(\textbf{z}^k _s|\xsubset)  \log f^{-1}\left(\sum _{\xsetm \in \xsubset} \frac{f(\unimodalpost)}{|\xsubset|}\right) - \log p_{\theta}(\textbf{z}^k _s)
+    \end{split}
+\end{equation}
+
+
+
+\begin{figure}[h!]
+    \centering
+    \resizebox{0.99\textwidth}{!}{%
+        \py{pytex_printonly(script='scripts_/mogfm_graph.py', data = '')}
+    }
+    \caption{\textbf{The iwMogfM makes use of the $f$-mean to create $2^M$ subsets, which are then merged with a MoE.} Here $M=2$, the empty subset is not shown. On the left side are the two input modalities from the polymnist dataset (see \cref{polymnist}), on the right side are the generated samples. In the header of each generated sample is described from which subset the decoder sampled for the generation (left side of the $\rightarrow$) and which modality was generated (right side of the $\rightarrow$).}
+    \label{iwmogfmGraph}
+\end{figure}
 
 \subsection{Datasets}
 
 \subsubsection{PolyMNIST} \label{polymnist}
-\begin{figure}
+\begin{figure}[h!]
     \centering
     \includegraphics[width=0.9\textwidth]{data/polymnist_example}
 \end{figure}
