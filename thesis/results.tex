@@ -40,3 +40,13 @@ My results.
         label='fig:vc',
         )}
 \end{sansmath}
+
+\py{
+    pytex_tab(
+    script='thesis/scripts/gen_eval_tab.py',
+    options_pre='\\centering \\resizebox{0.8\\textwidth}{!}{',
+    options_post='}',
+    caption='Generation coherence for the Test set.
+    ',
+    )
+}
