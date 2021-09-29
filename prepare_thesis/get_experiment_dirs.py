@@ -1,13 +1,24 @@
 """Get the experiment dirs from leomed"""
 import os
 from pathlib import Path
-from modun.zip_utils import unzip_to
+
+from mmvae_hub.experiment_vis.utils import get_exp_dir
+from mmvae_hub.utils.MongoDB import MongoDatabase
 from mmvae_hub.utils.utils import json2dict
-import os
-data_dir = Path('../data/thesis')
+
+from modun.zip_utils import unzip_to
+
+data_dir = Path(__file__).parent.parent / 'data/thesis'
 data_dir.mkdir(exist_ok=True, parents=True)
 
 conf = json2dict(Path('conf.json'))
+
+if conf['use_db']:
+    exp_db = MongoDatabase(training=False)
+    experiments = exp_db.connect()
+    db_uids = {exp['_id'] for exp in experiments.find({})}
+else:
+    db_uids = []
 
 # get experiment_uids from leomed
 leomed_path = Path(conf['data_dir_leomed']) / 'experiment_uids.json'
@@ -20,12 +31,18 @@ os.system(rsync_command)
 
 exp_uids = json2dict(experiment_uids_path)
 
-for method in ['mopgfm', 'moe']:
-# for method in ['mopgfm']:
+for method in ['mopoe', 'mopgfm', 'moe']:
+    # for method in ['mopgfm']:
     for nbr_mods, uid_list in exp_uids[method].items():
         for uid in uid_list:
-            try:
-                unzip_to(path_to_zip_file=Path(conf['local_leomed_exp_dir']) / (uid + '.zip'), dest_path=data_dir / uid,
-                         verbose=True)
-            except Exception as e:
-                print(e)
+            dest_dir = data_dir / uid
+            if not dest_dir.exists():
+                if uid in db_uids:
+                    get_exp_dir(_id=uid, dest_dir=dest_dir)
+                else:
+                    try:
+                        unzip_to(path_to_zip_file=Path(conf['local_leomed_exp_dir']) / (uid + '.zip'),
+                                 dest_path=dest_dir,
+                                 verbose=True)
+                    except Exception as e:
+                        print(e)

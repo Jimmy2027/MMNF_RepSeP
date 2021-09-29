@@ -809,3 +809,48 @@ thomas_gener-ELBO,
 	eprint = {1912.05075},
 	keywords = {Computer Science - Machine Learning, Statistics - Machine Learning}
 }
+
+
+@article{burgess_understanding_2018,
+	title = {Understanding disentangling in \${\textbackslash}beta\$-{VAE}},
+	url = {http://arxiv.org/abs/1804.03599},
+	abstract = {We present new intuitions and theoretical assessments of the emergence of disentangled representation in variational autoencoders. Taking a rate-distortion theory perspective, we show the circumstances under which representations aligned with the underlying generative factors of variation of data emerge when optimising the modified {ELBO} bound in \${\textbackslash}beta\$-{VAE}, as training progresses. From these insights, we propose a modification to the training regime of \${\textbackslash}beta\$-{VAE}, that progressively increases the information capacity of the latent code during training. This modification facilitates the robust learning of disentangled representations in \${\textbackslash}beta\$-{VAE}, without the previous trade-off in reconstruction accuracy.},
+	journaltitle = {{arXiv}:1804.03599 [cs, stat]},
+	author = {Burgess, Christopher P. and Higgins, Irina and Pal, Arka and Matthey, Loic and Watters, Nick and Desjardins, Guillaume and Lerchner, Alexander},
+	urldate = {2021-09-28},
+	date = {2018-04-10},
+	eprinttype = {arxiv},
+	eprint = {1804.03599},
+	note = {version: 1},
+	keywords = {Computer Science - Artificial Intelligence, Computer Science - Machine Learning, Statistics - Machine Learning},
+}
+
+
+@article{dorent_hetero-modal_2019,
+	title = {Hetero-Modal Variational Encoder-Decoder for Joint Modality Completion and Segmentation},
+	url = {http://arxiv.org/abs/1907.11150},
+	doi = {10.1007/978-3-030-32245-8_9},
+	abstract = {We propose a new deep learning method for tumour segmentation when dealing with missing imaging modalities. Instead of producing one network for each possible subset of observed modalities or using arithmetic operations to combine feature maps, our hetero-modal variational 3D encoder-decoder independently embeds all observed modalities into a shared latent representation. Missing data and tumour segmentation can be then generated from this embedding. In our scenario, the input is a random subset of modalities. We demonstrate that the optimisation problem can be seen as a mixture sampling. In addition to this, we introduce a new network architecture building upon both the 3D U-Net and the Multi-Modal Variational Auto-Encoder ({MVAE}). Finally, we evaluate our method on {BraTS}2018 using subsets of the imaging modalities as input. Our model outperforms the current state-of-the-art method for dealing with missing modalities and achieves similar performance to the subset-specific equivalent networks.},
+	journaltitle = {{arXiv}:1907.11150 [cs, eess]},
+	author = {Dorent, Reuben and Joutard, Samuel and Modat, Marc and Ourselin, Sébastien and Vercauteren, Tom},
+	urldate = {2021-09-28},
+	date = {2019-07-25},
+	eprinttype = {arxiv},
+	eprint = {1907.11150},
+	keywords = {Computer Science - Computer Vision and Pattern Recognition, Electrical Engineering and Systems Science - Image and Video Processing},
+}
+
+
+@article{calixto_latent_2019,
+	title = {Latent Variable Model for Multi-modal Translation},
+	url = {http://arxiv.org/abs/1811.00357},
+	abstract = {In this work, we propose to model the interaction between visual and textual features for multi-modal neural machine translation ({MMT}) through a latent variable model. This latent variable can be seen as a multi-modal stochastic embedding of an image and its description in a foreign language. It is used in a target-language decoder and also to predict image features. Importantly, our model formulation utilises visual and textual inputs during training but does not require that images be available at test time. We show that our latent variable {MMT} formulation improves considerably over strong baselines, including a multi-task learning approach (Elliott and K{\textbackslash}'ad{\textbackslash}'ar, 2017) and a conditional variational auto-encoder approach (Toyama et al., 2016). Finally, we show improvements due to (i) predicting image features in addition to only conditioning on them, (ii) imposing a constraint on the minimum amount of information encoded in the latent variable, and (iii) by training on additional target-language image descriptions (i.e. synthetic data).},
+	journaltitle = {{arXiv}:1811.00357 [cs]},
+	author = {Calixto, Iacer and Rios, Miguel and Aziz, Wilker},
+	urldate = {2021-09-28},
+	date = {2019-05-16},
+	eprinttype = {arxiv},
+	eprint = {1811.00357},
+	keywords = {Computer Science - Computation and Language, I.2.7},
+
+}

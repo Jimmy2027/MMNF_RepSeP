@@ -44,9 +44,29 @@ My results.
 \py{
     pytex_tab(
     script='thesis/scripts/gen_eval_tab.py',
-    options_pre='\\centering \\resizebox{0.8\\textwidth}{!}{',
+    options_pre='\\centering \\resizebox{0.7\\textwidth}{!}{',
     options_post='}',
     caption='Generation coherence for the Test set.
+    ',
+    )
+}
+
+\py{
+    pytex_tab(
+    script='thesis/scripts/lr_eval_tab.py',
+    options_pre='\\centering \\resizebox{0.99\\textwidth}{!}{',
+    options_post='}',
+    caption='Linear classification accuracy of latent representations for the Test set.\\
+    ',
+    )
+}
+
+\py{
+    pytex_tab(
+    script='thesis/scripts/prd_tab.py',
+    options_pre='\\centering \\resizebox{0.7\\textwidth}{!}{',
+    options_post='}',
+    caption='Area under the Precision and Recall curve of the PRD score \citep{precision_recall_distributions}.\\
     ',
     )
 }

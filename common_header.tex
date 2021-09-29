@@ -20,8 +20,18 @@
 % Needs to be loaded after hyperref and amsmath
 \usepackage{cleveref}
 
+% Grey definitions.
+\definecolor{dg}{gray}{0.25}
+\definecolor{mg}{gray}{0.55}
+\definecolor{lg}{gray}{0.73}
+\definecolor{vlg}{gray}{0.9}
+
 % new commands
+\newcommand{\mg}[1]{\textcolor{mg}{\texttt{#1}}}
 \newcommand{\xdensity}{\textit{p}_x (\textbf{x})}
+\newcommand{\zm}{\textbf{z}_m}
+\newcommand{\zs}{\textbf{z}_s}
+
 \newcommand{\udensity}{\textit{p}_u (\textbf{u})}
 \newcommand{\transformer}{\tau(z_i;\textbf{h}_i)}
 \newcommand{\conditioner}{c_i(\textbf{z}_{<1})}
@@ -30,7 +40,9 @@
 \newcommand{\xsubset}{\mathbb{X}_s}
 \newcommand{\xseti}{\mathbb{X}^{(i)}}
 \newcommand{\xsetm}{\mathbb{X}_m}
-\newcommand{\unimodalpost}{q_{\phi_m}(\textbf{z}|\xsetm)}
+\newcommand{\samplem}{\textbf{x}_m}
+
+\newcommand{\unimodalpost}{q_{\phi_m}(\textbf{z}|\samplem)}
 
 \newcommand{\approxdistri}{q_{\phi_i}(\textbf{z}|\xseti)}
 \newcommand{\approxdistr}{q_{\phi, \psi}(\textbf{z}|\xset)}

@@ -4,18 +4,17 @@ from mmvae_hub.leomed_utils.launch_jobs import launch_leomed_jobs
 from mmvae_hub.utils.setup.filehandling import get_experiment_uid
 from mmvae_hub.utils.utils import json2dict, dict2json
 
-end_epoch = 150
+end_epoch = 500
 eval_freq = 1000
 nbr_repeats = 1
 
 moe_args = {
     'method': 'moe',
-    "initial_learning_rate": 0.0005,
-    'class_dim': 640,
+    "initial_learning_rate": 0.001,
+    'class_dim': 512,
     "min_beta": 0,
-    "max_beta": 2.0,
-    "beta_warmup": 50,
-    "num_gfm_flows": 3,
+    "max_beta": 2.5,
+    "beta_warmup": 0,
     "num_mods": 3,
     "end_epoch": end_epoch,
     "eval_freq": eval_freq,
@@ -23,12 +22,11 @@ moe_args = {
 
 mopoe_args = {
     'method': 'mopoe',
-    "initial_learning_rate": 0.0005,
-    'class_dim': 640,
+    "initial_learning_rate": 0.001,
+    'class_dim': 512,
     "min_beta": 0,
-    "max_beta": 2.0,
-    "beta_warmup": 50,
-    "num_gfm_flows": 3,
+    "max_beta": 2.5,
+    "beta_warmup": 0,
     "num_mods": 3,
     "end_epoch": end_epoch,
     "eval_freq": eval_freq,
@@ -37,7 +35,7 @@ mopoe_args = {
 mopgfm_args = {
     'method': 'mopgfm',
     "initial_learning_rate": 0.0005,
-    'class_dim': 640,
+    'class_dim': 1280,
     "min_beta": 0,
     "max_beta": 2.0,
     "beta_warmup": 50,
@@ -45,7 +43,8 @@ mopgfm_args = {
     "end_epoch": end_epoch,
     "eval_freq": eval_freq,
     "coupling_dim": 64,
-    "num_gfm_flows": 11,
+    "num_gfm_flows": 1,
+    "nbr_coupling_block_layers": 5
 
 }
 
@@ -65,13 +64,13 @@ mogfm_args = {
 }
 
 if __name__ == '__main__':
-    experiment_uids_path = Path('../data/thesis/experiment_uids.json')
+    experiment_uids_path = Path(__file__).parent.parent / 'data/thesis/experiment_uids.json'
     if experiment_uids_path.exists():
         exp_uids = json2dict(experiment_uids_path)
     else:
         exp_uids = {}
 
-    for params in [mopgfm_args, moe_args]:
+    for params in [mopgfm_args, moe_args, mopoe_args]:
         method = params['method']
 
         if method not in exp_uids:
@@ -81,7 +80,7 @@ if __name__ == '__main__':
             params['num_mods'] = num_mods
             # more evaluation steps are needed for 3 mods
             if num_mods == 3:
-                params['eval_freq'] = 10
+                params['eval_freq'] = 50
             exp_uids[method][f'{num_mods}_mods'] = []
 
             for _ in range(nbr_repeats):
@@ -89,6 +88,7 @@ if __name__ == '__main__':
                 params["experiment_uid"] = experiment_uid
 
                 exp_uids[method][f'{num_mods}_mods'].append(experiment_uid)
+                # todo change experiment_dir path
                 launch_leomed_jobs(which_dataset='polymnist', params=params)
 
     dict2json(experiment_uids_path, d=exp_uids)

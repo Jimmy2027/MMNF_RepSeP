@@ -1,5 +1,11 @@
 {
+  "use_db": true,
   "experiment_dir_leomed": "/cluster/home/klugh/klugh/mmvae_hub_data/experiments",
   "data_dir_leomed": "/cluster/home/klugh/MMNF_RepSeP/data/thesis",
-  "local_leomed_exp_dir": "/Users/Hendrik/Documents/master_4/leomed_experiments"
+  "local_leomed_exp_dir": "/Users/Hendrik/Documents/master_4/leomed_experiments",
+  "methods": [
+    "mopoe",
+    "moe",
+    "mopgfm"
+  ]
 }

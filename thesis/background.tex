@@ -7,7 +7,7 @@ In contrast to a typical auto encoder network, the VAE is trained such that it's
 The most popular choice for a prior is the standard Gaussian distribution $\mathcal{N}(0,\textbf{I})$, which we also use in this work.
 The latent representation being a distribution, the decoder part can generate unseen data by sampling from it.
 The model is trained such that it maximizes the log-likelihood ($\log p(x)$) of the data by maximizing the Evidence Lower BOund (ELBO):
-
+% todo sag dass man oft eine gaussian nimmt als posterior und prior, und dass wir das in unseren methoden auch benutzen.
 \begin{equation}
     \label{vaeelbo}
     \begin{split}
@@ -30,12 +30,14 @@ A lower $\beta$ gives the model more freedom in learning the latent representati
 "Disentangled" here means that each dimension in the learned latent representation is independent of each other, and represents a latent factor that corresponds to a different attribute in the data.
 In images of animals for example, one dimension in the latent representation could represent the color of the fur, while another might correspond to the color of the eyes.
 Both the color of the fur and the color of the eyes are independent, and so should be the corresponding latent variables.
+The $\beta$ allows to weight the trade-off introduced by the modified training objective that punishes reconstruction quality in order to encourage disentanglement within the latent representations \citep{burgess_understanding_2018}.
 
 
 %todo benefits of disentanglement? no shared information between dimension -> maximum information in latent representation?
 
 %It is widely believed that disentanglement leads to a better latent representation
 Disentanglement is a popular objective in representation learning and has been addressed in recent works \parencite{chen_isolating_2019, locatello_challenging_2019}.
+In this work, we also make use of $\beta$ as a hyperparameter.
 
 \subsection{Multi Modal VAEs}
 In order for the VAE model to learn a representation which captures the underlying factors of multiple modalities, several adaptations to the objective in \cref{vaeelbo} need to be made.
@@ -74,6 +76,7 @@ Similar to the MoE, the MoPoE models the joint posterior as a mixture, however o
 For multi modal data $\mathbb{X}$ with M modalities, and $2^M$ subsets of modalities $\mathbb{X}_s \in \mathbb{X}$, the objective of the MoPoE, which is an evidence lower bound (ELBO) on the joint log-likelihood $\log p_{\theta}(\xset)$, can be written as follows:
 
 \begin{equation}
+    \label{eq:mopoe}
     \eqlmopoe
 \end{equation}
 

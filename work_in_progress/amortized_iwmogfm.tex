@@ -1,0 +1,61 @@
+%! Date = 24.09.21
+
+% Preamble
+\documentclass[11pt,english]{article}
+
+% Packages
+\usepackage{amsmath}
+\input{common_header.tex}
+% Document
+\begin{document}
+
+    We have:
+    \begin{equation}
+        \subsetpost = f^{-1}\left( \textbf{G}_f \right)
+    \end{equation}
+    where
+    \begin{equation}
+        \textbf{G}_f(\textbf{z}|\textbf{x}_{1:|\xsubset|}) =\sum _{\xsetm \in \xsubset} \frac{f(\unimodalpost)}{|\xsubset|} \where \unimodalpost \sim \mathcal{N}(\mu_m, \sigma_m^2)
+    \end{equation}
+
+    \section*{Idea}
+
+    Introduce new loss that pushes $f$ to map to an amortized prior distribution, i.e. such that
+    \begin{equation}
+        f(\unimodalpost) \sim \mathcal{N}(f(\mu_m), \textbf{I})
+    \end{equation}
+    Then the density of $\textbf{G}_f$ can easily be evaluated with:
+    \begin{equation}
+        \textbf{G}_f(\textbf{z}|\textbf{x}_{1:|\xsubset|}) =\sum _{\xsetm \in \xsubset} \frac{f(\unimodalpost)}{|\xsubset|} \sim \mathcal{N} \left(  \sum _{m \in \xsubset} \frac{f(\mu_m)}{|\xsubset|}, \frac{1}{\sqrt{|\xsubset|}}  \cdot \textbf{I} \right)
+    \end{equation}
+
+
+    This can be achieved by minimizing the KL-divergence between the transformed uni modal posteriors and the amortized prior:
+    \begin{equation}
+        \begin{split}
+            \mathcal{L}_2 &= \sum _{\xsetm \in \xset} D_{KL}\left( f(\unimodalpost)\ ||\ \mathcal{N}(f(\mu_m), \textbf{I}) \right)\\
+            &= \sum _{\xsetm \in \xset} D_{KL}\left( f(\unimodalpost)\ ||\ p_{\theta_m}(\textbf{z}) \right)\\
+            &=  \sum _{\xsetm \in \xset} \mathbb{E}_{f(\unimodalpost)} [\log f(\unimodalpost) - \log p_{\theta_m}(\textbf{z})]\\
+            &=  \sum _{\xsetm \in \xset} \mathbb{E}_{z_m \sim \unimodalpost} [\log q_{\phi_m}(z_m|\textbf{x}_M) - \log \det J_f  - \log p_{\theta_m}(f(z_m))]\\
+        \end{split}
+    \end{equation}
+
+    The ELBO can then be evaluated as following:
+    \begin{equation}
+        \begin{split}
+            \mathcal{L}_1 &=  \mathbb{E}_{q_{\phi}(\textbf{z}|\mathbb{X})}[\log (p_{\theta}(\mathbb{X}|\textbf{z}))] - D_{KL}\biggl( \frac{1}{2^M} \sum _{\mathbb{X}_s \in \mathcal{P}(\mathbb{X})} \tilde{q}_{\phi}(\textbf{z}|\mathbb{X}_s)\ ||\ p_{\theta}(\textbf{z})\biggr)\\
+            &= \mathbb{E}_{q_{\phi}(\textbf{z}|\mathbb{X})}[\log (p_{\theta}(\mathbb{X}|\textbf{z}))] - \frac{1}{2^M} \sum _{\mathbb{X}_s \in \mathcal{P}(\mathbb{X})} \mathbb{E}_{\tilde{q}_{\phi}(\textbf{z}|\mathbb{X}_s)}[\log \tilde{q}_{\phi}(\textbf{z}|\mathbb{X}_s) - \log p_{\theta}(\textbf{z}) ]\\
+            &= \mathbb{E}_{q_{\phi}(\textbf{z}|\mathbb{X})}[\log (p_{\theta}(\mathbb{X}|\textbf{z}))] - \frac{1}{2^M} \sum _{\mathbb{X}_s \in \mathcal{P}(\mathbb{X})} \mathbb{E}_{\textbf{G}_f(\textbf{z}|\textbf{x}_{1:|\xsubset|})}[\log \textbf{G}_f(\textbf{z}|\textbf{x}_{1:|\xsubset|}) + \log \det J_{f^{-1}}- \log p_{\theta}(\textbf{z}) ]
+        \end{split}
+    \end{equation}
+
+    The total loss is then:
+    \begin{equation}
+        \begin{split}
+            &\mathcal{L} = \mathcal{L}_2 + \mathcal{L}_2\\
+            &= \mathbb{E}_{q_{\phi}(\textbf{z}|\mathbb{X})}[\log (p_{\theta}(\mathbb{X}|\textbf{z}))] - \frac{1}{2^M} \sum _{\mathbb{X}_s \in \mathcal{P}(\mathbb{X})} \mathbb{E}_{\textbf{G}_f(\textbf{z}|\textbf{x}_{1:|\xsubset|})}[\log \textbf{G}_f(\textbf{z}|\textbf{x}_{1:|\xsubset|}) + \log \det J_{f^{-1}}- \log p_{\theta}(\textbf{z}) ]\\
+            &+ \sum _{\xsetm \in \xset} \mathbb{E}_{z_m \sim \unimodalpost} [\log q_{\phi_m}(z_m|\textbf{x}_M) - \log \det J_f  - \log p_{\theta_m}(f(z_m))]
+        \end{split}
+    \end{equation}
+
+\end{document}

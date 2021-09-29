@@ -1,6 +1,8 @@
+import re
 import typing
 
 import numpy as np
+
 
 def float_to_tex(f,
                  max_len=4,
@@ -119,7 +121,7 @@ def bold_max_row_value(df, df_tex: str):
 
     >>> import pandas as pd
     >>> df = pd.DataFrame({'col1': [1, 2, 20], 'col2': [3, 4, 8],'col3': [5, 6, 5]})
-    >>> print(bold_max_value(df, df.to_latex()), end="")
+    >>> print(bold_max_row_value(df, df.to_latex()), end="")
     \\begin{tabular}{lrrr}
     \\toprule
     {} &  col1 &  col2 &  col3 \\\\
@@ -132,7 +134,7 @@ def bold_max_row_value(df, df_tex: str):
 
 
     >>> df = pd.DataFrame({'col1': [1, 2, 20], 'col2': [3, 4, 8],'col3': [5, 6, 5], 'col4': ['2015.02.04', '2016.03.05', '1912.06.12']})
-    >>> print(bold_max_value(df, df.to_latex()), end="")
+    >>> print(bold_max_row_value(df, df.to_latex()), end="")
     \\begin{tabular}{lrrrl}
     \\toprule
     {} &  col1 &  col2 &  col3 &        col4 \\\\
@@ -167,10 +169,85 @@ def bold_max_column_value(df, except_cols: typing.Iterable[str] = None):
 
     for col in df.columns:
         if col not in except_cols:
-            df[col].loc[df[col] == df[col].max()] = rf'\textbf{{{np.round(df[col].max(),3)}}}'
+            df[col].loc[df[col] == df[col].max()] = rf'\textbf{{{np.round(df[col].max(), 3)}}}'
 
     # return df.to_latex(escape=False, column_format='c' * len(df.columns))
     return df.to_latex(escape=False)
+
+
+def tex_escape(t: str) -> str:
+    """
+        :param text: a plain text message
+        :return: the message escaped to appear correctly in LaTeX
+    """
+
+    conv = {
+        '&': r'\&',
+        '%': r'\%',
+        '$': r'\$',
+        '#': r'\#',
+        '_': r'\_',
+        '{': r'\{',
+        '}': r'\}',
+        '~': r'\textasciitilde{}',
+        '^': r'\^{}',
+        '\\': r'\textbackslash{}',
+        '<': r'\textless{}',
+        '>': r'\textgreater{}',
+    }
+    regex = re.compile('|'.join(re.escape(str(key)) for key in sorted(conv.keys(), key=lambda item: - len(item))))
+    return regex.sub(lambda match: conv[match.group()], t)
+
+
+def get_stats_and_bold_max_column_value(df,
+                                        except_cols: typing.Iterable[str] = None,
+                                        escape_colnames: bool = True,
+                                        column_order: typing.Iterable[str] = None
+                                        ) -> str:
+    """
+    Return df as a latex table where the highest value in each column is highlighted as bold and each value is followed by $\pm stdev$.
+
+    Parameters
+    ----------
+    df :  pandas.DataFrame
+            Pandas DataFrame object where each column "col" that is not included in except_cols contains numerical values and has a counterpart "col__STDEV", also containing numerical values.
+
+    >>> import pandas as pd
+    >>> df = pd.DataFrame({'col1': [1, 2, 20], 'col2': [3, 4, 8],'col1__STDEV': [0.1, 0.2, 0.21], 'col2__STDEV': [0.3, 0.4, 0.8],'col3': [5, 6, 5]})
+    >>> print(get_stats_and_bold_max_column_value(df, except_cols = ['col3']), end="")
+    \\begin{tabular}{lllr}
+    \\toprule
+    {} &                            col1 &                          col2 &  col3 \\\\
+    \\midrule
+    0 &             $1 \\tiny{\\pm  0.1}$ &           $3 \\tiny{\\pm  0.3}$ &     5 \\\\
+    1 &             $2 \\tiny{\\pm  0.2}$ &           $4 \\tiny{\\pm  0.4}$ &     6 \\\\
+    2 &  $\\textbf{20} \\tiny{\\pm  0.21}$ &  $\\textbf{8} \\tiny{\\pm  0.8}$ &     5 \\\\
+    \\bottomrule
+    \\end{tabular}
+    """
+    stdev_cols = [col for col in df.columns if col.endswith('__STDEV')]
+
+    if column_order is None:
+        column_order = [col for col in df.columns if col not in stdev_cols]
+
+    if except_cols is None:
+        except_cols = {*stdev_cols}
+    else:
+        except_cols = {*except_cols, *stdev_cols}
+
+    for col in df.columns:
+        if col not in except_cols:
+            df[col].loc[df[col] == df[col].max()] = rf'\textbf{{{np.round(df[col].max(), 3)}}}'
+
+            for idx in range(len(df)):
+                df[col].iloc[
+                    idx] = f"{df[col].iloc[idx]}\\color{{gray}}{{\\small{{$\\pm${df[col + '__STDEV'].iloc[idx]} }} }}"
+                # df[col].iloc[idx] = f"${df[col].iloc[idx]} _{{\\pm  {df[col + '__STDEV'].iloc[idx]}}}$"
+
+    if not escape_colnames:
+        return df[[*column_order]].to_latex(escape=False)
+    df = df[[*column_order]]
+    return df.rename(columns={k: tex_escape(k) for k in df.columns}).to_latex(escape=False)
 
 
 if __name__ == '__main__':

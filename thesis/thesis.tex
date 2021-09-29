@@ -30,8 +30,13 @@
     'thesis/scripts/plots/nbr_mods_comparison_gen.py',
     'thesis/scripts/plots/nbr_mods_comparison_lr.py',
     'thesis/scripts/plots/utils.py',
+    'thesis/scripts/tikz_graphs/rand_gen_comp_polymnist.py',
+    'thesis/scripts/gen_eval_tab.py',
     'scripts_/mopoe_graph.py',
     'scripts_/mogfm_graph.py',
+    'scripts_/mopgfm_graph.py',
+    'scripts_/mofop_graph.py',
+    'lib/utils.py',
     DOC_STYLE
     )
 \end{pythontexcustomcode}
@@ -40,13 +45,15 @@
 \usepackage[backend=bibtex,style=authoryear,natbib=true]{biblatex}
 \usepackage{color}
 \addbibresource{bib.bib}
-
+%Learning a flexible latent representation for Multi Modal Generative Learning with Normalizing Flows
+%Learning a flexible latent representation for Multi Modal Generative Learning with a parameterisable $f$-Mean
 \title{%
     Multi Modal Generative Learning\\ with Normalizing Flows \\
     \vspace{1em}
-    \large \color{gray}{Master Thesis}}
+    \large \color{gray}{Master Thesis}
+}
 
-\author{Hendrik Klug}
+\author{Hendrik J. Klug}
 
 % Document
 \begin{document}
@@ -62,10 +69,8 @@
     \input{thesis/methods.tex}
     \newpage
     \input{thesis/results.tex}
-
-
-
-
+    \newpage
+    \input{thesis/supplementary.tex}
     \newpage
     \printbibliography
 

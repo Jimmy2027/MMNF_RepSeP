@@ -26,8 +26,8 @@ def make_cond_gen_fig(which: str, methods: List[str]):
     in_mods = split[0]
     out_mod = split[-1]
 
-    input_samples_dir = Path(f'data/{methods[0]}/cond_gen_plots/input_samples')
-    cond_samples_path = {method: Path(f'data/{method}/cond_gen_plots/{in_mods}') for method in methods}
+    input_samples_dir = Path(f'data/thesis/{methods[0]}/cond_gen_plots/input_samples')
+    cond_samples_path = {method: Path(f'data/thesis/{method}/cond_gen_plots/{in_mods}') for method in methods}
 
     pic = tikz.Picture()
     plot_xshift_base = 3
@@ -37,30 +37,35 @@ def make_cond_gen_fig(which: str, methods: List[str]):
         xshift = plot_xshift_base
         for class_idx in range(10):
             img_name = f"{in_mod}_{class_idx}"
-            pic.set_node(text=f'\\includegraphics[width=2cm]{{{str(input_samples_dir / img_name)}}}',
-                         options=f'xshift={xshift}cm, yshift=-{yshift}cm',
-                         name=f'inmod_{img_name}')
+            pic.set_node(
+                text=f'\\includegraphics[width=2cm]{{{input_samples_dir / img_name}}}',
+                options=f'xshift={xshift}cm, yshift=-{yshift}cm',
+                name=f'inmod_{img_name}',
+            )
+
             xshift += 2.1
         yshift += 2
 
-    pic.set_node(text=r'\Large{\textbf{Model Input}}', options=f'yshift=-{np.floor(yshift / (2 * 2))}cm')
+    pic.set_node(text=r'\Large{\textbf{Input}}', options=f'yshift=-{np.floor(yshift / (2 * 2))}cm')
 
     yshift += 1.5
 
     for method in methods:
-        pic.set_node(text=fr'\Large{{\textbf{{{method} output}}}}', options=f'yshift=-{yshift}cm')
+        pic.set_node(text=fr'\Large{{\textbf{{{method}}}}}', options=f'yshift=-{yshift}cm')
         xshift = plot_xshift_base
         for class_idx in range(10):
             img_name = f"{out_mod}_{class_idx}"
 
-            pic.set_node(text=f'\\includegraphics[width=2cm]{{{str(cond_samples_path[method] / img_name)}}}',
-                         options=f'xshift={xshift}cm, yshift=-{yshift}cm',
-                         name=f'outmod_{img_name}')
+            pic.set_node(
+                text=f'\\includegraphics[width=2cm]{{{cond_samples_path[method] / img_name}}}',
+                options=f'xshift={xshift}cm, yshift=-{yshift}cm',
+                name=f'outmod_{img_name}',
+            )
+
             xshift += 2.1
         yshift += 2.1
 
-    output = pic.make()
-    return output
+    return pic.make()
 
 
 if __name__ == '__main__':

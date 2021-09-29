@@ -4,8 +4,8 @@ from matplotlib import pyplot as plt
 from mmvae_hub.experiment_vis.utils import save_cond_gen, show_generated_figs
 from mmvae_hub.utils.utils import json2dict
 
-d = json2dict(Path('../data/thesis/experiment_uids.json'))
-data_dir = Path('../data/thesis')
+data_dir = Path(__file__).parent.parent / 'data/thesis'
+d = json2dict(data_dir / 'experiment_uids.json')
 
 
 def save_polymnist_example():
@@ -44,7 +44,8 @@ if __name__ == '__main__':
 
     save_polymnist_example()
 
-    for method in ['mopoe']:
+    # for each method take the first _id and generate cond gen plots
+    for method in ['mopoe', 'mopgfm', 'moe']:
         save_path = data_dir / f'{method}/cond_gen_plots'
         save_path.mkdir(parents=True, exist_ok=True)
 

@@ -2,8 +2,9 @@
 
 TARGET="${1}"
 #  midterm_presentation/midterm_slides.tex
+#  thesis/thesis.tex
 WHITELIST="
-  thesis/thesis.tex
+work_in_progress/mogfm_kldiv.tex
 	"
 
 if [[ "$TARGET" = "all" ]] || [[ "$TARGET" == "" ]]; then

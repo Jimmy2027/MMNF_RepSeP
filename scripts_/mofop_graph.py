@@ -3,32 +3,35 @@ from pathlib import Path
 
 from scripts_ import tikz
 
-cond_samples_path = Path('data/thesis/mopgfm/cond_gen_single_imgs')
+cond_samples_path = Path('data/mofop/cond_gen_examples')
 input_samples_dir = cond_samples_path / 'input_samples'
 
 
 @dataclass
 class Nodes:
-    input_m1: str = f'\\includegraphics[width=2cm]{{{str(input_samples_dir / "m2_0.png")}}}'
-    input_m0: str = f'\\includegraphics[width=2cm]{{{str(input_samples_dir / "m1_0.png")}}}'
-    output__m1m2_m2: str = f'\\includegraphics[width=2cm]{{{str(cond_samples_path / "m1_m2" / "m2_0.png")}}}'
-    output__m1m2_m1: str = f'\\includegraphics[width=2cm]{{{str(cond_samples_path / "m1_m2" / "m1_0.png")}}}'
-    output__m2_m1: str = f'\\includegraphics[width=2cm]{{{str(cond_samples_path / "m2" / "m1_0.png")}}}'
-    output__m1_m2: str = f'\\includegraphics[width=2cm]{{{str(cond_samples_path / "m1" / "m2_0.png")}}}'
+    input_m1: str = f'\\includegraphics[width=2cm]{{{str(input_samples_dir / "m2.png")}}}'
+    input_m0: str = f'\\includegraphics[width=2cm]{{{str(input_samples_dir / "m1.png")}}}'
+    output__m1m2_m2: str = f'\\includegraphics[width=2cm]{{{str(cond_samples_path / "m1_m2" / "m2.png")}}}'
+    output__m1m2_m1: str = f'\\includegraphics[width=2cm]{{{str(cond_samples_path / "m1_m2" / "m1.png")}}}'
+    output__m2_m1: str = f'\\includegraphics[width=2cm]{{{str(cond_samples_path / "m2" / "m1.png")}}}'
+    output__m1_m2: str = f'\\includegraphics[width=2cm]{{{str(cond_samples_path / "m1" / "m2.png")}}}'
     q1: str = r'$q_{\phi_1}$'
     q2: str = r'$q_{\phi_2}$'
     q1_tilde: str = r'$\tilde{q}_{\phi_1}$'
     q2_tilde: str = r'$\tilde{q}_{\phi_2}$'
     q12_tilde: str = r'$\tilde{q}_{\phi_{12}}$'
-    gfm: str = r'$f$-Mean'
+    zk1: str = '$z_{k,1}$'
+    zk12: str = '$z_{k,12}$'
+    zk2: str = '$z_{k,2}$'
+    poe: str = r'\textbf{PoE}'
+    moe: str = r'\textbf{MoE}'
     z: str = r'joint\\ posterior'
     points: str = r'\ldots'
-    moe: str = r'\textbf{MoE}'
 
 
 nodes = Nodes()
 pic = tikz.Picture(
-    'gfm/.style={rectangle, draw=red!60, fill=red!5, very thick, minimum size=10mm},'
+    'PoE/.style={rectangle, draw=red!60, fill=red!5, very thick, minimum size=10mm},'
     'MoE/.style={rectangle, draw=red!60, fill=red!5, very thick, , minimum height=20mm, minimum width=10mm},'
     # 'lr/.style={ellipse, draw=blue!60, fill=blue!5, very thick, minimum size=15mm},'
     'm0/.style={regular polygon,regular polygon sides=4, draw=green!60, fill=green!5, very thick, minimum size=28mm},'
@@ -44,16 +47,19 @@ pic.set_node(text=nodes.q1, options='m0_dis, right of=input_m0, xshift=1.5cm', n
 pic.set_node(text=nodes.input_m1, options='below of=input_m0, yshift=-2cm', name='input_m1')
 pic.set_node(text=nodes.q2, options='m1_distr, right of=input_m1, xshift=1.5cm', name='q2')
 
-pic.set_node(text=nodes.gfm, options='gfm, right of=q1, xshift=1cm,yshift=-1.5cm, align=center', name='gfm12')
-pic.set_node(text=nodes.gfm, options='gfm, above of=gfm12,yshift=1.5cm, align=center', name='gfm1')
-pic.set_node(text=nodes.gfm, options='gfm, below of=gfm12,yshift=-1.5cm, align=center', name='gfm2')
+pic.set_node(text=nodes.poe, options='PoE, right of=q1, xshift=1cm, align=center', name='poe1')
+pic.set_node(text=nodes.poe, options='PoE, right of=q2, xshift=1cm, align=center', name='poe2')
+pic.set_node(text=nodes.poe, options='PoE, below of=poe1, yshift=-0.5cm, align=center', name='poe3')
 
-pic.set_node(text=nodes.q12_tilde, options='subset, right of=gfm12, xshift=1cm', name='q12_tilde')
-pic.set_node(text=nodes.q1_tilde, options='m0_dis, right of=gfm1, xshift=0.75cm', name='q1_tilde')
-pic.set_node(text=nodes.q2_tilde, options='m1_distr, right of=gfm2, xshift=0.75cm', name='q2_tilde')
+pic.set_node(text=nodes.q1_tilde, options='m0_dis, right of=poe1, xshift=0.5cm', name='q1_tilde')
+pic.set_node(text=nodes.q2_tilde, options='m1_distr, right of=poe2, xshift=0.5cm', name='q2_tilde')
+pic.set_node(text=nodes.q12_tilde, options='subset, right of=poe3, xshift=0.5cm', name='q12_tilde')
 
-pic.set_node(text=nodes.moe, options='MoE, right of=q12_tilde, xshift=0.75cm, align=center', name='moe')
+pic.set_node(text=nodes.zk1, options='m0_dis, right of=q1_tilde, xshift=1cm', name='zk1')
+pic.set_node(text=nodes.zk12, options='subset, right of=q12_tilde, xshift=1cm', name='zk12')
+pic.set_node(text=nodes.zk2, options='m1_distr, right of=q2_tilde, xshift=1cm', name='zk2')
 
+pic.set_node(text=nodes.moe, options='MoE, right of=zk12, xshift=1cm, align=center', name='moe')
 pic.set_node(text=nodes.z, options='lr,right of=moe, xshift=1cm, align=center', name='z')
 
 pic.set_node(text=nodes.output__m1m2_m2, options='right of=z, xshift=2cm,yshift=-1.5cm', name='output__m1m2_m2')
@@ -65,24 +71,22 @@ pic.set_node(text=nodes.output__m2_m1, options='right of=output__m1m2_m1, xshift
 pic.set_line('input_m0', 'q1', label=r'$enc_1$', label_pos='south')
 pic.set_line('input_m1', 'q2', label=r'$enc_2$', label_pos='south')
 
-pic.set_line('q1', 'gfm1', label=r'\textcolor{green}{$\mu_1$}', edge_options='bend right=-10', label_pos='south')
-pic.set_line('q1', 'gfm1', label=r'\textcolor{green}{$\sigma_1$}', edge_options='bend right=10', label_pos='north')
+pic.set_line('q1', 'poe1')
+pic.set_line('q2', 'poe2')
+pic.set_line('q1', 'poe3')
+pic.set_line('q2', 'poe3')
 
-pic.set_line('q1', 'gfm12', edge_options='bend right=-10')
-pic.set_line('q1', 'gfm12', edge_options='bend right=10')
-pic.set_line('q2', 'gfm12', edge_options='bend right=10')
-pic.set_line('q2', 'gfm12', edge_options='bend right=-10')
+pic.set_line('poe1', 'q1_tilde')
+pic.set_line('poe2', 'q2_tilde')
+pic.set_line('poe3', 'q12_tilde')
 
-pic.set_line('q2', 'gfm2', label=r'\textcolor{orange}{$\mu_2$}', edge_options='bend right=10', label_pos='north')
-pic.set_line('q2', 'gfm2', label=r'\textcolor{orange}{$\sigma_2$}', edge_options='bend right=-10', label_pos='south')
+pic.set_line('q1_tilde', 'zk1', label='flow', label_pos='south')
+pic.set_line('q12_tilde', 'zk12', label='flow', label_pos='south')
+pic.set_line('q2_tilde', 'zk2', label='flow', label_pos='south')
 
-pic.set_line('gfm12', 'q12_tilde')
-pic.set_line('gfm1', 'q1_tilde')
-pic.set_line('gfm2', 'q2_tilde')
-
-pic.set_line('q12_tilde', 'moe')
-pic.set_line('q1_tilde', 'moe')
-pic.set_line('q2_tilde', 'moe')
+pic.set_line('zk1', 'moe')
+pic.set_line('zk12', 'moe')
+pic.set_line('zk2', 'moe')
 
 pic.set_line('moe', 'z')
 

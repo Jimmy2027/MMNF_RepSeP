@@ -8,8 +8,6 @@ from mmvae_hub.utils.MongoDB import MongoDatabase
 from utils import get_experiments_df
 
 
-
-
 def df_maker(exp_df):
     methods = ['joint_elbo', 'mopgfm', 'mogfm', 'mofop']
 

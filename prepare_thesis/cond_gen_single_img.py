@@ -24,7 +24,7 @@ def save_plots(_id, experiment_dir: Path, save_path, method: str):
 
 
 if __name__ == '__main__':
-    for method in ['mopoe']:
+    for method in ['mopoe', 'mopgfm', 'moe']:
         save_path = data_dir / f'{method}/cond_gen_single_imgs'
         save_path.mkdir(parents=True, exist_ok=True)
 

@@ -1,0 +1,42 @@
+%! Date = 15.09.21
+
+% Preamble
+\documentclass[11pt, english]{article}
+
+% Packages
+\usepackage{amsmath}
+\input{common_header.tex}
+
+% Document
+\begin{document}
+    We have:
+    \begin{equation}
+        \begin{split}
+            D^{1:K}_s &=  \mathbb{E}_{z^{1:K}_s \sim \subsetpost} \left[ \frac{1}{K} \sum _{k=1}^K \log \tilde{q}_{\phi}(\textbf{z}^k _s|\xsubset) - \log p_{\theta}(\textbf{z}^k _s) \right]\\
+            &= \mathbb{E}_{\{z^{1:K}_m \sim \unimodalpost \forall \samplem \in \xsubset\}} \left[ \frac{1}{K} \sum _{k=1}^K \log f^{-1}\left(\sum _{\samplem \in \xsubset} \frac{f(q_{\phi_m}(\textbf{z}_m^k|\samplem))}{|\xsubset|}\right) - \log p_{\theta}(\textbf{z}^k _s) \right]
+        \end{split}
+    \end{equation}
+
+    Since the density of $f^{-1}\left(\sum _{\samplem \in \xsubset} \frac{f(q_{\phi_m}(\textbf{z}_m^k|\samplem))}{|\xsubset|}\right)$ is unknown, can do the following:
+    \begin{enumerate}
+        \item sample from each unimodal posterior\\
+        $\mathbb{Z}_s = \{\zm \sim \unimodalpost\ \forall\ \samplem \in \xsubset \}$, $\unimodalpost = \mathcal{N}(\mu_m,\sigma^2_m)$\\
+        with the reparameterization trick:\\ $\zm = \mu_m + \sigma_m \ast \epsilon$ with $\epsilon \sim  \mathcal{N}(0,\textbf{I})$
+        \item create a $\zs=f^{-1}\left(\sum _{\zm \in \mathbb{Z}_s} \frac{f(\zm)}{|\xsubset|}\right)$
+        \item compute the likelihood of $\zs$ for each unimodal posterior: $q_{\phi_m}(\zs|\samplem)$
+        \item then $\tilde{q}_{\phi}(\textbf{z}_s|\xsubset) \approx \sum _{\samplem \in \xsubset} \frac{q_{\phi_m}(\zs|\samplem)}{|\xsubset|}$
+        \item compute the KL-divergence like the following:
+        $$D_{KL}=\sum _{\samplem \in \xsubset} \frac{q_{\phi_m}(\zs|\samplem)}{|\xsubset|}\left(\log \sum _{\samplem \in \xsubset} \frac{q_{\phi_m}(\zs|\samplem)}{|\xsubset|} - \log p_{\theta}(\epsilon) \right)$$
+    \end{enumerate}
+
+
+    For the unimodal subset $\xsubset = \samplem$, containing modality 1, this gives the true KL-divergence:
+
+    \begin{equation}
+        \begin{split}
+            \zs&=f^{-1}\left(\sum _{\zm \in \mathbb{Z}_s} \frac{f(\zm)}{|\xsubset|}\right) =\textbf{z}_1\\
+            \tilde{q}_{\phi}(\textbf{z}_s|\xsubset) &= \sum _{\samplem \in \xsubset} \frac{q_{\phi_m}(\zs|\samplem)}{|\xsubset|} =q_{\phi_1}(\textbf{z}_1|\samplem)\\
+            D_{KL}&=\sum _{\samplem \in \xsubset} \frac{q_{\phi_m}(\zs|\samplem)}{|\xsubset|}\left(\log \sum _{\samplem \in \xsubset} \frac{q_{\phi_m}(\zs|\samplem)}{|\xsubset|} - \log p_{\theta}(\epsilon) \right)= D_{KL}(q_{\phi_1}(\textbf{z}_1|\samplem)\ ||\ p_{\theta}(\epsilon))
+        \end{split}
+    \end{equation}
+\end{document}

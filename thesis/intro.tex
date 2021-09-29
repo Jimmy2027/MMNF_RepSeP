@@ -1,5 +1,5 @@
 \section{Introduction}
-
+% in recent years, the field of deep learning has seen a shift from uni modal learning towards multi modal learning.
 The availability of multiple data types provides a rich source of information and holds promise for learning representations that generalise well across multiple modalities \parencite{baltrusaitis_multimodal_2019}.
 Similar to how humans learn and extract information from their surrounding using their five senses, a machine learning model could learn from multiple data types.
 Multimodal data naturally grants additional self-supervision in the form of shared information connecting the different data types.
@@ -17,12 +17,14 @@ These requirements are not inherent to the objective: the evidence lower bound (
 Hence, adaptions to the original formulation are required to cater to and benefit from multiple data types.
 
 % todo say that here we want to explore ways to make the joint distribution more flexible (by imporving the merging of unimoda distrs or by transforming the joint distribution with a flow)
+% want to evaluate if we can achieve a more meaningfull, expressive latent representation with the f-mean (can be evaluated with the separability of the latent representation, the generation coherence (especially for missing modalities, where the mopoe method struggles the most).
 % also want to give overview of hyperparameters and their influence
 
 % motivation
 A model that can generate any of the learned modalities, given any subset of modalities could be used for tasks where the model needs to translate from one modality to another for example, like image captioning.
-It can also find applications in the medical domain, where the model could generate, given images and medical data of a patient, a text describing the mdeical condition of a patient.
+It can also find applications in the medical domain, where the model could generate, given images and medical data of a patient, a text describing the medical condition of a patient.
 Self-supervised training paradigms are especially usefull in the medical domain since there labeled data is expensive to acquire and thus very scarce.
+% examples: (\citep{dorent_hetero-modal_2019}, \citep{calixto_latent_2019})
 
 
 VAEs consist of two parts: an encoder part which maps the input data to a probability distribution and a decoder which learns to reconstruct the input from samples out of that latent distribution.
