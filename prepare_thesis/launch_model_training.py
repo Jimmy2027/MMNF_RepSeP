@@ -4,7 +4,7 @@ from mmvae_hub.leomed_utils.launch_jobs import launch_leomed_jobs
 from mmvae_hub.utils.setup.filehandling import get_experiment_uid
 from mmvae_hub.utils.utils import json2dict, dict2json
 
-end_epoch = 500
+end_epoch = 1000
 eval_freq = 1000
 nbr_repeats = 5
 
@@ -79,9 +79,11 @@ if __name__ == '__main__':
     if experiment_uids_path.exists():
         exp_uids = json2dict(experiment_uids_path)
     else:
+        experiment_uids_path.parent.mkdir(exist_ok=True, parents=True)
         exp_uids = {}
 
-    for params in [mopgfm_args, moe_args, mopoe_args]:
+    # for params in [mopgfm_args, moe_args, mopoe_args]:
+    for params in [poe_args]:
         method = params['method']
 
         if method not in exp_uids:

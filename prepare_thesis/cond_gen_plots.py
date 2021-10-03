@@ -12,7 +12,7 @@ def save_polymnist_example():
     _id = d['mopoe']['3_mods'][0]
     experiment_dir = data_dir / _id
 
-    save_path = data_dir / f'polymnist_example.png'
+    save_path = data_dir / 'polymnist_example.png'
     cond_gen_plots = show_generated_figs(_id=_id, experiment_dir=experiment_dir, return_plots=True, nbr_samples_x=10,
                                          nbr_samples_y=0)
     fig = cond_gen_plots['cond_gen_03']['m0_m1_m2__m0']
@@ -28,7 +28,7 @@ def save_mnistsvhntext_example():
     _id = d['mopoe']['3_mods'][0]
     experiment_dir = data_dir / _id
 
-    save_path = data_dir / f'mnistsvhntext_example.png'
+    save_path = data_dir / 'mnistsvhntext_example.png'
     cond_gen_plots = show_generated_figs(_id=_id, experiment_dir=experiment_dir, return_plots=True, nbr_samples_x=10,
                                          nbr_samples_y=0)
     fig = cond_gen_plots['cond_gen_03']['m0_m1_m2__m0']
@@ -50,6 +50,6 @@ if __name__ == '__main__':
         save_path.mkdir(parents=True, exist_ok=True)
 
         _id = d[method]['3_mods'][0]
-        experiment_dir = data_dir / _id
+        experiment_dir = data_dir / 'experiments' / method / _id
 
         save_cond_gen(save_path=save_path, with_title=False, experiment_dir=experiment_dir, _id=_id)

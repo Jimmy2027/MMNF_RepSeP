@@ -31,11 +31,13 @@ os.system(rsync_command)
 
 exp_uids = json2dict(experiment_uids_path)
 
-for method in ['mopoe', 'mopgfm', 'moe']:
+for method in ['mopoe', 'mopgfm', 'moe', 'poe']:
+    method_data_dir = data_dir / 'experiments' / method
+    method_data_dir.mkdir(exist_ok=True)
     # for method in ['mopgfm']:
     for nbr_mods, uid_list in exp_uids[method].items():
         for uid in uid_list:
-            dest_dir = data_dir / uid
+            dest_dir = method_data_dir / uid
             if not dest_dir.exists():
                 if uid in db_uids:
                     get_exp_dir(_id=uid, dest_dir=dest_dir)

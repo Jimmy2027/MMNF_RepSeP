@@ -1,21 +1,19 @@
 """Save the dicts containing data for the epoch comparison and nbr_mods comparison."""
 
 from pathlib import Path
-from typing import Mapping, Union
 
 import numpy as np
 import pandas as pd
 import torch
-from mmvae_hub.evaluation.eval_metrics.coherence import flatten_cond_gen_values
 from mmvae_hub.utils.utils import json2dict, dict2json
-
-# data_dir = Path('../data/thesis')
 from modun.dict_utils import flatten_dict, dict2pyobject
+
+config = json2dict(Path('conf.json'))
 
 data_dir = Path(__file__).parent.parent / 'data/thesis'
 experiment_uids_path = data_dir / ('experiment_uids.json')
 exp_uids = json2dict(experiment_uids_path)
-methods = ['mopoe', 'moe', 'mopgfm']
+methods = config['methods']
 
 
 def load_flags(dir_path: Path):
@@ -29,7 +27,7 @@ def df_maker_epoch_comp(exp_uids: dict, method: str, data_dir: Path):
     df = pd.DataFrame()
     for _id in exp_uids[method]['3_mods']:
 
-        epoch_results_dir = data_dir / _id / 'epoch_results'
+        epoch_results_dir = data_dir / 'experiments' / method / _id / 'epoch_results'
 
         # get the epochs where the model was evaluated
         flags = load_flags(dir_path=data_dir / _id)
@@ -76,7 +74,7 @@ def df_maker_nbr_mods_comp(exp_uids: dict, method: str, data_dir: Path):
     df['nbr_mods'] = list(exp_uids[method])
     for nbr_mods in exp_uids[method]:
         for id in exp_uids[method][nbr_mods]:
-            epoch_results_dir = data_dir / id / 'epoch_results'
+            epoch_results_dir = data_dir / 'experiments' / method / id / 'epoch_results'
             if epoch_results_dir.exists():
                 last_epoch = max(int(i.stem) for i in epoch_results_dir.iterdir())
                 res_dict = json2dict(epoch_results_dir / f'{last_epoch}.json')

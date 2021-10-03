@@ -29,7 +29,7 @@ if __name__ == '__main__':
         save_path.mkdir(parents=True, exist_ok=True)
 
         _id = d[method]['3_mods'][0]
-        experiment_dir = data_dir / _id
+        experiment_dir = data_dir / 'experiments' / method / _id
 
         save_cond_gen(_id=_id, save_path=save_path, experiment_dir=experiment_dir)
 
