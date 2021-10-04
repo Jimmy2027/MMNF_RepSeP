@@ -11,9 +11,9 @@ nbr_repeats = 5
 poe_args = {
     'method': 'poe',
     "initial_learning_rate": 0.0005,
-    'class_dim': 1280,
+    'class_dim': 512,
     "min_beta": 0,
-    "max_beta": 2.0,
+    "max_beta": 2.5,
     "beta_warmup": 0,
     "num_mods": 3,
     "end_epoch": end_epoch,

@@ -27,10 +27,11 @@ def df_maker_epoch_comp(exp_uids: dict, method: str, data_dir: Path):
     df = pd.DataFrame()
     for _id in exp_uids[method]['3_mods']:
 
-        epoch_results_dir = data_dir / 'experiments' / method / _id / 'epoch_results'
+        exp_dir = data_dir / 'experiments' / method / _id
+        epoch_results_dir = exp_dir / 'epoch_results'
 
         # get the epochs where the model was evaluated
-        flags = load_flags(dir_path=data_dir / _id)
+        flags = load_flags(dir_path=exp_dir)
         eval_epochs = [i - 1 for i in range(1, flags.end_epoch) if i % flags.eval_freq == 0]
 
         if epoch_results_dir.exists():

@@ -38,7 +38,9 @@ for method in ['mopoe', 'mopgfm', 'moe', 'poe']:
     for nbr_mods, uid_list in exp_uids[method].items():
         for uid in uid_list:
             dest_dir = method_data_dir / uid
+
             if not dest_dir.exists():
+
                 if uid in db_uids:
                     get_exp_dir(_id=uid, dest_dir=dest_dir)
                 else:
