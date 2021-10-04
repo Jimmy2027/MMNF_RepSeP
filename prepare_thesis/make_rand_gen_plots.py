@@ -25,7 +25,7 @@ for method in ['mopoe', 'mopgfm', 'moe']:
     random_samples = model.generate(num_samples)
     m_keys = list(mods.keys())
 
-    rec = torch.zeros(exp.plot_img_size,
+    rec = torch.zeros(mods['m0'].plot_img_size,
                       dtype=torch.float32).repeat(num_samples, 1, 1, 1)
     for l in range(num_samples):
         m_key_in = random.choice(m_keys)

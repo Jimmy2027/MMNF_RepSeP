@@ -20,7 +20,7 @@ def df_maker():
 
         d = {'missing_mod_scores': [], 'reconstr_mod_scores': [], 'random_prd_scores': []}
         for method_uid in method_uids:
-            epoch_results_dir = data_dir / method_uid / 'epoch_results'
+            epoch_results_dir = data_dir / 'experiments' / method / method_uid / 'epoch_results'
             end_epoch = max(int(item.stem) for item in epoch_results_dir.iterdir())
             prd_dict = json2dict(epoch_results_dir / f'{end_epoch}.json')['test_results']['prd_scores']
 

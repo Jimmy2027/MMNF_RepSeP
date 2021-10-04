@@ -6,7 +6,7 @@ from mmvae_hub.utils.utils import json2dict, dict2json
 
 end_epoch = 1000
 eval_freq = 1000
-nbr_repeats = 5
+nbr_repeats = 1
 
 poe_args = {
     'method': 'poe',
@@ -59,6 +59,21 @@ mopgfm_args = {
     "nbr_coupling_block_layers": 8
 }
 
+mofop_args = {
+    'method': 'mofop',
+    "initial_learning_rate": 0.0005,
+    'class_dim': 1280,
+    "min_beta": 0,
+    "max_beta": 1.,
+    "beta_warmup": 50,
+    "num_mods": 3,
+    "end_epoch": end_epoch,
+    "eval_freq": eval_freq,
+    "coupling_dim": 128,
+    "num_gfm_flows": 3,
+    "nbr_coupling_block_layers": 8
+}
+
 # mogfm_args = {
 #     'method': 'iwmogfm',
 #     "initial_learning_rate": 0.0005,
@@ -83,7 +98,7 @@ if __name__ == '__main__':
         exp_uids = {}
 
     # for params in [mopgfm_args, moe_args, mopoe_args]:
-    for params in [poe_args]:
+    for params in [mofop_args]:
         method = params['method']
 
         if method not in exp_uids:

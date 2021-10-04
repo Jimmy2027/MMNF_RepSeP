@@ -15,7 +15,7 @@ def df_maker():
         method_uids = exp_uids[method]['3_mods']
         d = {}
         for method_uid in method_uids:
-            epoch_results_dir = data_dir / method_uid / 'epoch_results'
+            epoch_results_dir = data_dir / 'experiments' / method / method_uid / 'epoch_results'
             end_epoch = max(int(item.stem) for item in epoch_results_dir.iterdir())
 
             lr_eval_results = {k: np.round(v['accuracy'], 3) for k, v in

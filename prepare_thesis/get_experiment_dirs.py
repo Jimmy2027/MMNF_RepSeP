@@ -39,6 +39,9 @@ for method in ['mopoe', 'mopgfm', 'moe', 'poe']:
         for uid in uid_list:
             dest_dir = method_data_dir / uid
 
+            if dest_dir.exists() and not list((dest_dir / 'epoch_results').iterdir()):
+                print(dest_dir)
+
             if not dest_dir.exists():
 
                 if uid in db_uids:
