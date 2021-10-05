@@ -6,6 +6,10 @@
   "methods": [
     "mopoe",
     "moe",
-    "mopgfm"
-  ]
+    "mopgfm",
+    "poe",
+    "iwmogfm_amortized",
+    "mofop"
+  ],
+  "max_epoch": 499
 }

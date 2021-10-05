@@ -3,7 +3,8 @@ from pathlib import Path
 import pandas as pd
 from modun.file_io import json2dict
 
-from prepare_thesis.launch_model_training import poe_args, mopoe_args, moe_args, mopgfm_args
+from prepare_thesis.launch_model_training import poe_args, mopoe_args, moe_args, mopgfm_args, iwmogfm_amortized_args, \
+    mofop_args
 
 config = json2dict(Path('prepare_thesis/conf.json'))
 
@@ -11,7 +12,10 @@ method_args_mapping = {
     'mopoe': mopoe_args,
     'poe': poe_args,
     'moe': moe_args,
-    'mopgfm': mopgfm_args
+    'mopgfm': mopgfm_args,
+    'iwmogfm_amortized': iwmogfm_amortized_args,
+    'mofop': mofop_args
+
 }
 
 

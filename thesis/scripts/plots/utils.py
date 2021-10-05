@@ -23,12 +23,16 @@ def plot_comparisons(which: str, metric: str):
         raise ValueError(f'{which} not implemented for plot_comparisons.')
 
     markers = _cycle(['o', 's', 'v', 'p', '*', 'h'])
-    methods = ['mopoe', 'moe', 'mopgfm']
+    config = json2dict(Path('prepare_thesis/conf.json'))
+    methods = config['methods']
+
+    # adapt to the experiment that was trained for the least epochs
+    x_steps = x_steps[:min(len(e) for _, e in d.items())]
 
     for method in methods:
-        plt.plot(x_steps, d[method][metric], marker=next(markers))
-        plt.fill_between(x_steps, d[method][metric] - d[method][f'{metric}_std'],
-                         d[method][metric] + d[method][f'{metric}_std'],
+        plt.plot(x_steps, d[method][metric][:len(x_steps)], marker=next(markers))
+        plt.fill_between(x_steps, d[method][metric][:len(x_steps)] - d[method][f'{metric}_std'][:len(x_steps)],
+                         d[method][metric][:len(x_steps)] + d[method][f'{metric}_std'][:len(x_steps)],
                          alpha=0.5, linewidth=1)
     plt.title(title_mapping[metric])
     plt.legend(methods)

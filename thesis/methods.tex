@@ -100,6 +100,8 @@ The KL-divergences between the transformed subset posteriors and the prior can b
 
 We use the \mg{MoFoPoE} method in comparison to the other methods that make use of the inverse transform $f^{-1}$ to evaluate if the merging of information between unimodal posteriors can be improved by simply making the subsets more flexible. % todo
 
+One advantage of the \mg{MoFoPoE} method is that since the inverse of the flow transformation is not needed, implementations of normalizing flows can be used were the (% todo schreib das vielleicht lieber als NAchteil bei gfm models?)
+
 \begin{figure}[h!]
     \centering
     \resizebox{0.9\textwidth}{!}{%

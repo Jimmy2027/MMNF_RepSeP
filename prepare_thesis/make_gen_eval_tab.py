@@ -10,8 +10,9 @@ from modun.file_io import json2dict
 from utils import get_experiments_df
 
 
-def df_maker():
-    methods = ['mopoe', 'mopgfm', 'moe']
+def df_maker(epoch: int):
+    config = json2dict(Path(('conf.json')))
+    methods = config['methods']
     data_dir = Path(__file__).parent.parent / 'data/thesis'
     experiment_uids_path = data_dir / ('experiment_uids.json')
     exp_uids = json2dict(experiment_uids_path)
@@ -20,9 +21,9 @@ def df_maker():
         method_uids = exp_uids[method]['3_mods']
         d = {'missing_mod_scores': [], 'reconstr_mod_scores': [], 'random_gen_scores': []}
         for method_uid in method_uids:
-            epoch_results_dir = data_dir /'experiments' / method / method_uid / 'epoch_results'
-            end_epoch = max(int(item.stem) for item in epoch_results_dir.iterdir())
-            gen_eval_dict = flatten_dict(json2dict(epoch_results_dir / f'{end_epoch}.json')['test_results']['gen_eval'])
+            epoch_results_dir = data_dir / 'experiments' / method / method_uid / 'epoch_results'
+
+            gen_eval_dict = flatten_dict(json2dict(epoch_results_dir / f'{epoch}.json')['test_results']['gen_eval'])
 
             d['random_gen_scores'].append(
                 np.mean([score for k, score in gen_eval_dict.items() if k.startswith('random')]))
@@ -46,6 +47,8 @@ def df_maker():
 
 
 if __name__ == '__main__':
-    gen_eval_df = pd.DataFrame(data=df_maker())
+    config = json2dict(Path('conf.json'))
+
+    gen_eval_df = pd.DataFrame(data=df_maker(epoch=config['max_epoch']))
 
     gen_eval_df.to_csv(Path(__file__).parent.parent / 'data/thesis/gen_eval.csv', index=False)

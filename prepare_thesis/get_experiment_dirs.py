@@ -23,15 +23,18 @@ else:
 # get experiment_uids from leomed
 leomed_path = Path(conf['data_dir_leomed']) / 'experiment_uids.json'
 experiment_uids_path = data_dir / ('experiment_uids.json')
-if experiment_uids_path.exists():
-    os.remove(experiment_uids_path)
+
+# remove existing experiment_uids
+# if experiment_uids_path.exists():
+#     os.remove(experiment_uids_path)
+
 rsync_command = f'rsync -avP ethsec:{leomed_path} {experiment_uids_path}'
 print(rsync_command)
-os.system(rsync_command)
+# os.system(rsync_command)
 
 exp_uids = json2dict(experiment_uids_path)
 
-for method in ['mopoe', 'mopgfm', 'moe', 'poe']:
+for method in ['mopoe', 'mopgfm', 'moe', 'poe', 'mofop', 'iwmogfm_amortized']:
     method_data_dir = data_dir / 'experiments' / method
     method_data_dir.mkdir(exist_ok=True)
     # for method in ['mopgfm']:

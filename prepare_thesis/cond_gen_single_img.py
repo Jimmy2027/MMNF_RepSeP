@@ -24,13 +24,15 @@ def save_plots(_id, experiment_dir: Path, save_path, method: str):
 
 
 if __name__ == '__main__':
-    for method in ['mopoe', 'mopgfm', 'moe']:
+    config = json2dict(Path('conf.json'))
+    # for method in ['mopoe', 'mopgfm', 'moe']:
+    for method in ['mofop', 'iwmogfm_amortized']:
         save_path = data_dir / f'{method}/cond_gen_single_imgs'
         save_path.mkdir(parents=True, exist_ok=True)
 
         _id = d[method]['3_mods'][0]
         experiment_dir = data_dir / 'experiments' / method / _id
 
-        save_cond_gen(_id=_id, save_path=save_path, experiment_dir=experiment_dir)
+        save_cond_gen(_id=_id, save_path=save_path, experiment_dir=experiment_dir, epoch=config['max_epoch'])
 
         # save_plots(save_path=save_path, experiment_dir=experiment_dir, _id=_id, method=method)

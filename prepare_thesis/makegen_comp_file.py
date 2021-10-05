@@ -4,7 +4,7 @@ from pathlib import Path
 
 text = ""
 base_str = r"\begin{figure}\centering\resizebox{0.9\textwidth}{!}{\py{boilerplate.make_cond_gen_fig(which='m1_m2__m2'," \
-           r" methods=['mopoe','mopgfm', 'moe'])}}\end{figure}"
+           r" methods=['mopoe','mopgfm', 'moe', 'poe','mofop', 'iwmogfm_amortized'])}}\end{figure}"
 
 mods = ['m0', 'm1', 'm2']
 
@@ -21,7 +21,7 @@ for subset in subsets:
         key = f'{subset}__{out_mod}'
         text += r"\begin{figure}\centering\resizebox{0.9\textwidth}{!}{\py{boilerplate.make_cond_gen_fig(which='" \
                 + key + \
-                r"',methods=['mopoe','mopgfm', 'moe'])}}\end{figure}" + \
+                r"',methods=['mopoe','mopgfm', 'moe', 'poe','mofop', 'iwmogfm_amortized'])}}\end{figure}" + \
                 "\n\n\n\n"
 
 outfile = Path(__file__).parent.parent / 'thesis/gen_comp.tex'
