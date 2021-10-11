@@ -44,10 +44,11 @@ def save_mnistsvhntext_example():
 
 if __name__ == '__main__':
 
-    save_polymnist_example()
+    # save_polymnist_example()
 
     # for each method take the first _id and generate cond gen plots
-    for method in ['moe', 'mopoe', 'mopgfm', 'poe', 'mofop', 'iwmogfm_amortized']:
+    # for method in ['moe', 'mopoe', 'mopgfm', 'poe', 'mofop', 'iwmogfm_amortized']:
+    for method in ['iwmogfm2']:
         save_path = data_dir / f'{method}/cond_gen_plots'
         save_path.mkdir(parents=True, exist_ok=True)
 

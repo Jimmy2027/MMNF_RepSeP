@@ -34,7 +34,7 @@ print(rsync_command)
 
 exp_uids = json2dict(experiment_uids_path)
 
-for method in ['mopoe', 'mopgfm', 'moe', 'poe', 'mofop', 'iwmogfm_amortized']:
+for method in ['iwmogfm2']:
     method_data_dir = data_dir / 'experiments' / method
     method_data_dir.mkdir(exist_ok=True)
     # for method in ['mopgfm']:

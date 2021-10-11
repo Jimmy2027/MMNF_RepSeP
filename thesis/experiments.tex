@@ -1,21 +1,140 @@
 \section{Experiments}
+In this section we describe the experimental setup that was used in order to compare our methods to each other and to the \mg{MVAE}, the \mg{MMVAE} and the \mg{MoPoE} methods.
 
 \subsection{Datasets}
+We evaluate on three datasets, each providing different difficulties in order to filter out advantages and disadvantages of our methods.
 
 \subsubsection{PolyMNIST} \label{polymnist}
+The PolyMNIST dataset, first introduced in \cite{sutter_multimodal_2020}, consists of MNIST digits overlayed over a random part of a certain background image.
+The modality specific information of each sample in this dataset is defined by the background image and the shared information by the digit.
+In this case the modality specific information is harder to learn than the shared information (for the modality specific information the model has to have learned the set of possible backgrounds and styles of handwriting while the shared information is simply the set of digits).
+Examples from the PolyMNIST dataset are shown in \cref{fig:PolyMNIST}.
+In total there are 60,000 tuples of training examples and 10,000 tuples of test examples.
+The PolyMNIST dataset is useful to study how the number of modalities impacts the performance of multi modal methods, an abritrary amount of modalities can easily be generated.
+
 \begin{figure}[h!]
     \centering
-    \includegraphics[width=0.9\textwidth]{data/polymnist_example}
+    \includegraphics[width=0.9\textwidth]{data/thesis/polymnist_example}
+    \caption{The PolyMNIST dataset consists of sets of MNIST
+    digits where each set consists of M images
+    with the same digit label but different backgrounds
+    and different styles of hand writing for M different modalities.}
+    \label{fig:PolyMNIST}
 \end{figure}
+
+\subsection{Metrics}
+In order to compare the proposed methods in a meaningful manner, we make use of three metrics that each quantifies the performance of a different aspect of the mmVAE.
+Namely, we compare the quality of the learned latent representation, the coherence of the generated samples and the quality of the generated samples, as described in the follwing sections.
+
+\subsubsection{Evaluation of the Latent Representation}
+To evaluate if the different mmVAEs are able to extract characteristic information and compress it in the latent representation in a meaningful manner, we evaluate the separability of the latent space via linear classifiers.
+If the classifier can separate the latent space into the corresponding classes, we conclude that the posterior approximations are meaningful.
+One classifier for each class and for each latent space is trained on the 1000 encoded samples from the training set and tested on the test set.
+Note that this can be seen as a variant of the disentanglement metric from \cite{beta_vae} where each class is a different generative factor.
+If the dimensions of latent representation are independent and interpretable, there will be less variance in the samples belonging to the same class and thus make them separable from the rest with low capacity classifiers.
+It has been shown in \cite{locatello_challenging_2019} that this disentanglement metric correlates with other disentanglement metrics.
+
+\subsubsection{Evaluation of the generation coherence}
+\label{subsubsec:gen_coh}
+To evaluate if the method is able to separate the shared information from the modality specific information, we verify that all generated tuples belong to the same class using pretrained classifiers.
+For conditional generation, the conditionally generated samples have to be coherent to the input samples.
+The coherence accuracy is the ratio of coherent samples divided by the number of generated samples.
+For every data type, we train a neural network classifier in a supervised way and the architecture is identical to the encoder except from the last layer.
+
+\subsubsection{Evaluation of the generation quality}
+\label{subsubsec:gen_qual}
+To evaluate the quality of the generated samples, we make use of the precision-recall score from \cite{precision_recall_distributions}.
+The Precision and Recall for Disitributions (prd) metric is similar to the Fréchet Inception Distance (FID) \citep{heusel_gans_2017}, but disentangles the quality of generated samples from the coverage of the target distribution.
+The prd metric reduces the problem of comparing a distribution Q (the distribution of generated samples) to a reference distribution P (the distribution of true images) into a one dimensional problem by applying a pre-trained classifier trained on natural images and to compare \^{P} and \^{Q} at a feature level.
+The embeddings are then clustered such that the histogram over the cluster assignments can be meaningfully compared.
+Here we compute the prd score by taking the area under the precision-recall curve.
+
+\subsection{Hyperparameter Selection}
+We select three hyperparameters for the standard mmVAE models (\mg{MoPoE}, \mg{MoE}, \mg{PoE}) that we optimize for our experiments:
+
+\begin{itemize}
+    \item The dimension of the latent representation (the bottleneck of the VAE).
+    A higher dimensional latent representation gives the model more freedom to separate the different classes and can contain more information in general.
+    However, for a too large latent representation, the encoder is not constrained to extract only the most informative features of the input such that the latent representation will contain much information that is non-informative for the decoder.
+    \item The learning rate for the stochastic optimization of the parameters, using the Adam optimizer \citep{kingma_adam_2017}.
+    A low learning will take a very long time to converge and a too high learning rate might never converge.
+    \item The $\beta$ in the modified ELBO from \cref{eq:vaeelbo}, described in \cref{subsec:vae}
+\end{itemize}
+
+Since the choice for these parameters is non-trivial, we optimize them using the hyperparameter optimization framework \dg{Optuna} \citep{akiba_optuna_2019}.
+As objective, we use a mixture of the generation coherence metric (\cref{subsubsec:gen_coh}) and the area Under the precision-recall curve (\cref{subsubsec:gen_qual}).
+The results for the \mg{MoPoE} method can be seen in \cref{fig:mopoe hyperopt}.
+
+For our methods that make use of normalizing flows, we add three additional hyperparameters:
+\begin{itemize}
+    \item The number of chained transformations that make the flow.
+    \item The number of coupling block layers per transformation.
+    \item The number of parameters of each coupling block layer.
+\end{itemize}
+
+For the optimization of those, we fixed the dimension of the latent representation to 1280 and the learning rate to $5e-3$.
+The results can be seen in \cref{fig:mopgfm hyperopt}.
+The parameters used for each method in our experiments are shown in \cref{tab:params}.
+
 
 \py{
     pytex_tab(
     script='thesis/scripts/params_tab.py',
     options_pre='\\centering \\resizebox{0.9\\textwidth}{!}{',
     options_post='}',
-    caption='Generation coherence for the Test set.
-    ',
+    caption='Generation coherence for the Test set.',
+    label='params'
     )
 }
 
-\subsection{Hyperparameter Selection}
+\begin{figure}
+    \centering
+    \begin{subfigure}[b]{0.49\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{data/static/mopoe_beta}
+        \caption{Results shown in function of $\beta$}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.49\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{data/static/mopoe_class_dim}
+        \caption{Results shown in function of the dimension of the latent representation}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.5\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{data/static/mopoe_lr_rate}
+        \caption{Results shown in function of the learning rate}
+    \end{subfigure}
+    \caption{Hyperoptimization run results with the \mg{MoPoE} method.}
+    \label{fig:mopoe hyperopt}
+\end{figure}
+
+\begin{figure}
+    \centering
+    \begin{subfigure}[b]{0.49\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{data/static/mopgfm_nbr_cup_layers}
+        \caption{Results shown in function of the number of coupling layers in each flow}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.49\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{data/static/mopgfm_coupling_dim}
+        \caption{Results shown in function of the couling layer dimension}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.49\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{data/static/mopgfm_nbr_flows}
+        \caption{Results shown in function of the number of flows}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.49\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{data/static/mopgfm_beta}
+        \caption{Results shown in function of $\beta$}
+    \end{subfigure}
+    \caption{Hyperoptimization run results with the \mg{Mopgfm} method.}
+    \label{fig:mopgfm hyperopt}
+\end{figure}

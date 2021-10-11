@@ -12,8 +12,9 @@ exp_uids = json2dict(data_dir / 'experiment_uids.json')
 
 num_samples = 30
 
-# for method in ['mopoe', 'mopgfm', 'moe']:
-for method in ['mofop', 'iwmogfm_amortized', 'poe']:
+config = json2dict(Path('conf.json'))
+# for method in config['methods']:
+for method in ['iwmogfm2']:
     save_path = data_dir / f'{method}/rand_gen_plot.png'
 
     _id = exp_uids[method]['3_mods'][0]

@@ -718,7 +718,6 @@ thomas_gener-ELBO,
     eprinttype = {arxiv},
     eprint = {1907.10902},
     keywords = {Computer Science - Machine Learning, Statistics - Machine Learning},
-    file = {Akiba et al_2019_Optuna.pdf:/Users/Hendrik/zotfile/Akiba et al_2019_Optuna.pdf:application/pdf}
 }
 
 
@@ -749,6 +748,21 @@ thomas_gener-ELBO,
     urldate = {2021-05-21},
     date = {2016-11-04},
     langid = {english},
+}
+
+
+@article{heusel_gans_2017,
+	title = {{GANs} Trained by a Two Time-Scale Update Rule Converge to a Local Nash Equilibrium},
+	url = {http://arxiv.org/abs/1706.08500},
+	abstract = {Generative Adversarial Networks ({GANs}) excel at creating realistic images with complex models for which maximum likelihood is infeasible. However, the convergence of {GAN} training has still not been proved. We propose a two time-scale update rule ({TTUR}) for training {GANs} with stochastic gradient descent on arbitrary {GAN} loss functions. {TTUR} has an individual learning rate for both the discriminator and the generator. Using the theory of stochastic approximation, we prove that the {TTUR} converges under mild assumptions to a stationary local Nash equilibrium. The convergence carries over to the popular Adam optimization, for which we prove that it follows the dynamics of a heavy ball with friction and thus prefers flat minima in the objective landscape. For the evaluation of the performance of {GANs} at image generation, we introduce the "Fr{\textbackslash}'echet Inception Distance" ({FID}) which captures the similarity of generated images to real ones better than the Inception Score. In experiments, {TTUR} improves learning for {DCGANs} and Improved Wasserstein {GANs} ({WGAN}-{GP}) outperforming conventional {GAN} training on {CelebA}, {CIFAR}-10, {SVHN}, {LSUN} Bedrooms, and the One Billion Word Benchmark.},
+	journaltitle = {{arXiv}:1706.08500 [cs, stat]},
+	author = {Heusel, Martin and Ramsauer, Hubert and Unterthiner, Thomas and Nessler, Bernhard and Hochreiter, Sepp},
+	urldate = {2021-10-09},
+	date = {2017-06-26},
+	eprinttype = {arxiv},
+	eprint = {1706.08500},
+	note = {version: 1},
+	keywords = {Computer Science - Machine Learning, Statistics - Machine Learning}
 }
 
 
@@ -863,3 +877,39 @@ thomas_gener-ELBO,
     author = {Ngiam, Jiquan and Khosla, Aditya and Kim, Mingyu and Nam, Juhan and Lee, Honglak and Ng, Andrew Y},
     langid = {english},
 }
+
+
+@incollection{daun_disent,
+    location = {Cham},
+    title = {Self-supervised Disentanglement of Modality-Specific and Shared Factors Improves Multimodal Generative Models},
+    volume = {12544},
+    isbn = {978-3-030-71277-8 978-3-030-71278-5},
+    url = {https://link.springer.com/10.1007/978-3-030-71278-5_33},
+    abstract = {Multimodal generative models learn a joint distribution over multiple modalities and thus have the potential to learn richer representations than unimodal models. However, current approaches are either ineﬃcient in dealing with more than two modalities or fail to capture both modality-speciﬁc and shared variations. We introduce a new multimodal generative model that integrates both modality-speciﬁc and shared factors and aggregates shared information across any subset of modalities eﬃciently. Our method partitions the latent space into disjoint subspaces for modality-speciﬁc and shared factors and learns to disentangle these in a purely self-supervised manner. Empirically, we show improvements in representation learning and generative performance compared to previous methods and showcase the disentanglement capabilities.},
+    pages = {459--473},
+    booktitle = {Pattern Recognition},
+    publisher = {Springer International Publishing},
+    author = {Daunhawer, Imant and Sutter, Thomas M. and Marcinkevičs, Ričards and Vogt, Julia E.},
+    editor = {Akata, Zeynep and Geiger, Andreas and Sattler, Torsten},
+    urldate = {2021-07-21},
+    date = {2021},
+    langid = {english},
+    doi = {10.1007/978-3-030-71278-5_33},
+
+}
+
+
+@article{kingma_adam_2017,
+    title = {Adam: A Method for Stochastic Optimization},
+    url = {http://arxiv.org/abs/1412.6980},
+    shorttitle = {Adam},
+    abstract = {We introduce Adam, an algorithm for first-order gradient-based optimization of stochastic objective functions, based on adaptive estimates of lower-order moments. The method is straightforward to implement, is computationally efficient, has little memory requirements, is invariant to diagonal rescaling of the gradients, and is well suited for problems that are large in terms of data and/or parameters. The method is also appropriate for non-stationary objectives and problems with very noisy and/or sparse gradients. The hyper-parameters have intuitive interpretations and typically require little tuning. Some connections to related algorithms, on which Adam was inspired, are discussed. We also analyze the theoretical convergence properties of the algorithm and provide a regret bound on the convergence rate that is comparable to the best known results under the online convex optimization framework. Empirical results demonstrate that Adam works well in practice and compares favorably to other stochastic optimization methods. Finally, we discuss {AdaMax}, a variant of Adam based on the infinity norm.},
+    journaltitle = {{arXiv}:1412.6980 [cs]},
+    author = {Kingma, Diederik P. and Ba, Jimmy},
+    urldate = {2021-10-09},
+    date = {2017-01-29},
+    eprinttype = {arxiv},
+    eprint = {1412.6980},
+    keywords = {Computer Science - Machine Learning},
+}
+

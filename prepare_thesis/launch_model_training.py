@@ -11,9 +11,9 @@ nbr_repeats = 2
 poe_args = {
     'method': 'poe',
     "initial_learning_rate": 0.0005,
-    'class_dim': 512,
+    'class_dim': 1280,
     "min_beta": 0,
-    "max_beta": 2.5,
+    "max_beta": 2.,
     "beta_warmup": 0,
     "num_mods": 3,
     "end_epoch": end_epoch,
@@ -34,10 +34,10 @@ moe_args = {
 
 mopoe_args = {
     'method': 'mopoe',
-    "initial_learning_rate": 0.001,
-    'class_dim': 512,
+    "initial_learning_rate": 0.0005,
+    'class_dim': 1280,
     "min_beta": 0,
-    "max_beta": 2.5,
+    "max_beta": 2.,
     "beta_warmup": 0,
     "num_mods": 3,
     "end_epoch": end_epoch,
@@ -49,14 +49,14 @@ mopgfm_args = {
     "initial_learning_rate": 0.0005,
     'class_dim': 1280,
     "min_beta": 0,
-    "max_beta": 1.4,
+    "max_beta": 2.,
     "beta_warmup": 50,
     "num_mods": 3,
     "end_epoch": end_epoch,
     "eval_freq": eval_freq,
     "coupling_dim": 64,
-    "num_gfm_flows": 1,
-    "nbr_coupling_block_layers": 5
+    "num_gfm_flows": 15,
+    "nbr_coupling_block_layers": 8
 }
 
 mofop_args = {
@@ -64,18 +64,32 @@ mofop_args = {
     "initial_learning_rate": 0.0005,
     'class_dim': 1280,
     "min_beta": 0,
-    "max_beta": 1.,
+    "max_beta": 2.,
     "beta_warmup": 50,
     "num_mods": 3,
     "end_epoch": end_epoch,
     "eval_freq": eval_freq,
-    "coupling_dim": 128,
-    "num_gfm_flows": 3,
+    "coupling_dim": 64,
+    "num_gfm_flows": 15,
     "nbr_coupling_block_layers": 8
 }
 
 iwmogfm_amortized_args = {
     'method': 'iwmogfm_amortized',
+    "initial_learning_rate": 0.0005,
+    'class_dim': 1280,
+    "min_beta": 0,
+    "max_beta": 0,
+    "num_mods": 3,
+    "end_epoch": end_epoch,
+    "eval_freq": eval_freq,
+    "coupling_dim": 512,
+    "num_gfm_flows": 4,
+    "nbr_coupling_block_layers": 2
+}
+
+iwmogfm2_args = {
+    'method': 'iwmogfm2',
     "initial_learning_rate": 0.0005,
     'class_dim': 1280,
     "min_beta": 0,
@@ -111,7 +125,7 @@ if __name__ == '__main__':
         experiment_uids_path.parent.mkdir(exist_ok=True, parents=True)
         exp_uids = {}
 
-    for params in [poe_args, mopgfm_args, moe_args, mopoe_args, mofop_args]:
+    for params in [poe_args, moe_args, mopoe_args]:
         # for params in [mofop_args]:
         method = params['method']
 

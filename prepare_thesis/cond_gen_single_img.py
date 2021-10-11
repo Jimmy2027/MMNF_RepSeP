@@ -4,8 +4,9 @@ from matplotlib import pyplot as plt
 from mmvae_hub.experiment_vis.utils import save_cond_gen, show_generated_figs
 from mmvae_hub.utils.utils import json2dict
 
-d = json2dict(Path('../data/thesis/experiment_uids.json'))
-data_dir = Path('../data/thesis')
+data_dir = Path(__file__).parent.parent / 'data/thesis'
+d = json2dict(data_dir / 'experiment_uids.json')
+config = json2dict(Path('conf.json'))
 
 
 def save_plots(_id, experiment_dir: Path, save_path, method: str):
@@ -25,8 +26,8 @@ def save_plots(_id, experiment_dir: Path, save_path, method: str):
 
 if __name__ == '__main__':
     config = json2dict(Path('conf.json'))
-    # for method in ['mopoe', 'mopgfm', 'moe']:
-    for method in ['mofop', 'iwmogfm_amortized']:
+    for method in ['iwmogfm2']:
+    # for method in config['methods']:
         save_path = data_dir / f'{method}/cond_gen_single_imgs'
         save_path.mkdir(parents=True, exist_ok=True)
 

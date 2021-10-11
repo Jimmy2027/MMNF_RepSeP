@@ -2,6 +2,7 @@
 In this section, we introduce concepts and previous work on VAEs, self supervised multi modal generative learning and normalizing flows, on which this work builds on.
 
 \subsection{Variational Autoencoder}
+\label{subsec:vae}
 The VAE, first introduced by \cite{kingma_auto-encoding_2014} and \cite{rezende_stochastic_2014}, consists of an encoder network and a decoder network.
 In contrast to a typical auto encoder network, the VAE is trained such that it's learned representation has the structure of a prior distribution.
 The most popular choice for a prior is the standard Gaussian distribution $\mathcal{N}(0,\textbf{I})$, which we also use in this work.
@@ -104,6 +105,13 @@ For gaussian posteriors, the PoE in \cref{eq:subsetmopoe} can be computed in clo
 \end{equation}
 
 In this work, the \mg{MoPoE} is taken as the current state of the art for scalable, self supervised, multi modal generative models and is used as baseline.
+
+Next to the function with which the uni modal posteriors are merged, other methods have been proposed to improve mmVAEs.
+In \cite{daun_disent}, the authors propose to split the latent space into modality specific and shared information in order to disentangle them in a purely self-supervised manner.
+The aggregation of modalities should only happen over the shared information and thus it makes sense to separate it from the modality specific information in order to simplify the aggregation.
+For this, the authors add a new term to the mmVAE objective, which disentangles the shared representations with the modality specific representations and encourages mutual information between representations that contain shared information.
+This has been shown to improve the conditional generation of missing modalities, however the results from \cite{sutter_multimodal_2020} point out that independent of that separation, the generation coherence differs between different merging functions.
+The goal of this work is solely to improve the merging function, which is why we forgo this method even though we expect the separation of shared and modality specific information to improve our results.
 
 
 \begin{lemma}[Joint Approximation Function \citep{sutter_multimodal_2020}]

@@ -4,6 +4,7 @@ from typing import List
 import numpy as np
 import pandas as pd
 
+from lib.utils import tex_escape
 from scripts_ import tikz
 
 
@@ -51,7 +52,7 @@ def make_cond_gen_fig(which: str, methods: List[str]):
     yshift += 1.5
 
     for method in methods:
-        pic.set_node(text=fr'\Large{{\textbf{{{method}}}}}', options=f'yshift=-{yshift}cm')
+        pic.set_node(text=fr'\Large{{\textbf{{{tex_escape(method)}}}}}', options=f'yshift=-{yshift}cm')
         xshift = plot_xshift_base
         for class_idx in range(10):
             img_name = f"{out_mod}_{class_idx}"

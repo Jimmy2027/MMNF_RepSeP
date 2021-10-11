@@ -1,4 +1,3 @@
-import tempfile
 from pathlib import Path
 
 import numpy as np
@@ -7,20 +6,17 @@ from mmvae_hub.evaluation.eval_metrics.coherence import save_generated_samples
 from mmvae_hub.evaluation.eval_metrics.sample_quality import calc_prd_score
 from mmvae_hub.experiment_vis.utils import load_experiment
 from mmvae_hub.hyperopt.hyperopt_metrics import get_missing_mod_scores_prd, get_reconstr_mod_scores_prd
-from mmvae_hub.utils.MongoDB import MongoDatabase
 from mmvae_hub.utils.plotting.save_samples import save_generated_samples_singlegroup
-from mmvae_hub.utils.utils import at_most_n, dict_to_device
+from mmvae_hub.utils.utils import dict_to_device
 from modun.file_io import json2dict, dict2json
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 
-from utils import get_experiments_df
 
-
-def df_maker(epoch: int, data_dir: Path):
+def df_maker(epoch: int):
     config = json2dict(Path(('conf.json')))
     methods = config['methods']
-    data_dir = data_dir / 'thesis'
+    data_dir = Path(__file__).parent.parent / 'data/thesis'
     experiment_uids_path = data_dir / ('experiment_uids.json')
     exp_uids = json2dict(experiment_uids_path)
 
@@ -84,6 +80,6 @@ def df_maker(epoch: int, data_dir: Path):
 if __name__ == '__main__':
     config = json2dict(Path('conf.json'))
 
-    prd_eval_df = pd.DataFrame(data=df_maker(epoch=config['max_epoch'], data_dir=Path(config['data_dir'])))
+    prd_eval_df = pd.DataFrame(data=df_maker(epoch=config['max_epoch']))
 
     prd_eval_df.to_csv(Path(__file__).parent.parent / 'data/thesis/prd_eval.csv', index=False)

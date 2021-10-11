@@ -4,12 +4,13 @@
   "data_dir_leomed": "/cluster/home/klugh/MMNF_RepSeP/data/thesis",
   "local_leomed_exp_dir": "/Users/Hendrik/Documents/master_4/leomed_experiments",
   "methods": [
-    "mopoe",
     "moe",
     "mopgfm",
     "poe",
     "iwmogfm_amortized",
-    "mofop"
+    "mofop",
+    "iwmogfm2",
+    "mopoe"
   ],
   "max_epoch": 499
 }
