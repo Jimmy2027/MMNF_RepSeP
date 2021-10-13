@@ -32,8 +32,7 @@ A lower $\beta$ gives the model more freedom in learning the latent representati
 In images of animals for example, one dimension in the latent representation could represent the color of the fur, while another might correspond to the color of the eyes.
 Both the color of the fur and the color of the eyes are independent, and so should be the corresponding latent variables.
 
-A structured and disentangled representation leads to better interpretability and is widely believed to lead to better results in down-stream tasks, however this claim has been challenged in %todo
-where the authors could not find evidence for it.
+A structured and disentangled representation leads to better interpretability and is widely believed to lead to better results in down-stream tasks, however this claim has been challenged in \cite{locatello_challenging_2019} where the authors could not find evidence for it.
 
 The $\beta$ allows to weight the trade-off introduced by the modified training objective that punishes reconstruction quality in order to encourage disentanglement within the latent representations \citep{burgess_understanding_2018}.
 
@@ -42,7 +41,7 @@ The $\beta$ allows to weight the trade-off introduced by the modified training o
 
 %It is widely believed that disentanglement leads to a better latent representation
 Disentanglement is a popular objective in representation learning and has been addressed in recent works \parencite{chen_isolating_2019, locatello_challenging_2019}.
-In this work, we also make use of $\beta$ as a hyperparameter.
+In this work, we also make use of $\beta$ as a hyperparameter that we tune for each method.
 
 \subsection{Multi Modal VAEs}
 In order for the VAE model to learn a representation which captures the underlying factors of multiple modalities, several adaptations to the objective in \cref{vaeelbo} need to be made.
@@ -65,17 +64,17 @@ Another approach was proposed with the \mg{MMVAE} in \cite{shi2019variational}, 
 
 The MoE has the advantage of optimizing each inference network individually, however it does not merge the information between posteriors since only uni modal posteriors are considered during training.
 
-Both the advantage of the PoE, which results in a good approximation of the joint distribution and the MoE which optimizes each uni modal posterior individually are combined in the \mg{MoPoE} \parencite{thomas_gener-ELBO}.
+Both advantages of the PoE, which results in a good approximation of the joint distribution and the MoE which optimizes each uni modal posterior individually are combined in the \mg{MoPoE} \parencite{thomas_gener-ELBO}.
 The \mg{MoPoE}-VAE takes advantage of both methods by merging the uni modal posteriors into $2^M$ subsets, which are then combined with a MoE (see \cref{mopoeGraph}).
 
-%\begin{figure}[h!]
-%    \centering
-%    \resizebox{0.9\textwidth}{!}{%
-%        \py{pytex_printonly(script='scripts_/mopoe_graph.py', data = '')}
-%    }
-%    \caption{\textbf{The \mg{MoPoE} makes use of the PoE to create $2^M$ subsets, which are then merged with a MoE.} Here $M=2$, the empty subset is not shown. On the left side are the two input modalities from the polymnist dataset (see \cref{polymnist}), on the right side are the generated samples. In the header of each generated sample is described from which subset the decoder sampled for the generation (left side of the $\rightarrow$) and which modality was generated (right side of the $\rightarrow$).}
-%    \label{mopoeGraph}
-%\end{figure}
+\begin{figure}[h!]
+    \centering
+    \resizebox{0.9\textwidth}{!}{%
+        \py{pytex_printonly(script='scripts_/mopoe_graph.py', data = '')}
+    }
+    \caption{\textbf{The \mg{MoPoE} makes use of the PoE to create $2^M$ subsets, which are then merged with a MoE.} Here $M=2$, the empty subset is not shown. On the left side are the two input modalities from the polymnist dataset (see \cref{polymnist}), on the right side are the generated samples. In the header of each generated sample is described from which subset the decoder sampled for the generation (left side of the $\rightarrow$) and which modality was generated (right side of the $\rightarrow$).}
+    \label{mopoeGraph}
+\end{figure}
 
 Similar to the MoE, the \mg{MoPoE} models the joint posterior as a mixture, however of subsets instead of uni modal posteriors.
 For multi modal data $\mathbb{X}$ with M modalities, and $2^M$ subsets of modalities $\mathbb{X}_s \in \mathbb{X}$, the objective of the \mg{MoPoE}, which is an evidence lower bound (ELBO) on the joint log-likelihood $\log p_{\theta}(\xset)$, can be written as follows:
@@ -105,6 +104,9 @@ For gaussian posteriors, the PoE in \cref{eq:subsetmopoe} can be computed in clo
 \end{equation}
 
 In this work, the \mg{MoPoE} is taken as the current state of the art for scalable, self supervised, multi modal generative models and is used as baseline.
+We also compare to the \mg{PoE} which is seen as the gold standard for aggregating information across modalities and the \mg{MoE} for learning each modality equaly well.
+
+\smallskip
 
 Next to the function with which the uni modal posteriors are merged, other methods have been proposed to improve mmVAEs.
 In \cite{daun_disent}, the authors propose to split the latent space into modality specific and shared information in order to disentangle them in a purely self-supervised manner.
@@ -123,8 +125,8 @@ The goal of this work is solely to improve the merging function, which is why we
     \end{equation}
 \end{lemma}
 
-\subsection{Importance Weighted Autoencoder}
-It has been shown that the tightness of the ELBO in \cref{eq:vaeelbo} can be improved by sampling multiple samples form the posterior at each step \parencite{burda_importance_2016}, which results in the following lower bound:
+\subsection{Importance Weighted Autoencoder} \label{subsec:iwvae}
+It has been shown that the tightness of the ELBO in \cref{eq:vaeelbo} can be improved by sampling multiple samples from the posterior at each step \parencite{burda_importance_2016}, which results in the following lower bound:
 \begin{equation}
     \label{eq:iwelbo}
     \log p(x) \geq \mathbb{E}_{z_1,\ldots,z_K \sim q_{\phi}(z|x)}\left[ \log \frac{1}{K} \sum ^K _{k=1} \frac{p_{\theta}(x|z_k)p_{\theta}(z)}{q_{\phi}(z_k| x)} \right]\\
@@ -162,5 +164,23 @@ In generative modeling, normalizing flows are used to learn a diffeomorphic mapp
 Since $T$ is invertible, one can then transform samples from the prior into new images with $T^{-1}$.
 
 For variational inference, normalizing flows are used to transform the posterior into a flexible, arbitrarily complex distribution by transforming it with a normalizing flow.
-The transformed posterior can be a much more faithfull approximation of the true underlying distribution than posterior approximations that are limited to one class, like a Normal distribution with a diagonal covariance.
+The transformed posterior can be a much more faithfull approximation of the true underlying distribution than posterior approximations that are limited to one class, like a normal distribution with a diagonal covariance.
 
+\smallskip
+
+In this work, we make use of chained coupling blocks as normalizing flows, implemented by the \textcolor{dg}{\texttt{Framework for Easily Invertible Architectures}} (FrEIA).
+Coupling blocks were first introduced by Dinh et al. in \cite{dinh_nice_2015} for their Nonlinear Independent Components Estimation (NICE) method.
+Chained coupling blocks are constructed such that at every block, the data is split into two halves.
+One half is transformed by a simple linear transformation with parameters depending on the other half.
+The transformed half is then concatenated with the other, unchanged half.
+This process is shown in \cref{fig:coupling block}.
+
+This transformation has a Jacobian which determinant is easily computable since it is triangular, which gives: $\det Df(x) = \det D\hat{f}(x^B | \Theta (x^A))$.
+Affine coupling blocks have been shown to provide good results, especially for image data \citep{dinh_density_2017}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=\textwidth]{data/static/coupling_block}
+    \caption{Flowchart depicting the workings of a coupling block, taken from the ECCV2020's Tutorial: "Introduction to Normalizing Flows" from Marcus A. Brubaker (\url{https://youtu.be/u3vVyFVU\_lI})}
+    \label{fig:coupling block}
+\end{figure}

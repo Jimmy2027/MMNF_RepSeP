@@ -15,7 +15,7 @@ method_args_mapping = {
     'mopgfm': mopgfm_args,
     'iwmogfm_amortized': iwmogfm_amortized_args,
     'mofop': mofop_args,
-    "iwmogfm2": iwmogfm2_args
+    "iwmogfm": iwmogfm2_args
 
 }
 

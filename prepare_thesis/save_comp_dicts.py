@@ -32,7 +32,8 @@ def df_maker_epoch_comp(exp_uids: dict, method: str, data_dir: Path):
 
         # get the epochs where the model was evaluated
         flags = load_flags(dir_path=exp_dir)
-        eval_epochs = [i - 1 for i in range(1, config['max_epoch']) if i % flags.eval_freq == 0]
+        # eval_epochs = [i - 1 for i in range(1, config['max_epoch']) if i % flags.eval_freq == 0]
+        eval_epochs = [i - 1 for i in range(1, config['max_epoch']) if i % 100 == 0]
 
         if epoch_results_dir.exists():
             if 'epoch' not in df.columns:

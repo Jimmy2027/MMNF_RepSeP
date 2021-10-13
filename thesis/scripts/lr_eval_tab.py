@@ -3,7 +3,7 @@ from pathlib import Path
 import pandas as pd
 
 from lib.utils import get_stats_and_bold_max_column_value
-from thesis.scripts.utils import METHODS, method_footnote_mapping
+from thesis.scripts.utils import METHODS, method_mapping
 
 lr_eval_df = pd.read_csv(Path('data/thesis/lr_eval.csv'))
 lr_eval_df = lr_eval_df.loc[lr_eval_df.Method.isin(METHODS)]
@@ -16,6 +16,6 @@ text = get_stats_and_bold_max_column_value(lr_eval_df, escape_colnames=True,
     .replace('\\bottomrule', '') \
     .replace('lrrrrrrr', 'lccccccc')
 
-for k, v in method_footnote_mapping.items():
+for k, v in method_mapping.items():
     text = text.replace(k, v)
 print(text)

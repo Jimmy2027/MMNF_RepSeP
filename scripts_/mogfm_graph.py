@@ -3,18 +3,18 @@ from pathlib import Path
 
 from scripts_ import tikz
 
-cond_samples_path = Path('data/mogfm/cond_gen_examples')
+cond_samples_path = Path('data/thesis/iwmogfm/cond_gen_single_imgs')
 input_samples_dir = cond_samples_path / 'input_samples'
 
 
 @dataclass
 class Nodes:
-    input_m1: str = f'\\includegraphics[width=2cm]{{{str(input_samples_dir / "m2.png")}}}'
-    input_m0: str = f'\\includegraphics[width=2cm]{{{str(input_samples_dir / "m1.png")}}}'
-    output__m1m2_m2: str = f'\\includegraphics[width=2cm]{{{str(cond_samples_path / "m1_m2" / "m2.png")}}}'
-    output__m1m2_m1: str = f'\\includegraphics[width=2cm]{{{str(cond_samples_path / "m1_m2" / "m1.png")}}}'
-    output__m2_m1: str = f'\\includegraphics[width=2cm]{{{str(cond_samples_path / "m2" / "m1.png")}}}'
-    output__m1_m2: str = f'\\includegraphics[width=2cm]{{{str(cond_samples_path / "m1" / "m2.png")}}}'
+    input_m1: str = f'\\includegraphics[width=2cm]{{{str(input_samples_dir / "m2_0.png")}}}'
+    input_m0: str = f'\\includegraphics[width=2cm]{{{str(input_samples_dir / "m1_0.png")}}}'
+    output__m1m2_m2: str = f'\\includegraphics[width=2cm]{{{str(cond_samples_path / "m1_m2" / "m2_0.png")}}}'
+    output__m1m2_m1: str = f'\\includegraphics[width=2cm]{{{str(cond_samples_path / "m1_m2" / "m1_0.png")}}}'
+    output__m2_m1: str = f'\\includegraphics[width=2cm]{{{str(cond_samples_path / "m2" / "m1_0.png")}}}'
+    output__m1_m2: str = f'\\includegraphics[width=2cm]{{{str(cond_samples_path / "m1" / "m2_0.png")}}}'
     q1: str = r'$q_{\phi_1}$'
     q2: str = r'$q_{\phi_2}$'
 

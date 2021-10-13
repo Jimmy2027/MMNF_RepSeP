@@ -1,7 +1,7 @@
 \section{Methods}
 \label{sec:methods}
 As introduced herein, we are working with a multi modal VAE (mmVAE), which learns a joint distribution that contains the combined information of each learned uni modal latent distribution.
-In order to generalize previous methods and to increase the flexibility of the combination of the modalities, we implement the fusion of the uni modal latent distributions with a mixture of generalized $f$-mean.
+In order to generalize previous methods and to increase the flexibility of the aggregation of modalities, we implement the fusion of the uni modal latent distributions with a mixture of generalized $f$-mean.
 Instead of merging the uni modal posteriors into subset-posteriors with a PoE, like is done in the \mg{MoPoE}, we merge them with a trainable $f_{\psi}$-mean, with parameters $\psi$.
 The main difficulty in this approach comes from the fact that the $f$-mean of the uni modal distributions follows an unknown distribution.
 While this makes the joint distribution more flexible, this also makes the computation of the regularization term in the ELBO, the KL-divergence, more difficult to compute.
@@ -24,7 +24,7 @@ with
 
 Here Q is a sum of random variables, which can be rewritten as chained convolutions \footnote{\url{https://en.wikipedia.org/wiki/Sum_of_normally_distributed_random_variables}} and is hard to evaluate.
 
-Instead, we propose three workarounds to the computation of the KL-divergence in \cref{eq:kldivbound}.
+Instead, we propose four workarounds to the computation of the KL-divergence in \cref{eq:kldivbound}.
 \begin{enumerate}
 
     \item For one, \cref{eq:kldivbound} can be simplified by skipping the backwards transformation $f^{-1}$.
@@ -34,7 +34,7 @@ Instead, we propose three workarounds to the computation of the KL-divergence in
     \begin{equation}
         D_{KL}\left(\sum _{\xsetm \in \xsubset} \frac{f_{\psi}(\unimodalpost)}{|\xsubset|}\ ||\ \prior\right) \leq \frac{1}{|\xsubset|} \sum  _{\xsetm \in \xsubset} D_{KL} \left(f_{\psi} (\unimodalpost))||\ \prior \right) \quad (\cref{lemma:DklLowerBound})
     \end{equation}
-% todo write all method names as grey ?
+
     We implement this in the Mixture of flow of product of experts (\mg{MofoPoE}) model, which is described in \cref{subsec:mofopoe}.
 
 % todo beschreib mofop method and sag vorteile und nachteile von dieser Methods: man macht die einzelnen posterior besser aber man macht das mergen der information nicht flexibler
@@ -51,17 +51,18 @@ Instead, we propose three workarounds to the computation of the KL-divergence in
     This is implemented as the mixture of parameter generalized $f$-mean (\mg{MopgfM}) and described in \cref{subsec:mopgfm}.
 
     \item The sum of random variables in the $f$-mean (\cref{eq:kldivbound}) is hard to evaluate since the transformed uni modal posteriors ($\unimodalpost$) follow an unknown distribution.
-    It is however possible to steer the normalizing flow $f_{\psi}$ to map towards $\unimodalpost$ a normal distribution, such that the sum of random variables can be evaluated.
+    It is however possible to steer the normalizing flow $f_{\psi}$ to map $\unimodalpost$ towards a normal distribution, such that the sum of random variables can be evaluated.
     This normal distribution can be amortized by making it dependent on the input.
     We implement this as the \mg{MogfM\_amortized} method, described in \cref{subsubsec:mogfm_amortized}.
 
-    \item The third option is to instead of computing the KL-divergence in closed form, one can approximate it by sampling from the posterior, i.e. comparing k samples from the posterior with k samples from the prior.
-    This method is similar to the importance weighted VAE \parencite[iwVAE]{burda_importance_2016}, however since the Kl-divergence is not computed is closed form but approximated with the K samples, a higher number of K is required to obtain good results.
-    This method is implemented as the importance weighted mixture of generalized $f$-mean (iwMogfM) and described in %todo.
+    \item Instead of evaluating the density of the sum of random variables inside the $f$-mean, we investigate if it is possible to approximate it with a normal distribution.
+    The mean and variance can be inferred using importance samples from the sum of random variables.
+    We implement this as the importance weighted mixture of generalized $f$-mean (\mg{iwMogfM}), described in \cref{subsubsec:iwMogfM}.
+
 \end{enumerate}
 
 \subsection{Models}
-Here we describe the models that implement the three methods introduced above and enumerate their advantages and disadvantages.
+Here we describe the models that implement the four methods introduced above and enumerate their advantages and disadvantages.
 
 \subsubsection{MofoPoE}\label{subsec:mofopoe}
 The \mg{MofoPoE} builds on the \mg{MoPoE} by transforming the subset posteriors $\subsetpost$ with a series of F invertible transformations with trainable parameters $\psi$:
@@ -75,9 +76,9 @@ The density of the resulting transformed subset posterior can be evaluated with 
     \ln f(\subsetpost) = \ln q_\phi (z_0|\xsubset) - \sum _{i=1} ^{F}\ln \left|  \det \frac{df_i}{dz_{i-1}}\right|
 \end{equation}
 
-Here $f(\subsetpost)$ can follow any distribution is thus more flexible than the gaussian subset posterior in the \mg{MoPoE} model.
-A flow chart depiction of the \mg{MofoPoE} is shown in \cref{fig:mofopoe}.
-Effectively, during a forward pass, the reparameterisation happens at the subset posteriors.
+Here $f(\subsetpost)$ can follow any distribution and is thus more flexible than the gaussian subset posterior in the \mg{MoPoE} model.
+A flow chart depiction of the \mg{MofoPoE} is shown in \cref{fig:mofopoe}.\\
+During a forward pass, the reparameterisation happens at the subset posteriors.
 I.e. a sample is taken from each subset posterior, transformed with a normalizing flow $f$ and then mixed with a MoE.
 
 The resulting objective can be written as follows, by slightly modifying the \mg{MoPoE} objective from \cref{eq:mopoe_}:
@@ -89,7 +90,7 @@ The resulting objective can be written as follows, by slightly modifying the \mg
     \end{split}
 \end{equation}
 
-The KL-divergences between the transformed subset posteriors and the prior can be evaluated as follows using \cref{eq:changeofvariables_}:
+The KL-divergence between the transformed subset posteriors and the prior can be evaluated as follows using \cref{eq:changeofvariables_}:
 
 \begin{equation}
     \begin{split}
@@ -100,22 +101,32 @@ The KL-divergences between the transformed subset posteriors and the prior can b
 
 We use the \mg{MoFoPoE} method in comparison to the other methods that make use of the inverse transform $f^{-1}$ to evaluate if the merging of information between unimodal posteriors can be improved by simply making the subsets more flexible. % todo
 
-One advantage of the \mg{MoFoPoE} method is that since the inverse of the flow transformation is not needed, implementations of normalizing flows can be used were the (% todo schreib das vielleicht lieber als NAchteil bei gfm models?)
+One advantage of the \mg{MoFoPoE} method is that since the inverse of the flow transformation is not needed, implementations of normalizing flows can be used where the evaluation of the inverse flow does not need to be tractable.
+This gives more flexibility in the choice of the flow implementation.
 
-%\begin{figure}[h!]
-%    \centering
-%    \resizebox{0.9\textwidth}{!}{%
-%        \py{pytex_printonly(script='scripts_/mofop_graph.py', data = '')}
-%    }
-%    \caption{\textbf{Fowchart depicting the \mg{MofoPoE} method.} The \mg{MofoPoE} creates more expressive subset posteriors by transforming the PoE posteriors with a series of invertible transformations.}
-%    \label{fig:mofopoe}
-%\end{figure}
+\begin{figure}[h!]
+    \centering
+    \resizebox{0.9\textwidth}{!}{%
+        \py{pytex_printonly(script='scripts_/mofop_graph.py', data = '')}
+    }
+    \caption{\textbf{Fowchart depicting the \mg{MofoPoE} method.} The \mg{MofoPoE} creates more expressive subset posteriors by transforming the PoE posteriors with a series of invertible transformations.
+    Here, an example with 2 subsets is shown. On the left side are the two input modalities from the polymnist dataset (see \cref{polymnist}), on the right side are the generated samples.
+    In the header of each generated sample is described from which subset the decoder sampled for the generation (left side of the $\rightarrow$) and which modality was generated (right side of the $\rightarrow$).}
+    \label{fig:mofopoe}
+\end{figure}
 
 \subsubsection{MopgfM}\label{subsec:mopgfm}
-% the main disadvantage here is that this method requires many parameters (needs to flows) but has not much flexibility
-The \mg{Mopgfm} mixes the mean and the standard deviation of the unimodal posteriors, in order to obtain a normal distribution that depends on each of the uni modal posteriors (see \cref{eq:qjointmopgfm}).
-This is a generalisation of the PoE method since a product of gaussian experts is itself Gaussian with mean $\mu_{PoE} = (\sum _i \mu _i V_i)(\sum _i V_i)^{-1}$ and covariance $V_{PoE}= (\sum _i V_i)^{-1}$ where $\mu _i, V_i$ are the parameters of the $i$-th Gaussian.
+% the main disadvantage here is that this method requires many parameters (needs two flows) but has not much flexibility
+The \mg{Mopgfm} mixes the means and the standard deviations of the unimodal posteriors, in order to obtain a normal distribution that depends on each of the uni modal posteriors (see \cref{eq:qjointmopgfm}).
+The aggregation over the means and the standard deviations if done with a parameterized $f$-mean.
+
+\smallskip
+
+This is a generalisation of the PoE method since a product of gaussian experts is itself Gaussian with mean $\mu_{PoE} = (\sum _i \mu _i V_i)(\sum _i V_i)^{-1}$ and covariance $V_{PoE}= (\sum _i V_i)^{-1}$ where $\mu _i, V_i$ are the parameters of the $i$-th Gaussian.\\
 Without loss of generality, it can be assumed that $f_{\mu}^{-1}(\sum _{\xsetm \in \xsubset} \frac{f_{\mu}(\mu_s)}{|\xsubset|}) = \mu_{PoE}$ and $f_{\sigma}^{-1}(\sum  _{\xsetm \in \xsubset} \frac{f_{\sigma}(\sigma_s^2)}{|\xsubset|}) = V_{PoE}$.
+
+\smallskip
+
 The main advantage of this method is that since it is a generalisation of the PoE, it gives more flexibility to the modality fusion.
 However, this comes at the cost that the expressiveness of the joint distribution is limited by being a Gaussian, and since the transformations are applied on the parameters of the uni modal distributions, transparency of the resulting transformation is lost.
 It is hard, if not impossible, to translate \cref{eq:qjointmopgfm} into the following equation:
@@ -123,12 +134,16 @@ It is hard, if not impossible, to translate \cref{eq:qjointmopgfm} into the foll
     q_{\phi, joint} = T(\{q_{\phi _m}(z|x_m) \forall x_m \in \xset\})
 \end{equation}
 with T a well defined transformation.
+The internal workings of the \mg{MopgfM} method are depicted in a simplified manner in \cref{fig:mopgfm}.
+
 
 \begin{figure}[h!]
     \centering
     \resizebox{0.9\textwidth}{!}{%
         \py{pytex_printonly(script='scripts_/mopgfm_graph.py', data = '')}
     }
+    \caption{\textbf{The \mg{MopgfM} makes use of the $f$-mean to aggregate the means und standard deviations of the unimodal posteriors create $2^M$ normally distributed subsets, which are then merged with a MoE.} Here, an example with 2 subsets is shown. On the left side are the two input modalities from the polymnist dataset (see \cref{polymnist}), on the right side are the generated samples. In the header of each generated sample is described from which subset the decoder sampled for the generation (left side of the $\rightarrow$) and which modality was generated (right side of the $\rightarrow$).}
+    \label{fig:mopgfm}
 \end{figure}
 
 \subsubsection{MogfM\_amortized}\label{subsubsec:mogfm_amortized}
@@ -166,20 +181,27 @@ The ELBO can then be evaluated as following:
 The total loss is then:
 \begin{equation}
     \begin{split}
-        &\mathcal{L} = \mathcal{L}_2 + \mathcal{L}_2\\
+        &\mathcal{L} = \mathcal{L}_1 + \mathcal{L}_2\\
         &= \mathbb{E}_{q_{\phi}(\textbf{z}|\mathbb{X})}[\log (p_{\theta}(\mathbb{X}|\textbf{z}))] - \frac{1}{2^M} \sum _{\mathbb{X}_s \in \mathcal{P}(\mathbb{X})} \mathbb{E}_{\textbf{G}_f(\textbf{z}|\textbf{x}_{1:|\xsubset|})}[\log \textbf{G}_f(\textbf{z}|\textbf{x}_{1:|\xsubset|}) + \log \det J_{f^{-1}}- \log p_{\theta}(\textbf{z}) ]\\
         &+ \sum _{\xsetm \in \xset} \mathbb{E}_{z_m \sim \unimodalpost} [\log q_{\phi_m}(z_m|\textbf{x}_M) - \log \det J_f  - \log p_{\theta_m}(f(z_m))]
     \end{split}
 \end{equation}
 
-The resulting joint posterior $\textbf{G}_f(\textbf{z}|\textbf{x}_{1:|\xsubset|}) =\sum _{\xsetm \in \xsubset} \frac{f(\unimodalpost)}{|\xsubset|}$ of the \mg{MogfM\_amortized} method can follow any distribution can thus be more expressive than the joint posterior in the \mg{MopgfM} or \mg{MoPoE} methods.
+The resulting joint posterior $\textbf{G}_f(\textbf{z}|\textbf{x}_{1:|\xsubset|}) =\sum _{\xsetm \in \xsubset} \frac{f(\unimodalpost)}{|\xsubset|}$ of the \mg{MogfM\_amortized} method can follow any distribution and can thus be more expressive than the joint posterior in the \mg{MopgfM} or \mg{MoPoE} methods.
 The main disadvantage of this method is that the KL-divergence term in $\mathcal{L}_1$ can only be evaluated when the flow $f$ has already learned to map the uni modal posteriors towards the amortized priors.
-In parctice, this makes it very hard to tune the two loss functions to each other.
+In practice, this makes it very hard to tune the two loss functions to each other.
+However, our results show that the \mg{MogfM\_amortized} method is able to learn meaningful representations and yield good generative results, without the divergence as regularisation term in $\mathcal{L}_1$ (i.e. with $\beta = 0$).
 
-\subsubsection{iwMogfM}
-Like the \mg{MoPoE}, the iwMogfM creates the joint posterior by creating $2^M$ subsets from the uni modal posteriors and then mixing them with a mixture of experts.
+\subsubsection{iwMogfM} \label{subsubsec:iwMogfM}
+The central limit theorem states that a sum of independent random variables tends towards a normal distribution, even if the original variables themselves are not normally distributed.
+With the \mg{iwMogfM} method, we evaluate if the sum of unimodal posteriors from \cref{eq:kldivbound} can be approximated with a normal distribution.
+It is important to note that since the unimodal posteriors should contain shared information they are assumed to be dependent such that the independence condition for the central limit theorem is not met.
+We find however that the normal distribution with inferred parameters is a useful proxy which allows to evaluate the KL-divergence term in the objective from \cref{vaeelbo}.
+To infer the parameters of the normal distribution, we take K importance samples from the sum of unimodal posteriors and evaluate their average and variance.
+Importance sampling from the posterior has been done before for the \mg{iwVAE} in \cite{burda_importance_2016} (see \cref{subsec:iwvae}).
+
+Like the \mg{MoPoE}, the \mg{iwMogfM} creates the joint posterior by creating $2^M$ subsets from the uni modal posteriors and then mixes them with a mixture of experts.
 However, instead of using a PoE to create the subsets, it uses an $f$-mean.
-The iwMogfM also makes use of the importance sampling method from the iwVAE, by sampling K samples from the posterior.
 To derive the resulting objective, we rewrite the objective from the \mg{MoPoE} for K importance samples in a first step:
 \begin{equation}
     \begin{split}
@@ -206,36 +228,36 @@ Using the fact that the logarithm is concave and Jensens inequality, $\mathcal{L
 where $\mathcal{R}$ is the reconstruction loss and D the Kl-divergence between the subset posterior and the prior.
 The subset posteriors are obtained with an $f$-mean of the uni modal posteriors:
 \begin{equation}
-    \subsetpost = f^{-1}\left(\sum _{\xsetm \in \xsubset} \frac{f(\unimodalpost)}{|\xsubset|}\right)
+    \subsetpost = f^{-1}\left(\sum _{\xsetm \in \xsubset} \frac{f(\unimodalpost)}{|\xsubset|}\right) = f^{-1}(Q_s)
 \end{equation}
 
-Since the density of the subset posteriors is hard to evaluate, $D^{1:K}_s$ is calculated by comparing K samples from $\subsetpost$ with K samples from the prior $\prior$:
+Since the density of $Q_S$ is hard to evaluate, $D^{1:K}_s$ is calculated with a normally distributed proxy $\tilde{Q}_s$.
+The mean and the variance of $\tilde{Q}_s$ are inferred from the mean and the variance of the K importance samples $\textbf{z}_{Q_s}^{1:K} \sim Q_s$
+
+$D^{1:K}$ is then approximated with:
 \begin{equation}
     \begin{split}
-        D^{1:K}_s &=  \mathbb{E}_{z^{1:K}_s \sim \subsetpost} \left[ \frac{1}{K} \sum _{k=1}^K \log \tilde{q}_{\phi}(\textbf{z}^k _s|\xsubset) - \log p_{\theta}(\textbf{z}^k _s) \right]\\
+        D^{1:K}_s &\approx \mathbb{E}_{z_s \sim \subsetpost} \left[ \log \tilde{q}_{\phi}(\textbf{z} _s|\xsubset) - \log p_{\theta}(\textbf{z} _s) \right]\\
         %
-        &=     \mathbb{E}_{\{z^{1:K}_m \sim \unimodalpost \forall \samplem \in \xsubset\}} \left[ \frac{1}{K} \sum _{k=1}^K \log f^{-1}\left(\sum _{\samplem \in \xsubset} \frac{f(q_{\phi_m}(\textbf{z}_m^k|\samplem))}{|\xsubset|}\right) - \log p_{\theta}(\textbf{z}^k _s) \right] \label{eq:samplestep}\\
-        %
-%        &\approx \sum ^{\text{batch size}} \frac{1}{K} \sum _{k=1}^K f^{-1}\left(\sum _{\xsetm \in \xsubset} \frac{f(q_{\phi_m}(\textbf{z}_m^k|\xsetm))}{|\xsubset|}\right)(  \log f^{-1}\left(\sum _{\xsetm \in \xsubset} \frac{f(q_{\phi_m}(\textbf{z}_m^k|\xsetm))}{|\xsubset|}\right) - \log p_{\theta}(\textbf{z}^k _s))\\
-        %
-        &\approx \sum ^{\text{batch size}} \frac{1}{K} \sum _{k=1}^K f^{-1}\left(\sum _{\xsetm \in \xsubset} \frac{f(\mu_m+\sigma_m\ast \epsilon)}{|\xsubset|}\right)(  \log f^{-1}\left(\sum _{\xsetm \in \xsubset} \frac{f(\mu_m+\sigma_m\ast \epsilon)}{|\xsubset|}\right) - \log \epsilon), \epsilon \sim \mathcal{N}(0,\textbf{I})
+        &=\mathbb{E}_{z_s \sim \subsetpost} \left[ \log Q_s + \log \det J_{f^{-1}} - \log p_{\theta}(\textbf{z} _s) \right]\\
     \end{split}
 \end{equation}
 
-%In \cref{eq:samplestep}, the sampling from the gaussian uni modal posteriors is done with the reparameterisation trick \citep{rezende_stochastic_2014}:
-%\begin{equation}
-%
-%\end{equation}
+The sampling from the uni modal posteriors is depicted in \cref{iwmogfmGraph}.
 
+\smallskip
 
-%\begin{figure}[h!]
-%    \centering
-%    \resizebox{0.99\textwidth}{!}{%
-%        \py{pytex_printonly(script='scripts_/mogfm_graph.py', data = '')}
-%    }
-%    \caption{\textbf{The iwMogfM makes use of the $f$-mean to create $2^M$ subsets, which are then merged with a MoE.} Here $M=2$, the empty subset is not shown. On the left side are the two input modalities from the polymnist dataset (see \cref{polymnist}), on the right side are the generated samples. In the header of each generated sample is described from which subset the decoder sampled for the generation (left side of the $\rightarrow$) and which modality was generated (right side of the $\rightarrow$).}
-%    \label{iwmogfmGraph}
-%\end{figure}
+Since the divergence term in the objective is evaluated with a proxy for the joint posterior, we find it to be very unstable in practive.
+However, our results show that even if the divergence is weighted with a very small weight ($\beta = 0.0001$), the \mg{iwMogfM} method is able to learn meaningful representations and yield good generative performance.
+
+\begin{figure}[h!]
+    \centering
+    \resizebox{0.99\textwidth}{!}{%
+        \py{pytex_printonly(script='scripts_/mogfm_graph.py', data = '')}
+    }
+    \caption{\textbf{The iwMogfM makes use of the $f$-mean to create $2^M$ subsets, which are then merged with a MoE.} Here $M=2$, the empty subset is not shown. On the left side are the two input modalities from the polymnist dataset (see \cref{polymnist}), on the right side are the generated samples. In the header of each generated sample is described from which subset the decoder sampled for the generation (left side of the $\rightarrow$) and which modality was generated (right side of the $\rightarrow$).}
+    \label{iwmogfmGraph}
+\end{figure}
 
 
 

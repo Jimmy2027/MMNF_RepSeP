@@ -8,48 +8,29 @@
 % also compare training times
 
 
-My results.
+\subsection{PolyMNIST} \label{subsec: results polymnist}
+Evaluating the separability of the latent representation for 3 modalities, we find that the \mg{mofop}, the \mg{mopgfm} and the \mg{mopoe} perform similarly, yielding on average a linear classification accuracy of \py{boilerplate.get_lr_score(method='mofop')}, \py{boilerplate.get_lr_score(method='mopgfm')} and \py{boilerplate.get_lr_score(method='mopoe')} respectively for all subsets (see \cref{fig:ep comp lr}).
+
+\smallskip
+
+\Cref{tab:lr eval} compares the classification accuracies over multiple subsets.
+Overall, we see that the classification accuracy improves when more modalities make up the latent representation which shows that all methods are able to aggregate the modalities.
+In particular, we find that the \mg{iwmogfm} method has the best performance when all modalities are given.
+%Our results show that the $m0$ modality is the hardest modality to learn from todo
+
+% todo comment on nbr mod comp
 
 
 \begin{sansmath}
-    \py{pytex_subfigs(
-        [
-            {'script':'thesis/scripts/plots/epoch_comparison_lr.py', 'label':'vccv','conf':'thesis/4*2.conf', 'options_pre':'{.48\\textwidth}',
-        'options_pre_caption':'\\vspace{-1.5em}\\',
-        'options_post':'\\vspace{1em}',
-        'caption':''
-        ,},
-            {'script':'thesis/scripts/plots/epoch_comparison_gen.py', 'label':'sccv','conf':'thesis/4*2.conf', 'options_pre':'{.48\\textwidth}',
-        'options_pre_caption':'\\vspace{-1.5em}\\',
-        'options_post':'\\vspace{1em}',
-        'caption':''
-        ,},
-            {'script':'thesis/scripts/plots/nbr_mods_comparison_lr.py', 'label':'vcfb','conf':'thesis/4*2.conf', 'options_pre':'{.48\\textwidth}',
-        'options_pre_caption':'\\vspace{-1.5em}\\',
-        'options_post':'\\vspace{1em}',
-        'caption':''
-        ,},
-            {'script':'thesis/scripts/plots/nbr_mods_comparison_gen.py', 'label':'scfb','conf':'thesis/4*2.conf', 'options_pre':'{.48\\textwidth}',
-        'options_pre_caption':'\\vspace{-1.5em}\\',
-        'options_post':'\\vspace{1em}',
-        'caption':''
-        ,},
-        ],
-        caption='
-        ',
-        label='fig:vc',
-        )}
-\end{sansmath}
-
-\py{
-    pytex_tab(
-    script='thesis/scripts/gen_eval_tab.py',
-    options_pre='\\centering \\resizebox{0.7\\textwidth}{!}{',
-    options_post='}',
-    caption='Generation coherence for the Test set.
+    \py{pytex_fig('thesis/scripts/plots/epoch_comparison_lr.py',
+        conf='thesis/main.conf',
+        label='ep comp lr',
+    caption='
+    \\textbf{Linear classification accuracy for different epochs, averaged over all subsets, for 3 modalities.}
+    Overall, the \mg{mofop}, the \mg{mopoe} and the \mg{mopgfm} method perform similarly.
     ',
-    )
-}
+    )}
+\end{sansmath}
 
 \py{
     pytex_tab(
@@ -58,15 +39,96 @@ My results.
     options_post='}',
     caption='Linear classification accuracy of latent representations for the Test set.\\
     ',
+    label='lr eval',
     )
 }
 
+\begin{sansmath}
+    \py{pytex_fig('thesis/scripts/plots/nbr_mods_comparison_lr.py',
+        conf='thesis/main.conf',
+        label='nbr mods comp lr',
+        caption='
+        \\textbf{Generation classification accuracy for different epochs.}
+        Overall, the \mg{mofop}, the \mg{mopoe} and the \mg{mopgfm} method perform similarly.
+        ',
+        )}
+\end{sansmath}
+
+
+\begin{sansmath}
+    \py{pytex_fig('thesis/scripts/plots/epoch_comparison_gen.py',
+        conf='thesis/main.conf',
+        label='ep comp gen',
+        caption='
+        \\textbf{Generation classification accuracy for different epochs.}
+        Overall, the \mg{mofop}, the \mg{mopoe} and the \mg{mopgfm} method perform similarly.
+        ',
+        )}
+\end{sansmath}
+
+
+
+\begin{sansmath}
+    \py{pytex_fig('thesis/scripts/plots/nbr_mods_comparison_gen.py',
+        conf='thesis/main.conf',
+        label='nbr mods comp gen',
+        caption='
+        \\textbf{Generation classification accuracy for different epochs.}
+        Overall, the \mg{mofop}, the \mg{mopoe} and the \mg{mopgfm} method perform similarly.
+        ',
+        )}
+\end{sansmath}
+
+
+
+%\begin{sansmath}
+%\py{pytex_subfigs(
+%[
+%{'script':'thesis/scripts/plots/epoch_comparison_lr.py', 'label':'vccv','conf':'thesis/4*2.conf', 'options_pre':'{.48\\textwidth}',
+%'options_pre_caption':'\\vspace{-1.5em}\\',
+%'options_post':'\\vspace{1em}',
+%'caption':''
+%,},
+%{'script':'thesis/scripts/plots/epoch_comparison_gen.py', 'label':'sccv','conf':'thesis/4*2.conf', 'options_pre':'{.48\\textwidth}',
+%'options_pre_caption':'\\vspace{-1.5em}\\',
+%'options_post':'\\vspace{1em}',
+%'caption':''
+%,},
+%{'script':'thesis/scripts/plots/nbr_mods_comparison_lr.py', 'label':'vcfb','conf':'thesis/4*2.conf', 'options_pre':'{.48\\textwidth}',
+%'options_pre_caption':'\\vspace{-1.5em}\\',
+%'options_post':'\\vspace{1em}',
+%'caption':''
+%,},
+%{'script':'thesis/scripts/plots/nbr_mods_comparison_gen.py', 'label':'scfb','conf':'thesis/4*2.conf', 'options_pre':'{.48\\textwidth}',
+%'options_pre_caption':'\\vspace{-1.5em}\\',
+%'options_post':'\\vspace{1em}',
+%'caption':''
+%,},
+%],
+%caption='
+%',
+%label='fig:vc',
+%)}
+%\end{sansmath}
+
 \py{
-    pytex_tab(
-    script='thesis/scripts/prd_tab.py',
-    options_pre='\\centering \\resizebox{0.7\\textwidth}{!}{',
-    options_post='}',
-    caption='Area under the Precision and Recall curve of the PRD score \citep{precision_recall_distributions}.\\
-    ',
-    )
+pytex_tab(
+script='thesis/scripts/gen_eval_tab.py',
+options_pre='\\centering \\resizebox{0.7\\textwidth}{!}{',
+options_post='}',
+caption='Generation coherence for the Test set.
+',
+)
+}
+
+
+
+\py{
+pytex_tab(
+script='thesis/scripts/prd_tab.py',
+options_pre='\\centering \\resizebox{0.7\\textwidth}{!}{',
+options_post='}',
+caption='Area under the Precision and Recall curve of the PRD score \citep{precision_recall_distributions}.\\
+',
+)
 }

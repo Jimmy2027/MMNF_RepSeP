@@ -14,7 +14,7 @@ num_samples = 30
 
 config = json2dict(Path('conf.json'))
 # for method in config['methods']:
-for method in ['iwmogfm2']:
+for method in ['iwmogfm']:
     save_path = data_dir / f'{method}/rand_gen_plot.png'
 
     _id = exp_uids[method]['3_mods'][0]

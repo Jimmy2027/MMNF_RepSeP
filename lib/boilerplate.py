@@ -4,8 +4,9 @@ from typing import List
 import numpy as np
 import pandas as pd
 
-from lib.utils import tex_escape
+from lib.utils import tex_escape, float_to_tex
 from scripts_ import tikz
+from mmvae_hub.utils.utils import json2dict
 
 
 def get_cond_gen_plot(method: str, which: str):
@@ -69,6 +70,14 @@ def make_cond_gen_fig(which: str, methods: List[str]):
     return pic.make()
 
 
+def get_lr_score(method: str):
+    epoch_comp_dict = json2dict(Path('data/thesis/epoch_comp.json'))
+    return float_to_tex(epoch_comp_dict[method]['lat_eval'][-1])
+
+
 if __name__ == '__main__':
     # get_cond_gen_plot(method=r'joint\_elbo', which='m0__m0')
-    make_cond_gen_fig(which='m0_m1__m0', methods=['mogfm'])
+    # make_cond_gen_fig(which='m0_m1__m0', methods=['mogfm'])
+    get_lr_score('mopoe')
+    get_lr_score('mofop')
+    get_lr_score('mopgfm')

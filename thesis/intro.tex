@@ -6,6 +6,11 @@ Multimodal data naturally grants self-supervision in the form of shared informat
 It can also serve as an inherent regularization which forces the model to learn more robust features from the data, since these features need to be connected between modalities.
 This may also lead to more interpretable features for humans, since humans also infer from multiple modalities.
 
+A model that can generate any of the learned modalities, given any subset of modalities can be used for translation between modalities for example, like image captioning.
+It can also find applications in the medical domain, where the model could generate, given images and medical data of a patient, a text describing the medical condition of a patient.
+Self-supervised training paradigms are especially useful in the medical domain since there labeled data is expensive to acquire and thus very scarce.
+% examples: (\citep{dorent_hetero-modal_2019}, \citep{calixto_latent_2019})
+
 However, the understanding of different modalities and the interplay between data types are non-trivial research questions and longstanding goals in machine learning research \citep{ngiam_multimodal_nodate}.
 While fully-supervised approaches have been applied successfully \parencite{karpathy_deep_2015,tsai_learning_2018}, the labeling of multiple data types remains time-consuming and expensive.
 Therefore, models that efficiently learn from multiple data types in a self-supervised fashion are much more widely applicable for real world problems.
@@ -27,10 +32,7 @@ Hence, adaptions to the original formulation are required in order to cater to a
 %Popular models such as CLIP and DALL-E from Openai have revolutionised the text to image translation.
 % motivation
 %It has been shown that using shared information of multiple modalities as a self-supervised training paradigm can significantly improve
-A model that can generate any of the learned modalities, given any subset of modalities can be used for translation between modalities for example, like image captioning.
-It can also find applications in the medical domain, where the model could generate, given images and medical data of a patient, a text describing the medical condition of a patient.
-Self-supervised training paradigms are especially useful in the medical domain since there labeled data is expensive to acquire and thus very scarce.
-% examples: (\citep{dorent_hetero-modal_2019}, \citep{calixto_latent_2019})
+
 
 
 VAEs consist of two parts: an encoder part which maps the input data to a probability distribution and a decoder which learns to reconstruct the input from samples out of that latent distribution.

@@ -6,12 +6,12 @@ from mmvae_hub.utils.utils import json2dict, dict2json
 
 end_epoch = 500
 eval_freq = 500
-nbr_repeats = 2
+nbr_repeats = 5
 
 poe_args = {
     'method': 'poe',
     "initial_learning_rate": 0.0005,
-    'class_dim': 1280,
+    'class_dim': 512,
     "min_beta": 0,
     "max_beta": 2.,
     "beta_warmup": 0,
@@ -125,14 +125,14 @@ if __name__ == '__main__':
         experiment_uids_path.parent.mkdir(exist_ok=True, parents=True)
         exp_uids = {}
 
-    for params in [poe_args, moe_args, mopoe_args]:
+    for params in [mopgfm_args, mofop_args]:
         # for params in [mofop_args]:
         method = params['method']
 
         if method not in exp_uids:
             exp_uids[method] = {}
 
-        for num_mods in range(1, 6):
+        for num_mods in range(1, 5):
             params['num_mods'] = num_mods
             # more evaluation steps are needed for 3 mods
             if num_mods == 3:
