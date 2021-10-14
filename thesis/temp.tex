@@ -1,0 +1,62 @@
+
+
+
+
+
+
+Here, we focus on variational autoencoders (VAEs) \parencite{kingma_auto-encoding_2014,rezende_stochastic_2014} which are able to jointly infer representations and generate new observations.
+Despite their success on unimodal datasets, there are additional challenges associated with multimodal data \parencite{suzuki_joint_2016, vedantam_generative_2018}.
+In particular, multimodal generative models need to represent both modality-specific and shared factors and generate semantically coherent samples across modalities.
+Semantically coherent samples are connected by the information which is shared between data types \parencite{shi_variational_2019}.
+These requirements are not inherent to the objective: the evidence lower bound (ELBO) of uni-modal VAEs.
+Hence, adaptions to the original formulation are required in order to cater to and benefit from multiple data types.
+
+% todo say that here we want to explore ways to make the joint distribution more flexible (by imporving the merging of unimoda distrs or by transforming the joint distribution with a flow)
+% want to evaluate if we can achieve a more meaningfull, expressive latent representation with the f-mean (can be evaluated with the separability of the latent representation, the generation coherence (especially for missing modalities, where the mopoe method struggles the most).
+% also want to give overview of hyperparameters and their influence
+
+%In recent years the focus of machine learning research has shifted more and more towards a multi modal setting.
+%Popular models such as CLIP and DALL-E from Openai have revolutionised the text to image translation.
+% motivation
+%It has been shown that using shared information of multiple modalities as a self-supervised training paradigm can significantly improve
+
+
+
+VAEs consist of two parts: an encoder part which maps the input data to a probability distribution and a decoder which learns to reconstruct the input from samples out of that latent distribution.
+For $M$ modalities, $M$ different encoder and decoder pairs are needed, each encoder learning a unimodal latent distribution $\unimodalpost$.
+To learn a joint distribution of multiple data modalities, some function $\mathcal{F}$ is needed that merges the information from all unimodal latent distributions into one joint distribution (see \cref{fig:magic_graph}).
+
+
+In previous work \parencite{poe,shi_variational_2019,sutter_generalized_2020}, learning a joint distribution has been done effectively by combining learned unimodal distributions with a geometric mean \parencite{poe}, an arithmetic mean \parencite{shi_variational_2019} or both \parencite{sutter_generalized_2020}.
+
+%todo say that while both the MoE and PoE are sensible choices, there is no reason that they are the best -> would be better to have a merging function that is learnable by the model
+
+Here, we generalize previous work by substituting $\mathcal{F}$ with a parameterized generalized $f_{\psi}$-Mean \parencite{niculescu_convex_2018} with trainable paramters $\psi$.
+The generalized $f$-Mean being a generalisation of the arithmetic and the geometric mean, using it should bring results that are at least equally good or better than previous results if the objective is right.
+E.g. if the geometric or the arithmetic mean were the best functions to merge the uni modal posteriors, the model could learn parameters $\psi$ such that the $f_{\psi}$-Mean equals an arithmetic or geometric mean.
+
+The generalized $f$-Mean is defined as follows:
+\begin{equation}
+    \label{gfm}
+    \mathcal{M}_{f}\left( \textbf{p} \right) = f^{-1}\left( \frac{1}{N} \sum ^N _{i=1} f(\textbf{p}_i)) \right)
+\end{equation}
+
+In \cref{gfm}, $f$ can be anything as long as it is invertible and differentiable.
+Normalizing Flows \parencite{papamakarios_normalizing_2019} present an approach to implement a sequence of invertible transformations with neural networks and provide a natural implementation for a parameterized $f_{\psi}$.
+
+
+% todo maybe introduce notations:
+%q for latent distributions
+% M for number of modalities
+% for iw samples K, index k
+%  for index over subset: s, number of subsets: S
+% index of samples of subsets:j (x_j \in X_s)
+
+%todo summarize intro and work
+
+\bigskip
+The goal of this work is to implement and evaluate multi modal VAEs that use a parameterized $f_{\psi}$-Mean to merge the uni modal posteriors into a joint posterior.
+We compare our methods to three baselines, the \mg{MVAE} from \cite{poe}, the \mg{MMVAE} from \cite{shi2019variational} and the \mg{MoPoE} from \cite{thomas_gener-ELBO} and evaluate on three datasets for the generation quality, the separability of the latent representation and the generation coherence.
+
+\vspace{3cm}
+

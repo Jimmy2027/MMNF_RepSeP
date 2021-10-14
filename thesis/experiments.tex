@@ -1,10 +1,10 @@
-\section{Experiments}
+\chapter{Experiments}
 In this section we describe the experimental setup that was used in order to compare our methods to each other and to the \mg{MVAE}, the \mg{MMVAE} and the \mg{MoPoE} methods.
 
-\subsection{Datasets}
+\section{Datasets}
 We evaluate on three datasets, each providing different difficulties in order to filter out advantages and disadvantages of our methods.
 
-\subsubsection{PolyMNIST} \label{polymnist}
+\subsection{PolyMNIST} \label{polymnist}
 The PolyMNIST dataset, first introduced in \cite{sutter_multimodal_2020}, consists of MNIST digits overlayed over a random part of a certain background image.
 The modality specific information of each sample in this dataset is defined by the background image and the shared information by the digit.
 In this case the modality specific information is harder to learn than the shared information (for the modality specific information the model has to have learned the set of possible backgrounds and styles of handwriting while the shared information is simply the set of digits).
@@ -25,11 +25,11 @@ All results are presented as averages over the 5 runs, accompanied with the stan
     \label{fig:PolyMNIST}
 \end{figure}
 
-\subsection{Metrics}
+\section{Metrics}
 In order to compare the proposed methods in a meaningful manner, we make use of three metrics that each quantifies the performance of a different aspect of the mmVAE.
 Namely, we compare the quality of the learned latent representation, the coherence of the generated samples and the quality of the generated samples, as described in the follwing sections.
 
-\subsubsection{Evaluation of the Latent Representation}
+\subsection{Evaluation of the Latent Representation}
 To evaluate if the different mmVAEs are able to extract characteristic information and compress it in the latent representation in a meaningful manner, we evaluate the separability of the latent space via linear classifiers.
 If the classifier can separate the latent space into the corresponding classes, we conclude that the posterior approximations are meaningful.
 One classifier for each class and for each latent space is trained on the 1000 encoded samples from the training set and tested on the test set.
@@ -37,14 +37,14 @@ Note that this can be seen as a variant of the disentanglement metric from \cite
 If the dimensions of latent representation are independent and interpretable, there will be less variance in the samples belonging to the same class and thus make them separable from the rest with low capacity classifiers.
 It has been shown in \cite{locatello_challenging_2019} that this disentanglement metric correlates with other disentanglement metrics.
 
-\subsubsection{Evaluation of the generation coherence}
+\subsection{Evaluation of the generation coherence}
 \label{subsubsec:gen_coh}
 To evaluate if the method is able to separate the shared information from the modality specific information, we verify that all generated tuples belong to the same class using pretrained classifiers.
 For conditional generation, the conditionally generated samples have to be coherent to the input samples.
 The coherence accuracy is the ratio of coherent samples divided by the number of generated samples.
 For every data type, we train a neural network classifier in a supervised way and the architecture is identical to the encoder except from the last layer.
 
-\subsubsection{Evaluation of the generation quality}
+\subsection{Evaluation of the generation quality}
 \label{subsubsec:gen_qual}
 To evaluate the quality of the generated samples, we make use of the precision-recall score from \cite{precision_recall_distributions}.
 The Precision and Recall for Disitributions (prd) metric is similar to the Fréchet Inception Distance (FID) \citep{heusel_gans_2017}, but disentangles the quality of generated samples from the coverage of the target distribution.
@@ -52,7 +52,7 @@ The prd metric reduces the problem of comparing a distribution Q (the distributi
 The embeddings are then clustered such that the histogram over the cluster assignments can be meaningfully compared.
 Here we compute the prd score by taking the area under the precision-recall curve.
 
-\subsection{Hyperparameter Selection}
+\section{Hyperparameter Selection}
 We select three hyperparameters for the standard mmVAE models (\mg{MoPoE}, \mg{MoE}, \mg{PoE}) that we optimize for our experiments:
 
 \begin{itemize}
@@ -95,13 +95,13 @@ The parameters used for each method in our experiments are shown in \cref{tab:pa
     \begin{subfigure}[b]{0.49\textwidth}
         \centering
         \includegraphics[width=\textwidth]{data/static/mopoe_lr_rate}
-        \caption{Results shown in function\\ of the learning rate}
+        \caption{Results shown in function of the learning rate}
     \end{subfigure}
     \hfill
     \begin{subfigure}[b]{0.49\textwidth}
         \centering
         \includegraphics[width=\textwidth]{data/static/mopoe_class_dim}
-        \caption{Results shown in function\\ of the dimension of the latent representation}
+        \caption{Results shown in function of the dimension of the latent representation}
     \end{subfigure}
     \hfill
     \begin{subfigure}[b]{0.5\textwidth}

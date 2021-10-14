@@ -1,9 +1,72 @@
-\section{Methods}
+\chapter{Methods}
 \label{sec:methods}
+
+\section{Learning a flexible joint posterior with a generalized $f$-Mean}
 As introduced herein, we are working with a multi modal VAE (mmVAE), which learns a joint distribution that contains the combined information of each learned uni modal latent distribution.
-In order to generalize previous methods and to increase the flexibility of the aggregation of modalities, we implement the fusion of the uni modal latent distributions with a mixture of generalized $f$-mean.
-Instead of merging the uni modal posteriors into subset-posteriors with a PoE, like is done in the \mg{MoPoE}, we merge them with a trainable $f_{\psi}$-mean, with parameters $\psi$.
-The main difficulty in this approach comes from the fact that the $f$-mean of the uni modal distributions follows an unknown distribution.
+For $M$ modalities, $M$ different encoder and decoder pairs are needed, each encoder learning a unimodal latent distribution $\unimodalpost$.
+To learn a joint distribution of multiple data modalities, some function $\mathcal{F}$ is needed that merges the information from all unimodal latent distributions into one joint distribution (see \cref{fig:magic_graph}).
+In previous work \parencite{poe,shi_variational_2019,sutter_generalized_2020}, learning a joint distribution has been done effectively by combining learned unimodal distributions with a PoE \parencite{poe}, an MoE \parencite{shi_variational_2019} or both \parencite{sutter_generalized_2020}.
+While for both the MoE and PoE, reasons have been established why they are good choices for the aggregation function, both come with several shortcomings (\cref{subsec:Multi Modal VAEs}).
+A more flexible and generic function could improve the fusion of information from each modality and improve the expressiveness of the joint posterior.
+
+\smallskip
+
+To this end, we generalize previous methods and implement the fusion of the uni modal latent distributions with a trainable mixture of generalized $f$-mean, with parameters $\psi$.
+
+\smallskip
+
+The generalized $f$-Mean being a generalisation of the arithmetic and the geometric mean, using it should bring results that are at least equally good or better than previous results if the objective is right.
+E.g. if the geometric or the arithmetic mean were the best functions to merge the uni modal posteriors, the model could learn parameters $\psi$ such that the $f$-Mean equals an arithmetic or geometric mean.
+
+The generalized $f$-Mean is defined as follows:
+\begin{equation}
+    \label{gfm}
+    \mathcal{M}_{f}\left( \textbf{p} \right) = f^{-1}\left( \frac{1}{N} \sum ^N _{i=1} f(\textbf{p}_i)) \right)
+\end{equation}
+
+In \cref{gfm}, $f$ can be anything as long as it is invertible and differentiable.
+Normalizing Flows \parencite{papamakarios_normalizing_2019} present an approach to implement a sequence of invertible transformations with neural networks and provide a natural implementation for a parameterized $f_{\psi}$.
+We refer to \cref{subsec: Normalizing Flows} for a more in-depth introduction to normalizing flows.
+
+
+
+
+
+
+\begin{figure}[h!]
+    \centering
+    \resizebox{0.9\textwidth}{!}{%
+        \begin{tikzpicture}[Mod1/.style={rectangle, draw=blue!60, fill=blue!5, very thick, minimum size=5mm},Mod2/.style={rectangle, draw=green!60, fill=green!5, very thick, minimum size=5mm},enc_mods/.style={circle, draw=gray!60, fill=gray!5, very thick, minimum size=10mm},magic/.style={rectangle, draw=red!60, fill=red!5, very thick, minimum size=20mm},]
+            \node[Mod1] (mod1) {$Mod_1$};
+            \node[below of=mod1] (points) {\ldots};
+            \node[enc_mods, right of=mod1, xshift=1.5cm] (q1) {$q_1$};
+            \node[Mod2, below of=points] (modn) {$Mod_M$};
+            \node[enc_mods, right of=modn, xshift=1.5cm] (q2) {$q_N$};
+            \node[below of=q1] (points) {\ldots};
+            \node[magic, right of=q1, yshift=-1cm, xshift=1.5cm] (magic) {\Large$\mathcal{F}$};
+            \node[enc_mods, right of=magic, xshift=1.7cm] (joint) {Joint Distr};
+            \node[Mod1, right of=joint, xshift=1.7cm,yshift=+1cm] (rec_mod1) {$Mod_1$};
+            \node[right of=joint,xshift=1.7cm] (points) {\ldots};
+            \node[Mod2, right of=joint, xshift=1.7cm,yshift=-1cm] (rec_mod2) {$Mod_M$};
+            \draw[->] (mod1) -- node[anchor=south] {$enc_1$} (q1);
+            \draw[->] (q1) -- (magic);
+            \draw[->] (modn) -- node[anchor=south] {$enc_M$} (q2);
+            \draw[->] (q2) -- (magic);
+            \draw[->] (magic) -- (joint);
+            \draw[->] (joint) edge[bend left=20] node[anchor=south] {$dec_1$} (rec_mod1);
+            \draw[->] (joint) edge[bend right=20] node[anchor=north] {$dec_M$} (rec_mod2);
+        \end{tikzpicture}
+    }
+    \caption{\textbf{Flowchart depicting the main elements of a multi modal VAE wit $M$ different modalities.}
+    Each input modality $m$ gets mapped to a unimodal latent distribution $q_m$ by an encoder $enc_m$.
+    The $M$ unimodal learned distributions then get merged by a function $\mathcal{F}$ into a joint distribution from which the decoders can sample in order to reconstruct each of the $M$ modalities.}
+    \label{fig:magic_graph}
+\end{figure}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Evaluating the join posterior}
+The main difficulty in our approach comes from the fact that the $f$-mean of the uni modal distributions follows an unknown distribution.
 While this makes the joint distribution more flexible, this also makes the computation of the regularization term in the ELBO, the KL-divergence, more difficult to compute.
 In fact, if the density of the joint distribution is unknown, it is impossible to compute the KL-divergence in closed form.
 
@@ -13,7 +76,7 @@ An intuitive alternative would be to find an upper bound of the KL-divergence wh
     D_{KL}^{\prime} \geq D_{KL}(\mathcal{M}_f(\{\unimodalpost\ \forall\ \xsetm \in \xsubset\})) =  D_{KL}\left(f^{-1}\left(\sum _{\xsetm \in \xsubset} \frac{f(\unimodalpost)}{|\xsubset|}\right)\ ||\ \prior\right)
 \end{equation}
 
-Using the change of variable formula (\cref{eq:changeofvariables}), the $f$-mean can be rewritten as follows:
+Using the change of variable formula (\cref{eq:changeofvariables}), the $f$-mean in \cref{eq:kldivbound} can be rewritten as follows:
 \begin{equation}
     \mathcal{M}_f = f^{-1}(Q)|J_{f^{-1}}(Q)|
 \end{equation}
@@ -61,10 +124,12 @@ Instead, we propose four workarounds to the computation of the KL-divergence in 
 
 \end{enumerate}
 
-\subsection{Models}
-Here we describe the models that implement the four methods introduced above and enumerate their advantages and disadvantages.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\subsubsection{MofoPoE}\label{subsec:mofopoe}
+\section{Models}
+In this section, we describe the models that implement the four methods introduced above and enumerate their advantages and disadvantages.
+
+\subsection{MofoPoE}\label{subsec:mofopoe}
 The \mg{MofoPoE} builds on the \mg{MoPoE} by transforming the subset posteriors $\subsetpost$ with a series of F invertible transformations with trainable parameters $\psi$:
 \begin{equation}
     z_{F,S} =f_{\psi}(z_{0,S} \sim \subsetpost) = f_F \circ \ldots \circ f_2 \circ f_1(z_{0,S} \sim \subsetpost)
@@ -115,7 +180,7 @@ This gives more flexibility in the choice of the flow implementation.
     \label{fig:mofopoe}
 \end{figure}
 
-\subsubsection{MopgfM}\label{subsec:mopgfm}
+\subsection{MopgfM}\label{subsec:mopgfm}
 % the main disadvantage here is that this method requires many parameters (needs two flows) but has not much flexibility
 The \mg{Mopgfm} mixes the means and the standard deviations of the unimodal posteriors, in order to obtain a normal distribution that depends on each of the uni modal posteriors (see \cref{eq:qjointmopgfm}).
 The aggregation over the means and the standard deviations if done with a parameterized $f$-mean.
@@ -123,7 +188,8 @@ The aggregation over the means and the standard deviations if done with a parame
 \smallskip
 
 This is a generalisation of the PoE method since a product of gaussian experts is itself Gaussian with mean $\mu_{PoE} = (\sum _i \mu _i V_i)(\sum _i V_i)^{-1}$ and covariance $V_{PoE}= (\sum _i V_i)^{-1}$ where $\mu _i, V_i$ are the parameters of the $i$-th Gaussian.\\
-Without loss of generality, it can be assumed that $f_{\mu}^{-1}(\sum _{\xsetm \in \xsubset} \frac{f_{\mu}(\mu_s)}{|\xsubset|}) = \mu_{PoE}$ and $f_{\sigma}^{-1}(\sum  _{\xsetm \in \xsubset} \frac{f_{\sigma}(\sigma_s^2)}{|\xsubset|}) = V_{PoE}$.
+Without loss of generality, it can be assumed that:\\
+$f_{\mu}^{-1}(\sum _{\xsetm \in \xsubset} \frac{f_{\mu}(\mu_s)}{|\xsubset|}) = \mu_{PoE}$ and $f_{\sigma}^{-1}(\sum  _{\xsetm \in \xsubset} \frac{f_{\sigma}(\sigma_s^2)}{|\xsubset|}) = V_{PoE}$.
 
 \smallskip
 
@@ -192,7 +258,7 @@ The main disadvantage of this method is that the KL-divergence term in $\mathcal
 In practice, this makes it very hard to tune the two loss functions to each other.
 However, our results show that the \mg{MogfM\_amortized} method is able to learn meaningful representations and yield good generative results, without the divergence as regularisation term in $\mathcal{L}_1$ (i.e. with $\beta = 0$).
 
-\subsubsection{iwMogfM} \label{subsubsec:iwMogfM}
+\subsection{iwMogfM} \label{subsubsec:iwMogfM}
 The central limit theorem states that a sum of independent random variables tends towards a normal distribution, even if the original variables themselves are not normally distributed.
 With the \mg{iwMogfM} method, we evaluate if the sum of unimodal posteriors from \cref{eq:kldivbound} can be approximated with a normal distribution.
 It is important to note that since the unimodal posteriors should contain shared information they are assumed to be dependent such that the independence condition for the central limit theorem is not met.

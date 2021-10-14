@@ -1,0 +1,14 @@
+%% Custom commands
+%% ===============
+
+%% Fixed/scaling delimiter examples (see mathtools documentation)
+\DeclarePairedDelimiter\abs{\lvert}{\rvert}
+\DeclarePairedDelimiter\norm{\lVert}{\rVert}
+
+%% Use the alternative epsilon per default and define the old one as \oldepsilon
+\let\oldepsilon\epsilon
+\renewcommand{\epsilon}{\ensuremath\varepsilon}
+
+%% Also set the alternate phi as default.
+\let\oldphi\phi
+\renewcommand{\phi}{\ensuremath{\varphi}}

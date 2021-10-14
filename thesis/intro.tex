@@ -1,104 +1,30 @@
-\section{Introduction}
+\chapter{Introduction}
 % in recent years, the field of deep learning has seen a shift from uni modal learning towards multi modal learning.
-The availability of multiple data types provides a rich source of information and holds promise for learning representations that generalise well across multiple modalities \parencite{baltrusaitis_multimodal_2019}.
-Similar to how humans learn and extract information from their surrounding using their five senses, a machine learning model can learn from multiple data types.
+The availability of multiple data types provides a rich source of information and holds promise for learning representations that generalise well across multiple modalities \citep{baltrusaitis_multimodal_2019}.
+Similar to how humans learn and extract information from their surrounding using an aggregation of their senses, a machine learning model can learn from multiple data types.
 Multimodal data naturally grants self-supervision in the form of shared information connecting the different data types.
-It can also serve as an inherent regularization which forces the model to learn more robust features from the data, since these features need to be connected between modalities.
-This may also lead to more interpretable features for humans, since humans also infer from multiple modalities.
+It also serves as an inherent regularization which forces the model to learn more robust features from the data, since these features need to be connected between modalities.
+This may lead to more interpretable features for humans, since they also infer from multiple modalities.
 
 A model that can generate any of the learned modalities, given any subset of modalities can be used for translation between modalities for example, like image captioning.
 It can also find applications in the medical domain, where the model could generate, given images and medical data of a patient, a text describing the medical condition of a patient.
-Self-supervised training paradigms are especially useful in the medical domain since there labeled data is expensive to acquire and thus very scarce.
+%Self-supervised training paradigms are especially useful in the medical domain since there labeled data is expensive to acquire and thus very scarce.
 % examples: (\citep{dorent_hetero-modal_2019}, \citep{calixto_latent_2019})
 
 However, the understanding of different modalities and the interplay between data types are non-trivial research questions and longstanding goals in machine learning research \citep{ngiam_multimodal_nodate}.
-While fully-supervised approaches have been applied successfully \parencite{karpathy_deep_2015,tsai_learning_2018}, the labeling of multiple data types remains time-consuming and expensive.
+While fully-supervised approaches have been applied successfully \citep{karpathy_deep_2015,tsai_learning_2018}, the labeling of multiple data types remains time-consuming and expensive.
 Therefore, models that efficiently learn from multiple data types in a self-supervised fashion are much more widely applicable for real world problems.
 %Therefore, it requires models that efficiently learn from multiple data types in a self-supervised fashion.
 Learning the joint distribution of multiple data types without supervision can be done with self-supervised, generative models.
+In the medical domain for example, self-supervised training paradigms are especially useful since there labeled data is expensive to acquire and thus very scarce.
 
-Here, we focus on variational autoencoders (VAEs) \parencite{kingma_auto-encoding_2014,rezende_stochastic_2014} which are able to jointly infer representations and generate new observations.
-Despite their success on unimodal datasets, there are additional challenges associated with multimodal data \parencite{suzuki_joint_2016, vedantam_generative_2018}.
-In particular, multimodal generative models need to represent both modality-specific and shared factors and generate semantically coherent samples across modalities.
-Semantically coherent samples are connected by the information which is shared between data types \parencite{shi_variational_2019}.
-These requirements are not inherent to the objective: the evidence lower bound (ELBO) of uni-modal VAEs.
-Hence, adaptions to the original formulation are required in order to cater to and benefit from multiple data types.
+Self supervised, multi modal generative models have been applied to toy datasets \citep{shi_variational_2019, sutter_generalized_2020, poe} and real world data \citep{klug_multimodal_nodate}, however results have shown that current methods are not able to aggregate well enough over the modalities to generate coherently between them.
+For the model to generate coherent data, it needs to have learned to extract and fuse information from the multiple data types.
+An image captioning model for example, when generating the caption for an image of a green apple, needs to have learned to extract information from the image and generate text from it.
+Generating captions like "A red apple." or "A yellow truck." would not be coherent with the image of a green apple.
 
-% todo say that here we want to explore ways to make the joint distribution more flexible (by imporving the merging of unimoda distrs or by transforming the joint distribution with a flow)
-% want to evaluate if we can achieve a more meaningfull, expressive latent representation with the f-mean (can be evaluated with the separability of the latent representation, the generation coherence (especially for missing modalities, where the mopoe method struggles the most).
-% also want to give overview of hyperparameters and their influence
+\smallskip
 
-%In recent years the focus of machine learning research has shifted more and more towards a multi modal setting.
-%Popular models such as CLIP and DALL-E from Openai have revolutionised the text to image translation.
-% motivation
-%It has been shown that using shared information of multiple modalities as a self-supervised training paradigm can significantly improve
-
-
-
-VAEs consist of two parts: an encoder part which maps the input data to a probability distribution and a decoder which learns to reconstruct the input from samples out of that latent distribution.
-For $M$ modalities, $M$ different encoder and decoder pairs are needed, each encoder learning a unimodal latent distribution $\unimodalpost$.
-To learn a joint distribution of multiple data modalities, some function $\mathcal{F}$ is needed that merges the information from all unimodal latent distributions into one joint distribution (see \cref{fig:magic_graph}).
-
-
-In previous work \parencite{poe,shi_variational_2019,sutter_generalized_2020}, learning a joint distribution has been done effectively by combining learned unimodal distributions with a geometric mean \parencite{poe}, an arithmetic mean \parencite{shi_variational_2019} or both \parencite{sutter_generalized_2020}.
-
-%todo say that while both the MoE and PoE are sensible choices, there is no reason that they are the best -> would be better to have a merging function that is learnable by the model
-
-Here, we generalize previous work by substituting $\mathcal{F}$ with a parameterized generalized $f_{\psi}$-Mean \parencite{niculescu_convex_2018} with trainable paramters $\psi$.
-The generalized $f$-Mean being a generalisation of the arithmetic and the geometric mean, using it should bring results that are at least equally good or better than previous results if the objective is right.
-E.g. if the geometric or the arithmetic mean were the best functions to merge the uni modal posteriors, the model could learn parameters $\psi$ such that the $f_{\psi}$-Mean equals an arithmetic or geometric mean.
-
-The generalized $f$-Mean is defined as follows:
-\begin{equation}
-    \label{gfm}
-    \mathcal{M}_{f}\left( \textbf{p} \right) = f^{-1}\left( \frac{1}{N} \sum ^N _{i=1} f(\textbf{p}_i)) \right)
-\end{equation}
-
-In \cref{gfm}, $f$ can be anything as long as it is invertible and differentiable.
-Normalizing Flows \parencite{papamakarios_normalizing_2019} present an approach to implement a sequence of invertible transformations with neural networks and provide a natural implementation for a parameterized $f_{\psi}$.
-
-
-% todo maybe introduce notations:
-%q for latent distributions
-% M for number of modalities
-% for iw samples K, index k
-%  for index over subset: s, number of subsets: S
-% index of samples of subsets:j (x_j \in X_s)
-
-%todo summarize intro and work
-
-\bigskip
-The goal of this work is to implement and evaluate multi modal VAEs that use a parameterized $f_{\psi}$-Mean to merge the uni modal posteriors into a joint posterior.
-We compare our methods to three baselines, the \mg{MVAE} from \cite{poe}, the \mg{MMVAE} from \cite{shi2019variational} and the \mg{MoPoE} from \cite{thomas_gener-ELBO} and evaluate on three datasets for the generation quality, the separability of the latent representation and the generation coherence.
-
-\vspace{3cm}
-
-\begin{figure}[h!]
-    \centering
-    \resizebox{0.9\textwidth}{!}{%
-        \begin{tikzpicture}[Mod1/.style={rectangle, draw=blue!60, fill=blue!5, very thick, minimum size=5mm},Mod2/.style={rectangle, draw=green!60, fill=green!5, very thick, minimum size=5mm},enc_mods/.style={circle, draw=gray!60, fill=gray!5, very thick, minimum size=10mm},magic/.style={rectangle, draw=red!60, fill=red!5, very thick, minimum size=20mm},]
-            \node[Mod1] (mod1) {$Mod_1$};
-            \node[below of=mod1] (points) {\ldots};
-            \node[enc_mods, right of=mod1, xshift=1.5cm] (q1) {$q_1$};
-            \node[Mod2, below of=points] (modn) {$Mod_M$};
-            \node[enc_mods, right of=modn, xshift=1.5cm] (q2) {$q_N$};
-            \node[below of=q1] (points) {\ldots};
-            \node[magic, right of=q1, yshift=-1cm, xshift=1.5cm] (magic) {\Large$\mathcal{F}$};
-            \node[enc_mods, right of=magic, xshift=1.7cm] (joint) {Joint Distr};
-            \node[Mod1, right of=joint, xshift=1.7cm,yshift=+1cm] (rec_mod1) {$Mod_1$};
-            \node[right of=joint,xshift=1.7cm] (points) {\ldots};
-            \node[Mod2, right of=joint, xshift=1.7cm,yshift=-1cm] (rec_mod2) {$Mod_M$};
-            \draw[->] (mod1) -- node[anchor=south] {$enc_1$} (q1);
-            \draw[->] (q1) -- (magic);
-            \draw[->] (modn) -- node[anchor=south] {$enc_M$} (q2);
-            \draw[->] (q2) -- (magic);
-            \draw[->] (magic) -- (joint);
-            \draw[->] (joint) edge[bend left=20] node[anchor=south] {$dec_1$} (rec_mod1);
-            \draw[->] (joint) edge[bend right=20] node[anchor=north] {$dec_M$} (rec_mod2);
-        \end{tikzpicture}
-    }
-    \caption{\textbf{Flowchart depicting the main elements of a multi modal VAE wit $M$ different modalities.}
-    Each input modality $m$ gets mapped to a unimodal latent distribution $q_m$ by an encoder $enc_m$.
-    The $M$ unimodal learned distributions then get merged by a function $\mathcal{F}$ into a joint distribution from which the decoders can sample in order to reconstruct each of the $M$ modalities.}
-    \label{fig:magic_graph}
-\end{figure}
+In previous work, the aggregation over modalities is done with multiple, fixed, pre-selected methods, each coming with advantages and disadvantages.
+Here, we generalise previous work by implementing the aggregation over modalities using a generic function with trainable parameters.
+We show that this more flexible way to fuse the information between modalities improves the ability of the model to generate coherently across modalities.

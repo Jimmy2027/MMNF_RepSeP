@@ -695,8 +695,6 @@ thomas_gener-ELBO,
     urldate = {2021-07-30},
     date = {2018-02-15},
     langid = {american},
-    keywords = {\_tablet},
-    file = {Nowozin_2018_Debiasing Evidence Approximations.pdf:/Users/Hendrik/zotfile/Nowozin_2018_Debiasing Evidence Approximations.pdf:application/pdf;Snapshot:/Users/Hendrik/Zotero/storage/2P4TKEGT/debiasing-evidence-approximations-importance-weighted-autoencoders-jackknife-variational-infere.html:text/html}
 }
 
 @inproceedings{precision_recall_distributions,
@@ -873,9 +871,10 @@ thomas_gener-ELBO,
 @article{ngiam_multimodal_nodate,
     title = {Multimodal Deep Learning},
     abstract = {Deep networks have been successfully applied to unsupervised feature learning for single modalities (e.g., text, images or audio). In this work, we propose a novel application of deep networks to learn features over multiple modalities. We present a series of tasks for multimodal learning and show how to train deep networks that learn features to address these tasks. In particular, we demonstrate cross modality feature learning, where better features for one modality (e.g., video) can be learned if multiple modalities (e.g., audio and video) are present at feature learning time. Furthermore, we show how to learn a shared representation between modalities and evaluate it on a unique task, where the classiﬁer is trained with audio-only data but tested with video-only data and vice-versa. Our models are validated on the {CUAVE} and {AVLetters} datasets on audio-visual speech classiﬁcation, demonstrating best published visual speech classiﬁcation on {AVLetters} and eﬀective shared representation learning.},
-    pages = {8},
+    date = {2011},
     author = {Ngiam, Jiquan and Khosla, Aditya and Kim, Mingyu and Nam, Juhan and Lee, Honglak and Ng, Andrew Y},
     langid = {english},
+    url = {https://people.csail.mit.edu/khosla/papers/icml2011_ngiam.pdf},
 }
 
 
@@ -913,3 +912,76 @@ thomas_gener-ELBO,
     keywords = {Computer Science - Machine Learning},
 }
 
+
+@inproceedings{klug_multimodal_nodate,
+    title = {Multimodal Generative Learning on the {MIMIC}-{CXR} Database},
+    url = {https://openreview.net/pdf?id=ZVqjoKVbYMl},
+    author = {Klug, Hendrik and Sutter, Thomas M and Vogt, Julia E},
+    date = {2021-07-07},
+    langid = {english},
+    eventtitle = {{MIDL} 2021 Conference},
+}
+
+
+
+@inproceedings{pandey2017variational,
+    title={Variational methods for conditional multimodal deep learning},
+    author={Pandey, Gaurav and Dukkipati, Ambedkar},
+    booktitle={2017 International Joint Conference on Neural Networks (IJCNN)},
+    pages={308--315},
+    year={2017},
+    organization={IEEE}
+}
+
+@article{pu2016variational,
+    title={Variational autoencoder for deep learning of images, labels and captions},
+    author={Pu, Yunchen and Gan, Zhe and Henao, Ricardo and Yuan, Xin and Li, Chunyuan and Stevens, Andrew and Carin, Lawrence},
+    journal={Advances in neural information processing systems},
+    volume={29},
+    pages={2352--2360},
+    year={2016}
+}
+
+@inproceedings{ledig2017photo,
+    title={Photo-realistic single image super-resolution using a generative adversarial network},
+    author={Ledig, Christian and Theis, Lucas and Husz{\'a}r, Ferenc and Caballero, Jose and Cunningham, Andrew and Acosta, Alejandro and Aitken, Andrew and Tejani, Alykhan and Totz, Johannes and Wang, Zehan and others},
+    booktitle={Proceedings of the IEEE conference on computer vision and pattern recognition},
+    pages={4681--4690},
+    year={2017}
+}
+
+@inproceedings{liu2019few,
+    title={Few-shot unsupervised image-to-image translation},
+    author={Liu, Ming-Yu and Huang, Xun and Mallya, Arun and Karras, Tero and Aila, Timo and Lehtinen, Jaakko and Kautz, Jan},
+    booktitle={Proceedings of the IEEE/CVF International Conference on Computer Vision},
+    pages={10551--10560},
+    year={2019}
+}
+
+@article{suzuki2016joint,
+    title={Joint multimodal learning with deep generative models},
+    author={Suzuki, Masahiro and Nakayama, Kotaro and Matsuo, Yutaka},
+    journal={arXiv preprint arXiv:1611.01891},
+    year={2016}
+}
+
+@article{tsai2018learning,
+    title={Learning factorized multimodal representations},
+    author={Tsai, Yao-Hung Hubert and Liang, Paul Pu and Zadeh, Amir and Morency, Louis-Philippe and Salakhutdinov, Ruslan},
+    journal={arXiv preprint arXiv:1806.06176},
+    year={2018}
+}
+
+
+@article{goodfellow_generative_2014,
+    title = {Generative Adversarial Networks},
+    url = {http://arxiv.org/abs/1406.2661},
+    abstract = {We propose a new framework for estimating generative models via an adversarial process, in which we simultaneously train two models: a generative model G that captures the data distribution, and a discriminative model D that estimates the probability that a sample came from the training data rather than G. The training procedure for G is to maximize the probability of D making a mistake. This framework corresponds to a minimax two-player game. In the space of arbitrary functions G and D, a unique solution exists, with G recovering the training data distribution and D equal to 1/2 everywhere. In the case where G and D are defined by multilayer perceptrons, the entire system can be trained with backpropagation. There is no need for any Markov chains or unrolled approximate inference networks during either training or generation of samples. Experiments demonstrate the potential of the framework through qualitative and quantitative evaluation of the generated samples.},
+    journaltitle = {{arXiv}:1406.2661 [cs, stat]},
+    author = {Goodfellow, Ian J. and Pouget-Abadie, Jean and Mirza, Mehdi and Xu, Bing and Warde-Farley, David and Ozair, Sherjil and Courville, Aaron and Bengio, Yoshua},
+    urldate = {2021-04-28},
+    date = {2014-06-10},
+    eprinttype = {arxiv},
+    eprint = {1406.2661},
+    keywords = {Computer Science - Machine Learning, Statistics - Machine Learning}
+}

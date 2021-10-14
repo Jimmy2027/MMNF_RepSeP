@@ -1,0 +1,29 @@
+\chapter{Related Work}
+\section{Generative Modeling}
+Generative adversarial networks \citep[GANs]{goodfellow_generative_2014} and variational autoencoders (VAEs, \cref{subsec:vae}) are the two most popular methods for generative modeling.
+Both attempt to model the distribution over the data, however while for the VAEs, the resulting posterior approximation is defined explicitly, the learned posterior of GANs is not.
+GANs are made of two models that are trained simultaneously, a generative model G that captures the data distribution, and a discriminative model D that estimates the probability that a sample came from the training data rather than G.
+The joint optimization of both models D and G can be tricky in practice and GANs are known to suffer from mode collapse since the objective does not require the learned representation to contain all modes of the data.
+For images of animals for example, the generator G could learn to generate only images of brown, short haired dogs, so well that the discriminator D will not be able to distinguish them from the true data.
+Mode collapse does not happen in VAEs since their objective explicitly requires their learned representation to contain all modes of the data.
+In this work, we focus on VAEs and give a more in depth introduction in section \cref{subsec:vae}.
+
+\section{Multi Modal Generative Modeling}
+
+There have been a wide range of approaches for multi-modal generative modeling, however most fall short of expressing the complete range of behaviour that we expect in this setting.
+
+Most prior approaches to generative modelling with multi modal data have targeted modality translation, where the model learns to generate one modality conditioned on another one.
+In this case input an output modalities of the model are not interchangeable.
+Modality translation has been proposed both as VAE based \citep{pandey2017variational, pu2016variational}, as well as GAN based, for domain translation of images \citep{ledig2017photo, liu2019few}.
+% todo
+However, we expect our method to be able to generate any modality given any subset of modalities which extends translation between modalities.
+It would be possible to train $2^M -1$ modality translation network pairs for $M$ modalities, but this is intractable in practice.
+
+Other prior work has targeted to directly model the joint distribution over the data.
+The joint multi modal VAE (JMVAE) from \cite{suzuki2016joint} learns a joint posterior distribution using a joint inference network.
+To handle missing data at test time, inference networks need to be trained for every subset of modalities.
+While feasible for two modalities, this setup quickly becomes intractable with more data types.
+Similarly, the multimodal factorisation model (MFM) from \cite{tsai2018learning} explicitly defines a joint inference network on top of uni modal encoders, however additional decoder networks are needed to generate missing modalities.
+
+
+

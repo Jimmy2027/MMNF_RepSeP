@@ -1,7 +1,7 @@
-\section{Background}
-In this section, we introduce concepts and previous work on VAEs, self supervised multi modal generative learning and normalizing flows, on which this work builds on.
+\chapter{Background}
+Our methods build on concepts and previous work on variational autoencoders (VAEs), self supervised multi modal generative learning paradigms and normalizing flows, which we introduce in this section.
 
-\subsection{Variational Autoencoder}
+\section{Variational Autoencoder}
 \label{subsec:vae}
 The VAE, first introduced by \cite{kingma_auto-encoding_2014} and \cite{rezende_stochastic_2014}, consists of an encoder network and a decoder network.
 In contrast to a typical auto encoder network, the VAE is trained such that it's learned representation has the structure of a prior distribution.
@@ -43,7 +43,10 @@ The $\beta$ allows to weight the trade-off introduced by the modified training o
 Disentanglement is a popular objective in representation learning and has been addressed in recent works \parencite{chen_isolating_2019, locatello_challenging_2019}.
 In this work, we also make use of $\beta$ as a hyperparameter that we tune for each method.
 
-\subsection{Multi Modal VAEs}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Multi Modal VAEs}
+\label{subsec:Multi Modal VAEs}
 In order for the VAE model to learn a representation which captures the underlying factors of multiple modalities, several adaptations to the objective in \cref{vaeelbo} need to be made.
 The first approach that scales with the number of modalities, allows for a coherent joint generation over all modalities and cross-generation across individual modalities, the \mg{MVAE}, was introduced in \cite{poe}.
 The MVAE makes the assumption that the joint posterior is a product of uni modal posteriors, also called a Product-of-Experts (PoE) \parencite{hinton_training_2002}:
@@ -125,26 +128,10 @@ The goal of this work is solely to improve the merging function, which is why we
     \end{equation}
 \end{lemma}
 
-\subsection{Importance Weighted Autoencoder} \label{subsec:iwvae}
-It has been shown that the tightness of the ELBO in \cref{eq:vaeelbo} can be improved by sampling multiple samples from the posterior at each step \parencite{burda_importance_2016}, which results in the following lower bound:
-\begin{equation}
-    \label{eq:iwelbo}
-    \log p(x) \geq \mathbb{E}_{z_1,\ldots,z_K \sim q_{\phi}(z|x)}\left[ \log \frac{1}{K} \sum ^K _{k=1} \frac{p_{\theta}(x|z_k)p_{\theta}(z)}{q_{\phi}(z_k| x)} \right]\\
-    := \mathcal{L}_K
-\end{equation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\Cref{eq:iwelbo} yields useful properties summarized in \parencite{nowozin_debiasing_2018}, namely that one recovers the ELBO for $K=1$, $\mathcal{L}_K$ approaches the true $\log p(x)$ for larger Ks ($\lim _{K \rightarrow \inf} \mathcal{L}_K = \log p(x)$) and $\mathcal{L}_1, \ldots, \mathcal{L}_K$ provide stochastic monotonicity ($\mathcal{L}_E = \mathcal{L}_1 \leq \mathcal{L}_2 \leq \ldots \leq \log p(x)$).
-The MMVAE from \parencite{shi2019variational} adapts this for multi modal data:
-\begin{equation}
-    \label{eq:iwelbommvae}
-    \mathcal{L}^{MoE}_K(\textbf{x}_{1:M}) =
-    \frac{1}{M} \sum _{m=1} ^M \mathbb{E}_{z_m^{1:K} \sim q_{\phi_m}(z|x_m)}\left[ \log \frac{1}{K} \sum ^K _{k=1} \frac{p_{\theta}(x_{1:M}|z_m^k)p_{\theta}(z^k_m)}{q_{\phi}(z_m^k| x_{1:M})} \right]
-\end{equation}
-which is a valid lower bound of the multi modal log likelihood $\log p(\xset)$.
-
-In our work, we make use of this importance sampling training paradigm to improve the tightness of the ELBO and to approximate the KL-divergence between the posterior and the prior by comparing samples from both (see \cref{sec:methods})).
-
-\subsection{Normalizing Flows}
+\section{Normalizing Flows}
+\label{subsec: Normalizing Flows}
 Normalizing flows \parencite{papamakarios_normalizing_2019} represent an approach for defining invertible and differentiable transformations of probability distributions.
 They are widely used for generative modeling \citep[\textbf{GLOW}, \textbf{Real NVP}]{kingma_glow_2018, dinh_density_2017} and variational inference \parencite{rezende_variational_2016, berg_sylvester_2019}.
 In this work, we make use of normalizing flows both as a simple parameterizable invertible function for the $f$-mean, as well as a transformation of the joint posterior into an arbitrary complexity in order to improve its ability to capture the underlying factors of multiple modalities.
@@ -184,3 +171,25 @@ Affine coupling blocks have been shown to provide good results, especially for i
     \caption{Flowchart depicting the workings of a coupling block, taken from the ECCV2020's Tutorial: "Introduction to Normalizing Flows" from Marcus A. Brubaker (\url{https://youtu.be/u3vVyFVU\_lI})}
     \label{fig:coupling block}
 \end{figure}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Importance Weighted Autoencoder} \label{subsec:iwvae}
+It has been shown that the tightness of the ELBO in \cref{eq:vaeelbo} can be improved by sampling multiple samples from the posterior at each step \parencite{burda_importance_2016}, which results in the following lower bound:
+\begin{equation}
+    \label{eq:iwelbo}
+    \log p(x) \geq \mathbb{E}_{z_1,\ldots,z_K \sim q_{\phi}(z|x)}\left[ \log \frac{1}{K} \sum ^K _{k=1} \frac{p_{\theta}(x|z_k)p_{\theta}(z)}{q_{\phi}(z_k| x)} \right]\\
+    := \mathcal{L}_K
+\end{equation}
+
+\Cref{eq:iwelbo} yields useful properties summarized in \parencite{nowozin_debiasing_2018}, namely that one recovers the ELBO for $K=1$, $\mathcal{L}_K$ approaches the true $\log p(x)$ for larger Ks ($\lim _{K \rightarrow \inf} \mathcal{L}_K = \log p(x)$) and $\mathcal{L}_1, \ldots, \mathcal{L}_K$ provide stochastic monotonicity ($\mathcal{L}_E = \mathcal{L}_1 \leq \mathcal{L}_2 \leq \ldots \leq \log p(x)$).
+The MMVAE from \parencite{shi2019variational} adapts this for multi modal data:
+\begin{equation}
+    \label{eq:iwelbommvae}
+    \mathcal{L}^{MoE}_K(\textbf{x}_{1:M}) =
+    \frac{1}{M} \sum _{m=1} ^M \mathbb{E}_{z_m^{1:K} \sim q_{\phi_m}(z|x_m)}\left[ \log \frac{1}{K} \sum ^K _{k=1} \frac{p_{\theta}(x_{1:M}|z_m^k)p_{\theta}(z^k_m)}{q_{\phi}(z_m^k| x_{1:M})} \right]
+\end{equation}
+which is a valid lower bound of the multi modal log likelihood $\log p(\xset)$.
+
+In our work, we make use of this importance sampling training paradigm to improve the tightness of the ELBO and to approximate the KL-divergence between the posterior and the prior by comparing samples from both (see \cref{sec:methods})).
+
