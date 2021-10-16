@@ -12,7 +12,7 @@ config = json2dict(Path('conf.json'))
 
 data_dir = Path(__file__).parent.parent / 'data/thesis'
 experiment_uids_path = data_dir / ('experiment_uids.json')
-exp_uids = json2dict(experiment_uids_path)
+exp_uids = json2dict(experiment_uids_path)['polymnist']
 methods = config['methods']
 
 
@@ -27,13 +27,13 @@ def df_maker_epoch_comp(exp_uids: dict, method: str, data_dir: Path):
     df = pd.DataFrame()
     for _id in exp_uids[method]['3_mods']:
 
-        exp_dir = data_dir / 'experiments' / method / _id
+        exp_dir = data_dir / 'experiments' / 'polymnist' / method / _id
         epoch_results_dir = exp_dir / 'epoch_results'
 
         # get the epochs where the model was evaluated
         flags = load_flags(dir_path=exp_dir)
         # eval_epochs = [i - 1 for i in range(1, config['max_epoch']) if i % flags.eval_freq == 0]
-        eval_epochs = [i - 1 for i in range(1, config['max_epoch']) if i % 100 == 0]
+        eval_epochs = [i - 1 for i in range(1, config['max_epoch']['polymnist']) if i % 100 == 0]
 
         if epoch_results_dir.exists():
             if 'epoch' not in df.columns:

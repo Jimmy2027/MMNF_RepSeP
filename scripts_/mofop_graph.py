@@ -3,7 +3,7 @@ from pathlib import Path
 
 from scripts_ import tikz
 
-cond_samples_path = Path('data/thesis/mofop/cond_gen_single_imgs')
+cond_samples_path = Path('data/thesis/polymnist/mofop/cond_gen_single_imgs')
 input_samples_dir = cond_samples_path / 'input_samples'
 
 

@@ -48,12 +48,13 @@ if __name__ == '__main__':
 
     # for each method take the first _id and generate cond gen plots
     # for method in ['moe', 'mopoe', 'mopgfm', 'poe', 'mofop', 'iwmogfm_amortized']:
-    for method in ['iwmogfm']:
-        save_path = data_dir / f'{method}/cond_gen_plots'
-        save_path.mkdir(parents=True, exist_ok=True)
+    for dataset in ['mimic']:
+        for method in ['mofop']:
+            save_path = data_dir / dataset / f'{method}/cond_gen_plots'
+            save_path.mkdir(parents=True, exist_ok=True)
 
-        _id = d[method]['3_mods'][0]
-        experiment_dir = data_dir / 'experiments' / method / _id
+            _id = d[dataset][method]['3_mods'][0]
+            experiment_dir = data_dir / 'experiments' / method / _id
 
-        save_cond_gen(save_path=save_path, with_title=False, experiment_dir=experiment_dir, _id=_id,
-                      epoch=config['max_epoch'])
+            save_cond_gen(save_path=save_path, with_title=False, experiment_dir=experiment_dir, _id=_id,
+                          epoch=config['max_epoch'])

@@ -1,19 +1,20 @@
 \chapter{Experiments}
-In this section we describe the experimental setup that was used in order to compare our methods to each other and to the \mg{MVAE}, the \mg{MMVAE} and the \mg{MoPoE} methods.
+In this section we describe the experimental setup that was used in order to compare our methods to each other as well as to the \mg{MVAE}, the \mg{MMVAE} and the \mg{MoPoE} methods.
+
 
 \section{Datasets}
 We evaluate on three datasets, each providing different difficulties in order to filter out advantages and disadvantages of our methods.
 
 \subsection{PolyMNIST} \label{polymnist}
-The PolyMNIST dataset, first introduced in \cite{sutter_multimodal_2020}, consists of MNIST digits overlayed over a random part of a certain background image.
+The PolyMNIST dataset, first introduced in \citep{sutter_multimodal_2020}, consists of MNIST digits overlayed over a random part of a certain background image.
 The modality specific information of each sample in this dataset is defined by the background image and the shared information by the digit.
 In this case the modality specific information is harder to learn than the shared information (for the modality specific information the model has to have learned the set of possible backgrounds and styles of handwriting while the shared information is simply the set of digits).
 Examples from the PolyMNIST dataset are shown in \cref{fig:PolyMNIST}.
 In total there are 60,000 tuples of training examples and 10,000 tuples of test examples.
-The PolyMNIST dataset is useful to study how the number of modalities impacts the performance of multi modal methods, an abritrary amount of modalities can easily be generated.
+The PolyMNIST dataset is useful to study how the number of modalities impacts the performance of multi modal methods, since an abritrary amount of modalities can easily be generated.
 We present our results for the PolyMNIST dataset in \cref{subsec: results polymnist}, for which we trained each method for 5 times for 500 epochs.
 All results are presented as averages over the 5 runs, accompanied with the standard deviations.
-
+If the number of modalities is not explicitely specified, the model was trained with three modalities from the PolyMNIST dataset.
 
 \begin{figure}[h!]
     \centering
@@ -24,6 +25,19 @@ All results are presented as averages over the 5 runs, accompanied with the stan
     and different styles of hand writing for M different modalities.}
     \label{fig:PolyMNIST}
 \end{figure}
+
+\subsection{MIMIC-CXR-JPG}
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.9\textwidth]{data/static/mimic_dataset_sample}
+    \caption{The PolyMNIST dataset consists of sets of MNIST
+    digits where each set consists of M images
+    with the same digit label but different backgrounds
+    and different styles of hand writing for M different modalities.}
+    \label{fig:PolyMNIST}
+\end{figure}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{Metrics}
 In order to compare the proposed methods in a meaningful manner, we make use of three metrics that each quantifies the performance of a different aspect of the mmVAE.
@@ -52,7 +66,10 @@ The prd metric reduces the problem of comparing a distribution Q (the distributi
 The embeddings are then clustered such that the histogram over the cluster assignments can be meaningfully compared.
 Here we compute the prd score by taking the area under the precision-recall curve.
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 \section{Hyperparameter Selection}
+\label{sec:Hyperparameter Selection}
 We select three hyperparameters for the standard mmVAE models (\mg{MoPoE}, \mg{MoE}, \mg{PoE}) that we optimize for our experiments:
 
 \begin{itemize}
@@ -60,88 +77,48 @@ We select three hyperparameters for the standard mmVAE models (\mg{MoPoE}, \mg{M
     A higher dimensional latent representation gives the model more freedom to separate the different classes and can contain more information in general.
     However, for a too large latent representation, the encoder is not constrained to extract only the most informative features of the input such that the latent representation will contain much information that is non-informative for the decoder.
     \item The learning rate for the stochastic optimization of the parameters, using the Adam optimizer \citep{kingma_adam_2017}.
-    A low learning will take a very long time to converge and a too high learning rate might never converge.
+    For a low learning rate, the objective will take a very long time to converge and for a too high learning rate it might oscillate around a local minimum and never converge.
     \item The $\beta$ in the modified ELBO from \cref{eq:vaeelbo}, described in \cref{subsec:vae}
 \end{itemize}
 
-Since the choice for these parameters is non-trivial, we optimize them using the hyperparameter optimization framework \dg{Optuna} \citep{akiba_optuna_2019}.
-As objective, we use a mixture of the generation coherence metric (\cref{subsubsec:gen_coh}) and the area Under the precision-recall curve (\cref{subsubsec:gen_qual}).
+Since the choice for these parameters is non trivial, we optimize them using the hyperparameter optimization framework \dg{Optuna} \citep{akiba_optuna_2019}.
+As objective, we use a weighted average of the generation coherence metric (\cref{subsubsec:gen_coh}) and the area Under the precision-recall curve (prd-score, \cref{subsubsec:gen_qual}, where a higher weight is given to the prd-score since its values are generally lower than those of the generation cohrence metric.
 The results for the \mg{MoPoE} method can be seen in \cref{fig:mopoe hyperopt}.
 
 For our methods that make use of normalizing flows, we add three additional hyperparameters:
 \begin{itemize}
-    \item The number of chained transformations that make the flow.
-    \item The number of coupling block layers per transformation.
-    \item The number of parameters of each coupling block layer.
+    \item The number of chained transformations that make the flow (Nbr Flows).
+    \item The number of coupling block layers per transformation (Nbr Coupling Block layers).
+    \item The number of parameters of each coupling block layer Ccoupling Dim).
 \end{itemize}
 
-For the optimization of those, we fixed the dimension of the latent representation to 1280 and the learning rate to $5e-3$.
+For the optimization of those, we fixed the dimension of the latent representation to 1280 and the learning rate to $5e-4$.
 The results can be seen in \cref{fig:mopgfm hyperopt}.
 The parameters used for each method in our experiments are shown in \cref{tab:params}.
 
 
+\section{General Setup}
+All parameter values for the experiments studied in \cref{chap:results} can be found in \cref{tab:params}.
+We chose to use few normalizing flows to reduce training time and because that yielded more stable results.
+We adapted the parameters of the \mg{PoE} and the \mg{MoE} method to match those selected for the \mg{MoPoE} with the hyperoptimization.
+Only the dimension of the latent representation (class dim) of the \mg{PoE} was reduced since the performance of the \mg{PoE} dropped significantly with a higher dimension.
+
 \py{
     pytex_tab(
     script='thesis/scripts/params_tab.py',
-    options_pre='\\centering \\resizebox{0.9\\textwidth}{!}{',
+    options_pre='\\centering \\resizebox{\\textwidth}{!}{',
     options_post='}',
-    caption='Generation coherence for the Test set.',
+    caption='Parameters used for the models evaluated on the PolyMNIST dataset.',
     label='params'
     )
 }
 
-\begin{figure}
-    \centering
-    \begin{subfigure}[b]{0.49\textwidth}
-        \centering
-        \includegraphics[width=\textwidth]{data/static/mopoe_lr_rate}
-        \caption{Results shown in function of the learning rate}
-    \end{subfigure}
-    \hfill
-    \begin{subfigure}[b]{0.49\textwidth}
-        \centering
-        \includegraphics[width=\textwidth]{data/static/mopoe_class_dim}
-        \caption{Results shown in function of the dimension of the latent representation}
-    \end{subfigure}
-    \hfill
-    \begin{subfigure}[b]{0.5\textwidth}
-        \centering
-        \includegraphics[width=\textwidth]{data/static/mopoe_beta}
-        \caption{Results shown in function of $\beta$}
-    \end{subfigure}
-    \caption{Hyperoptimization run results for the \mg{MoPoE} method.}
-    \label{fig:mopoe hyperopt}
-\end{figure}
-
-\begin{figure}
-    \centering
-    \begin{subfigure}[b]{0.49\textwidth}
-        \centering
-        \includegraphics[width=\textwidth]{data/static/mopgfm_nbr_cup_layers}
-        \caption{Results shown in function of the number of coupling layers in each flow}
-    \end{subfigure}
-    \hfill
-    \begin{subfigure}[b]{0.49\textwidth}
-        \centering
-        \includegraphics[width=\textwidth]{data/static/mopgfm_coupling_dim}
-        \caption{Results shown in function of the couling layer dimension}
-    \end{subfigure}
-    \hfill
-    \begin{subfigure}[b]{0.49\textwidth}
-        \centering
-        \includegraphics[width=\textwidth]{data/static/mopgfm_nbr_flows}
-        \caption{Results shown in function of the number of flows}
-    \end{subfigure}
-    \hfill
-    \begin{subfigure}[b]{0.49\textwidth}
-        \centering
-        \includegraphics[width=\textwidth]{data/static/mopgfm_beta}
-        \caption{Results shown in function of $\beta$}
-    \end{subfigure}
-    \caption{Hyperoptimization run results for the \mg{Mopgfm} method.}
-    \label{fig:mopgfm hyperopt}
-\end{figure}
 
 %todo
-%\subsection{Reproducibility}
-%Advances in scientific research are contingent on reproducibility and verifiability of previous work.
+
+
+\section{Reproducibility}
+Advances in scientific research are contingent on reproducibility and verifiability of previous work.
+To ensure this, we make the framework used to train all models evaluated in this work available as an open source python package \citep{mmvae_github}, tested with continuous integration using \citep{travis} and kept up to date with \citep{dependabot}.
+We publish this thesis as a reproducible self publishing document \citep[\href{https://github.com/TheChymera/RepSeP}{RepSeP}]{repsep} made available on GitHub \citep{mmnf_repsep}.
+Using \LaTeX and PythonTeX \citep{pytex}, we make all steps described herein easily reexecutable and extendable.

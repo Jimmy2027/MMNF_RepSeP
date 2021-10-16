@@ -23,10 +23,12 @@ method_args_mapping = {
 def df_maker():
     for method in config['methods']:
         args = method_args_mapping[method]
+        if method == 'mofop':
+            args['num_gfm_flows'] = args['num_flows']
         yield {
             k: v
             for k, v in args.items()
-            if k not in ['eval_freq', 'beta_warmup', 'min_beta', 'num_mods']
+            if k not in ['eval_freq', 'beta_warmup', 'min_beta', 'num_mods', 'num_flows']
         }
 
 
@@ -37,7 +39,7 @@ df = pd.DataFrame(data=df_maker()).astype({'coupling_dim': pd.Int16Dtype(), 'num
              'class_dim': 'Class Dim',
              'max_beta': 'beta',
              'coupling_dim': 'Coupling Dim',
-             'num_gfm_flows': 'Nbr GfM Flows',
+             'num_gfm_flows': 'Nbr Flows',
              'nbr_coupling_block_layers': 'Nbr Coupling Block layers',
              'end_epoch': 'End Epoch'})
 df = df.set_index('Method')

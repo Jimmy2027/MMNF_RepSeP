@@ -55,7 +55,7 @@ mopgfm_args = {
     "end_epoch": end_epoch,
     "eval_freq": eval_freq,
     "coupling_dim": 64,
-    "num_gfm_flows": 15,
+    "num_gfm_flows": 1,
     "nbr_coupling_block_layers": 8
 }
 
@@ -70,7 +70,7 @@ mofop_args = {
     "end_epoch": end_epoch,
     "eval_freq": eval_freq,
     "coupling_dim": 64,
-    "num_gfm_flows": 15,
+    "num_flows": 1,
     "nbr_coupling_block_layers": 8
 }
 

@@ -1,4 +1,5 @@
 \chapter{Results}
+\label{chap:results}
 % First compare mopoe, mopgfm, mogfm
 % Then compare iwmopoe, iwmogfm, mogfm
 
@@ -6,6 +7,77 @@
 % Train 5 times: mopoe, mopgfm, mogfm
 
 % also compare training times
+
+
+\section{Hyperoptimization Results}
+
+The results for the optimization of the hyperparameters described in \cref{sec:Hyperparameter Selection} can be seen in \cref{fig:mopoe hyperopt} for the \mg{MoPoE} method and \cref{fig:mopgfm hyperopt} for the \mg{Mopgfm} method.
+Note that every figure in \cref{fig:mopoe hyperopt} and \cref{fig:mopgfm hyperopt} represents results in function of a parameter, however all other parameters are not fixed and might vary for every point.
+
+\paragraph{MoPoE Results} Descriptively, we find that the \mg{MoPoE} performs best on the PolyMNIST dataset with a learning rate $\approx 5e-4$ and a latent dimension of 1280.
+The performance of the \mg{MoPoE} seems to be robust to a change of $\beta$ in the range of 1.1 to 2.1.
+
+\paragraph{MopgfM Results} The optimal number of coupling layers appears to be 8 with the best number of dimensions being 64.
+\Cref{subfig:mopgfm_nbr_flows} shows that better scores are achieved with a higher number of chained transformations, however more flow transformations also lead to more variance in the resulting score.
+In practice, we have also experienced that models with a high number of normalizing flows can provide better performance but are more unstable.
+The \mg{Mopgfm} seems to perform best with a $\beta$ between 1.5 and 2.4.
+
+Overall the hyperoptimization results show that while the \mg{MoPoE} presents results that are much more stable (from \cref{subfig:mopoe_lr_rate}, one can infer that the only true variance in the objective value is due to a high learning rate), the highest achieved scores are lover than those achieved by the \mg{Mopgfm} method.
+
+
+\begin{figure}
+    \centering
+    \begin{subfigure}[b]{0.49\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{data/static/mopoe_lr_rate}
+        \caption{Results shown in function of the learning rate}
+        \label{subfig:mopoe_lr_rate}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.49\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{data/static/mopoe_class_dim}
+        \caption{Results shown in function of the dimension of the latent representation}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.5\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{data/static/mopoe_beta}
+        \caption{Results shown in function of $\beta$}
+    \end{subfigure}
+    \caption{Hyperoptimization run results for the \mg{MoPoE} method. Every subfigure presents results in function of one parameter, with all other parameters varying.}
+    \label{fig:mopoe hyperopt}
+\end{figure}
+
+\begin{figure}
+    \centering
+    \begin{subfigure}[b]{0.49\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{data/static/mopgfm_nbr_cup_layers}
+        \caption{Results shown in function of the number of coupling layers in each flow}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.49\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{data/static/mopgfm_coupling_dim}
+        \caption{Results shown in function of the couling layer dimension}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.49\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{data/static/mopgfm_nbr_flows}
+        \caption{Results shown in function of the number of flows}
+        \label{subfig:mopgfm_nbr_flows}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.49\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{data/static/mopgfm_beta}
+        \caption{Results shown in function of $\beta$}
+    \end{subfigure}
+    \caption{Hyperoptimization run results for the \mg{Mopgfm} method. Every subfigure presents results in function of one parameter, with all other parameters varying.}
+    \label{fig:mopgfm hyperopt}
+\end{figure}
 
 
 \section{PolyMNIST} \label{subsec: results polymnist}
@@ -25,11 +97,11 @@ In particular, we find that the \mg{iwmogfm} method has the best performance whe
     \py{pytex_fig('thesis/scripts/plots/epoch_comparison_lr.py',
         conf='thesis/main.conf',
         label='ep comp lr',
-    caption='
-    \\textbf{Linear classification accuracy for different epochs, averaged over all subsets, for 3 modalities.}
-    Overall, the \mg{mofop}, the \mg{mopoe} and the \mg{mopgfm} method perform similarly.
-    ',
-    )}
+        caption='
+        \\textbf{Linear classification accuracy for different epochs, averaged over all subsets, for 3 modalities.}
+        Overall, the \mg{mofop}, the \mg{mopoe} and the \mg{mopgfm} method perform similarly.
+        ',
+        )}
 \end{sansmath}
 
 \py{
@@ -80,7 +152,6 @@ In particular, we find that the \mg{iwmogfm} method has the best performance whe
 \end{sansmath}
 
 
-
 %\begin{sansmath}
 %\py{pytex_subfigs(
 %[
@@ -112,23 +183,30 @@ In particular, we find that the \mg{iwmogfm} method has the best performance whe
 %\end{sansmath}
 
 \py{
-pytex_tab(
-script='thesis/scripts/gen_eval_tab.py',
-options_pre='\\centering \\resizebox{0.7\\textwidth}{!}{',
-options_post='}',
-caption='Generation coherence for the Test set.
-',
-)
+    pytex_tab(
+    script='thesis/scripts/gen_eval_tab.py',
+    options_pre='\\centering \\resizebox{0.7\\textwidth}{!}{',
+    options_post='}',
+    caption='Generation coherence for the Test set.
+    ',
+    )
 }
 
 
 
 \py{
-pytex_tab(
-script='thesis/scripts/prd_tab.py',
-options_pre='\\centering \\resizebox{0.7\\textwidth}{!}{',
-options_post='}',
-caption='Area under the Precision and Recall curve of the PRD score \citep{precision_recall_distributions}.\\
-',
-)
+    pytex_tab(
+    script='thesis/scripts/prd_tab.py',
+    options_pre='\\centering \\resizebox{0.7\\textwidth}{!}{',
+    options_post='}',
+    caption='Area under the Precision and Recall curve of the PRD score \citep{precision_recall_distributions}.\\
+    ',
+    )
 }
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\section{Mimic-CXR}
+%todo
+% vergeleiche qualitativ examamples, vlt such ein beispiel mit offensichtlicher krankheit

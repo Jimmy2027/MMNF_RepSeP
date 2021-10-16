@@ -10,7 +10,6 @@ def plot_comparisons(which: str, metric: str):
     title_mapping = {
         'coherence_eval': 'Evaluation of the generation coherence',
         'lat_eval': 'Evaluation of the separability of the latent representation',
-
     }
 
     config = json2dict(Path('prepare_thesis/conf.json'))
@@ -25,7 +24,7 @@ def plot_comparisons(which: str, metric: str):
     if which == 'nbr_mods_comp':
         d = dict_elements_to_array(json2dict(Path('data/thesis/nbr_mods_comp.json')), exclude='nbr_mods')
         x_steps = [e.replace('_mods', '') for e in d['nbr_mods']]
-        methods = [m for m in config['methods'] if m not in ['iwmogfm_amortized']]
+        methods = [m for m in config['methods']]
         x_label = 'Number of modalities'
     elif which == 'epoch_comp':
         d = dict_elements_to_array(json2dict(Path('data/thesis/epoch_comp.json')), exclude='epochs')

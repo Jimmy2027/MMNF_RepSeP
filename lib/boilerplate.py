@@ -23,13 +23,13 @@ def get_cond_gen_plot(method: str, which: str):
     return f'\\includegraphics{{data/{method}/cond_gen_plots/{img_name}.png}}'
 
 
-def make_cond_gen_fig(which: str, methods: List[str]):
+def make_cond_gen_fig(which: str, methods: List[str], dataset:str):
     split = which.split('__')
     in_mods = split[0]
     out_mod = split[-1]
 
-    input_samples_dir = Path(f'data/thesis/{methods[0]}/cond_gen_plots/input_samples')
-    cond_samples_path = {method: Path(f'data/thesis/{method}/cond_gen_plots/{in_mods}') for method in methods}
+    input_samples_dir = Path(f'data/thesis/{dataset}/{methods[0]}/cond_gen_plots/input_samples')
+    cond_samples_path = {method: Path(f'data/thesis/{dataset}/{method}/cond_gen_plots/{in_mods}') for method in methods}
 
     pic = tikz.Picture()
     plot_xshift_base = 3
@@ -53,7 +53,11 @@ def make_cond_gen_fig(which: str, methods: List[str]):
     yshift += 1.5
 
     for method in methods:
-        pic.set_node(text=fr'\Large{{\textbf{{{tex_escape(method)}}}}}', options=f'yshift=-{yshift}cm')
+        if method == 'iwmogfm_amortized':
+            pic.set_node(text=fr'\Large{{\textbf{{iwmogfm}}}}\\\Large{{\textbf{{amortized}}}}', options=f'yshift=-{yshift}cm, align=center')
+        else:
+            pic.set_node(text=fr'\Large{{\textbf{{{tex_escape(method)}}}}}', options=f'yshift=-{yshift}cm')
+
         xshift = plot_xshift_base
         for class_idx in range(10):
             img_name = f"{out_mod}_{class_idx}"
@@ -77,7 +81,7 @@ def get_lr_score(method: str):
 
 if __name__ == '__main__':
     # get_cond_gen_plot(method=r'joint\_elbo', which='m0__m0')
-    # make_cond_gen_fig(which='m0_m1__m0', methods=['mogfm'])
-    get_lr_score('mopoe')
-    get_lr_score('mofop')
-    get_lr_score('mopgfm')
+    print(make_cond_gen_fig(which='m0_m1__m0', methods=['mopoe','mopgfm', 'moe', 'poe','mofop', 'iwmogfm_amortized', 'iwmogfm2'], dataset = 'polymnist'))
+    # get_lr_score('mopoe')
+    # get_lr_score('mofop')
+    # get_lr_score('mopgfm')

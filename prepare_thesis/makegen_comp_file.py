@@ -2,30 +2,69 @@
 from itertools import chain, combinations
 from pathlib import Path
 
-text = ""
-base_str = r"\begin{figure}\centering\resizebox{0.9\textwidth}{!}{\py{boilerplate.make_cond_gen_fig(which='m1_m2__m2'," \
-           r" methods=['mopoe','mopgfm', 'moe', 'poe','mofop', 'iwmogfm_amortized', 'iwmogfm2'])}}\end{figure}"
 
-mods = ['m0', 'm1', 'm2']
+def base_str(which: str, dataset: str):
+    if dataset == 'polymnist':
+        return r"\begin{figure}\centering\resizebox{0.9\textwidth}{!}{\py{boilerplate.make_cond_gen_fig(which='" \
+           + which + \
+           r"',methods=['mopoe', 'mopgfm', 'moe', 'poe', 'mofop', 'iwmogfm_amortized', 'iwmogfm'], dataset = '" \
+           + dataset + \
+           r"')}}\end{figure}" + \
+           "\n\n\n\n"
 
-subsets_list = chain.from_iterable(combinations(mods, n) for n in range(len(mods) + 1))
-# print(list(subsets_list))
-subsets = []
-for mod_names in subsets_list:
-    if mod_names:
-        subset = '_'.join(sorted(mod_names))
-        subsets.append(subset)
+    else:
+        return r"\begin{figure}\centering\resizebox{0.9\textwidth}{!}{\py{boilerplate.make_cond_gen_fig(which='" \
+               + which + \
+               r"',methods=['mofop'], dataset = '" \
+               + dataset + \
+               r"')}}\end{figure}" + \
+               "\n\n\n\n"
 
-for subset in subsets:
-    for out_mod in mods:
-        key = f'{subset}__{out_mod}'
-        text += r"\begin{figure}\centering\resizebox{0.9\textwidth}{!}{\py{boilerplate.make_cond_gen_fig(which='" \
-                + key + \
-                r"',methods=['mopoe', 'mopgfm', 'moe', 'poe', 'mofop', 'iwmogfm_amortized', 'iwmogfm'])}}\end{figure}" + \
-                "\n\n\n\n"
 
-outfile = Path(__file__).parent.parent / 'thesis/gen_comp.tex'
-with open(str(outfile), 'w') as f:
-    f.write(text)
+def make_gen_comp_polymnist():
+    text = ""
+    mods = ['m0', 'm1', 'm2']
 
-# rand generation comparison
+    subsets_list = chain.from_iterable(combinations(mods, n) for n in range(len(mods) + 1))
+    # print(list(subsets_list))
+    subsets = []
+    for mod_names in subsets_list:
+        if mod_names:
+            subset = '_'.join(sorted(mod_names))
+            subsets.append(subset)
+
+    for subset in subsets:
+        for out_mod in mods:
+            key = f'{subset}__{out_mod}'
+            text += base_str(which=key, dataset='polymnist')
+
+    outfile = Path(__file__).parent.parent / 'thesis/gen_comp_polymnist.tex'
+    with open(str(outfile), 'w') as f:
+        f.write(text)
+
+
+def make_gen_comp_mimic():
+    text = ""
+    mods = ['PA', 'Lateral', 'text']
+
+    subsets_list = chain.from_iterable(combinations(mods, n) for n in range(len(mods) + 1))
+
+    subsets = []
+    for mod_names in subsets_list:
+        if mod_names:
+            subset = '_'.join(sorted(mod_names))
+            subsets.append(subset)
+
+    for subset in subsets:
+        for out_mod in mods:
+            key = f'{subset}__{out_mod}'
+            text += base_str(which=key, dataset='mimic')
+
+    outfile = Path(__file__).parent.parent / 'thesis/gen_comp_mimic.tex'
+    with open(str(outfile), 'w') as f:
+        f.write(text)
+
+
+if __name__ == '__main__':
+    make_gen_comp_polymnist()
+    make_gen_comp_mimic()

@@ -34,25 +34,27 @@ print(rsync_command)
 
 exp_uids = json2dict(experiment_uids_path)
 
-for method in ['poe', 'iwmogfm']:
-    method_data_dir = data_dir / 'experiments' / method
-    method_data_dir.mkdir(exist_ok=True)
-    # for method in ['mopgfm']:
-    for nbr_mods, uid_list in exp_uids[method].items():
-        for uid in uid_list:
-            dest_dir = method_data_dir / uid
+# for dataset in exp_uids:
+for dataset in ['polymnist']:
+    dataset_data_dir = data_dir / 'experiments' / dataset
+    dataset_data_dir.mkdir(exist_ok=True)
 
-            if dest_dir.exists() and not list((dest_dir / 'epoch_results').iterdir()):
-                print(dest_dir)
+    for method in ['iwmogfm_amortized']:
+        method_data_dir = dataset_data_dir / method
+        method_data_dir.mkdir(exist_ok=True)
+        # for method in ['mopgfm']:
+        for nbr_mods, uid_list in exp_uids[dataset][method].items():
+            for uid in uid_list:
+                dest_dir = method_data_dir / uid
 
-            if not dest_dir.exists():
+                if not dest_dir.exists() and uid:
 
-                if uid in db_uids:
-                    get_exp_dir(_id=uid, dest_dir=dest_dir)
-                else:
-                    try:
-                        unzip_to(path_to_zip_file=Path(conf['local_leomed_exp_dir']) / (uid + '.zip'),
-                                 dest_path=dest_dir,
-                                 verbose=True)
-                    except Exception as e:
-                        print(e)
+                    if uid in db_uids:
+                        get_exp_dir(_id=uid, dest_dir=dest_dir)
+                    else:
+                        try:
+                            unzip_to(path_to_zip_file=Path(conf['local_leomed_exp_dir']) / (uid + '.zip'),
+                                     dest_path=dest_dir,
+                                     verbose=True)
+                        except Exception as e:
+                            print(e)

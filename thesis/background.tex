@@ -72,7 +72,7 @@ The \mg{MoPoE}-VAE takes advantage of both methods by merging the uni modal post
 
 \begin{figure}[h!]
     \centering
-    \resizebox{0.9\textwidth}{!}{%
+    \resizebox{\textwidth}{!}{%
         \py{pytex_printonly(script='scripts_/mopoe_graph.py', data = '')}
     }
     \caption{\textbf{The \mg{MoPoE} makes use of the PoE to create $2^M$ subsets, which are then merged with a MoE.} Here $M=2$, the empty subset is not shown. On the left side are the two input modalities from the polymnist dataset (see \cref{polymnist}), on the right side are the generated samples. In the header of each generated sample is described from which subset the decoder sampled for the generation (left side of the $\rightarrow$) and which modality was generated (right side of the $\rightarrow$).}
@@ -168,7 +168,7 @@ Affine coupling blocks have been shown to provide good results, especially for i
 \begin{figure}
     \centering
     \includegraphics[width=\textwidth]{data/static/coupling_block}
-    \caption{Flowchart depicting the workings of a coupling block, taken from the ECCV2020's Tutorial: "Introduction to Normalizing Flows" from Marcus A. Brubaker (\url{https://youtu.be/u3vVyFVU\_lI})}
+    \caption{Flowchart depicting the workings of a coupling block, taken from the ECCV2020's Tutorial: "Introduction to Normalizing Flows" \citep{coupling_blocks}}
     \label{fig:coupling block}
 \end{figure}
 

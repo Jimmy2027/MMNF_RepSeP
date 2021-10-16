@@ -12,5 +12,8 @@
     "iwmogfm",
     "mopoe"
   ],
-  "max_epoch": 499
+  "max_epoch": {
+    "polymnist": 499,
+    "mimic": 149
+  }
 }
