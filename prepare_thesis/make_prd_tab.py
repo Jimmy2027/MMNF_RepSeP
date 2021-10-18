@@ -80,6 +80,6 @@ def df_maker(epoch: int):
 if __name__ == '__main__':
     config = json2dict(Path('conf.json'))
 
-    prd_eval_df = pd.DataFrame(data=df_maker(epoch=config['max_epoch']['polymnist']))
+    prd_eval_df = pd.DataFrame(data=df_maker(epoch=config['max_epoch']['polymnist'] - 1))
 
     prd_eval_df.to_csv(Path(__file__).parent.parent / 'data/thesis/prd_eval.csv', index=False)

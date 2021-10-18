@@ -13,9 +13,9 @@ def base_str(which: str, dataset: str):
            "\n\n\n\n"
 
     else:
-        return r"\begin{figure}\centering\resizebox{0.9\textwidth}{!}{\py{boilerplate.make_cond_gen_fig(which='" \
+        return r"\begin{figure}\centering\resizebox{0.9\textwidth}{!}{\py{boilerplate.make_cond_gen_fig_mimic(which='" \
                + which + \
-               r"',methods=['mofop'], dataset = '" \
+               r"',methods=['mofop', 'mopoe'], dataset = '" \
                + dataset + \
                r"')}}\end{figure}" + \
                "\n\n\n\n"

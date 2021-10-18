@@ -74,8 +74,8 @@ mofop_args = {
     "nbr_coupling_block_layers": 8
 }
 
-iwmogfm_amortized_args = {
-    'method': 'iwmogfm_amortized',
+mogfm_amortized_args = {
+    'method': 'mogfm_amortized',
     "initial_learning_rate": 0.0005,
     'class_dim': 1280,
     "min_beta": 0,
@@ -85,7 +85,8 @@ iwmogfm_amortized_args = {
     "eval_freq": eval_freq,
     "coupling_dim": 512,
     "num_gfm_flows": 4,
-    "nbr_coupling_block_layers": 2
+    "nbr_coupling_block_layers": 2,
+    "K": 1
 }
 
 iwmogfm2_args = {
@@ -99,7 +100,8 @@ iwmogfm2_args = {
     "eval_freq": eval_freq,
     "coupling_dim": 512,
     "num_gfm_flows": 4,
-    "nbr_coupling_block_layers": 2
+    "nbr_coupling_block_layers": 2,
+    "K": 2,
 }
 
 # mogfm_args = {

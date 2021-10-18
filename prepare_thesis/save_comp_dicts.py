@@ -33,13 +33,12 @@ def df_maker_epoch_comp(exp_uids: dict, method: str, data_dir: Path):
         # get the epochs where the model was evaluated
         flags = load_flags(dir_path=exp_dir)
         # eval_epochs = [i - 1 for i in range(1, config['max_epoch']) if i % flags.eval_freq == 0]
-        eval_epochs = [i - 1 for i in range(1, config['max_epoch']['polymnist']) if i % 100 == 0]
+        eval_epochs = [i - 1 for i in range(1, config['max_epoch']['polymnist'] + 1) if i % 100 == 0]
 
         if epoch_results_dir.exists():
             if 'epoch' not in df.columns:
                 df['epoch'] = [int(i.stem) for i in epoch_results_dir.iterdir()]
             for epoch in eval_epochs:
-
                 res_dict = json2dict(epoch_results_dir / f'{epoch}.json')
                 if res_dict['test_results'] and 'lr_eval_q0' in res_dict['test_results']:
                     lr_eval_score = np.mean([v['accuracy'] for _, v in res_dict['test_results']['lr_eval_q0'].items()])
@@ -76,9 +75,9 @@ def df_maker_nbr_mods_comp(exp_uids: dict, method: str, data_dir: Path):
     df['nbr_mods'] = list(exp_uids[method])
     for nbr_mods in exp_uids[method]:
         for id in exp_uids[method][nbr_mods]:
-            epoch_results_dir = data_dir / 'experiments' / method / id / 'epoch_results'
+            epoch_results_dir = data_dir / 'experiments' / 'polymnist' / method / id / 'epoch_results'
             if epoch_results_dir.exists():
-                epoch = config['max_epoch']
+                epoch = config['max_epoch']['polymnist'] - 1
 
                 res_dict = json2dict(epoch_results_dir / f'{epoch}.json')
 

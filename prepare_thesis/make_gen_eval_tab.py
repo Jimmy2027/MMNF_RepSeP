@@ -7,9 +7,7 @@ from modun.dict_utils import flatten_dict
 from modun.file_io import json2dict
 
 
-def df_maker(epoch: int):
-    config = json2dict(Path(('conf.json')))
-    methods = config['methods']
+def df_maker(epoch: int, methods):
     data_dir = Path(__file__).parent.parent / 'data/thesis'
     experiment_uids_path = data_dir / ('experiment_uids.json')
     exp_uids = json2dict(experiment_uids_path)['polymnist']
@@ -44,8 +42,8 @@ def df_maker(epoch: int):
 
 
 if __name__ == '__main__':
-    config = json2dict(Path('conf.json'))
+    config = json2dict(Path(__file__).parent / 'conf.json')
 
-    gen_eval_df = pd.DataFrame(data=df_maker(epoch=config['max_epoch']['polymnist']))
+    gen_eval_df = pd.DataFrame(data=df_maker(epoch=config['max_epoch']['polymnist'] - 1, methods=config['methods']))
 
     gen_eval_df.to_csv(Path(__file__).parent.parent / 'data/thesis/gen_eval.csv', index=False)

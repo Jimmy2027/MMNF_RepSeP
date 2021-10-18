@@ -49,7 +49,7 @@ if __name__ == '__main__':
     # for each method take the first _id and generate cond gen plots
     # for method in ['moe', 'mopoe', 'mopgfm', 'poe', 'mofop', 'iwmogfm_amortized']:
     for dataset in ['mimic']:
-        for method in ['mofop']:
+        for method in ['mopoe']:
             save_path = data_dir / dataset / f'{method}/cond_gen_plots'
             save_path.mkdir(parents=True, exist_ok=True)
 

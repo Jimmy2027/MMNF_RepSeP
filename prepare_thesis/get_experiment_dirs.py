@@ -35,11 +35,11 @@ print(rsync_command)
 exp_uids = json2dict(experiment_uids_path)
 
 # for dataset in exp_uids:
-for dataset in ['polymnist']:
+for dataset in ['mimic']:
     dataset_data_dir = data_dir / 'experiments' / dataset
     dataset_data_dir.mkdir(exist_ok=True)
 
-    for method in ['iwmogfm_amortized']:
+    for method in ['mopoe']:
         method_data_dir = dataset_data_dir / method
         method_data_dir.mkdir(exist_ok=True)
         # for method in ['mopgfm']:

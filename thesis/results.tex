@@ -81,107 +81,84 @@ Overall the hyperoptimization results show that while the \mg{MoPoE} presents re
 
 
 \section{PolyMNIST} \label{subsec: results polymnist}
-Evaluating the separability of the latent representation for 3 modalities, we find that the \mg{mofop}, the \mg{mopgfm} and the \mg{mopoe} perform similarly, yielding on average a linear classification accuracy of \py{boilerplate.get_lr_score(method='mofop')}, \py{boilerplate.get_lr_score(method='mopgfm')} and \py{boilerplate.get_lr_score(method='mopoe')} respectively for all subsets (see \cref{fig:ep comp lr}).
 
-\smallskip
+\subsection{Evaluation of the Latent Representation}
 
-\Cref{tab:lr eval} compares the classification accuracies over multiple subsets.
-Overall, we see that the classification accuracy improves when more modalities make up the latent representation which shows that all methods are able to aggregate the modalities.
-In particular, we find that the \mg{iwmogfm} method has the best performance when all modalities are given.
-%Our results show that the $m0$ modality is the hardest modality to learn from todo
-
-% todo comment on nbr mod comp
-
+\paragraph{Evaluation over epochs}
+Evaluating the separability of the latent representation (\cref{subsec:lr metric}) for models trained on 3 modalities, we find that the \mg{mofop}, the \mg{mopgfm} and the \mg{mopoe} perform similarly, yielding on average a linear classification accuracy of \py{boilerplate.get_lr_score(method='mofop')}, \py{boilerplate.get_lr_score(method='mopgfm')} and \py{boilerplate.get_lr_score(method='mopoe')} respectively for all subsets after 400 training epochs (see \cref{fig:ep comp lr}).
+The two methods that do not regularize the latent representation with the KL-divergence (\mg{iwmogfm}, \mg{mogfm\_amortized}) perform worse than those that do, except for the \mg{moe} and \mg{poe} methods.
+The two latter methods have the worst performance overall.
 
 \begin{sansmath}
     \py{pytex_fig('thesis/scripts/plots/epoch_comparison_lr.py',
         conf='thesis/main.conf',
         label='ep comp lr',
         caption='
-        \\textbf{Linear classification accuracy for different epochs, averaged over all subsets, for 3 modalities.}
-        Overall, the \mg{mofop}, the \mg{mopoe} and the \mg{mopgfm} method perform similarly.
+        \\textbf{Linear classification accuracy for different epochs over the test set, averaged over all subsets.}
+        All methods were trained with 3 modalities.
         ',
         )}
 \end{sansmath}
+
+\paragraph{Evaluation across subset posteriors}
+\Cref{tab:lr eval} compares the classification accuracies of linear classifiers trained on each subset posterior.
+Overall, we see that the classification accuracy improves when more modalities make up the latent representation which shows that all methods are able to aggregate the modalities.
+In particular, we find that the \mg{iwmogfm} method has the best performance when all modalities are given.
+Comparatively, the \mg{mopgfm} is able to optimize the uni modal posteriors better than the \mg{mopoe} and the \mg{mofop}, yielding an average accuracy of \py{boilerplate.get_unimodal_lr_score(method = 'mopgfm')} compared to \py{boilerplate.get_unimodal_lr_score(method = 'mopoe')} and \py{boilerplate.get_unimodal_lr_score(method = 'mofop')}.
+Our results show that the $m0$ modality is the hardest modality to learn from and as expected the \mg{poe} struggles the most to optimize for it.
+It has the lowest accuracy on the subset containing only the $m0$ modality but compensates with the other modalities in the multi modal subsets.
+Similarly, both the \mg{iwmogfm} and \mg{mogfm\_amortized} yield their lowest score on the $m0$ subset, while their performance improves significantly on the multi modal subsets.
 
 \py{
     pytex_tab(
     script='thesis/scripts/lr_eval_tab.py',
     options_pre='\\centering \\resizebox{0.99\\textwidth}{!}{',
     options_post='}',
-    caption='Linear classification accuracy of latent representations for the Test set.\\
+    caption='Linear classification accuracy of all subset posteriors for the test set.\\
     ',
     label='lr eval',
     )
 }
+
+\paragraph{Scalability with the number of modalities}
+\Cref{fig:nbr mods comp lr} shows a comparison of how well each method scales with number of modalities it is trained on, using the linear classification metric (\cref{subsec:lr metric}).
+Again, we see that the \mg{mofop}, the \mg{mopoe} and the \mg{mopgfm} scale equally well with the number of modalities, the latter yielding a slightly better score for 1 modality.
 
 \begin{sansmath}
     \py{pytex_fig('thesis/scripts/plots/nbr_mods_comparison_lr.py',
         conf='thesis/main.conf',
         label='nbr mods comp lr',
         caption='
-        \\textbf{Generation classification accuracy for different epochs.}
-        Overall, the \mg{mofop}, the \mg{mopoe} and the \mg{mopgfm} method perform similarly.
+        \\textbf{Linear classification accuracy for models trained with different number of modalities, averaged over all subsets.}
+        All methods were trained for 500 epochs.
         ',
         )}
 \end{sansmath}
 
+\subsection{Evaluation of the Generation Coherence}
+
+\paragraph{Evaluation over epochs}
+Evaluating the generation coherence (\cref{subsubsec:gen_coh}), we find that the \mg{mogfm\_amortized} and the \mg{iwmogfm} perform the best overall, yielding an accuracy of $\approx 0.88$ after only 100 epochs (\cref{fig:ep comp gen}).
+However, the performance of both methods does not improve after 100 epochs such that after 500 epochs, it almost matches that of the \mg{mopgfm} and \mg{mofop}.
+Overall, all methods making use of normalizing flow yield higher scores than the baseline methods.
 
 \begin{sansmath}
     \py{pytex_fig('thesis/scripts/plots/epoch_comparison_gen.py',
         conf='thesis/main.conf',
         label='ep comp gen',
         caption='
-        \\textbf{Generation classification accuracy for different epochs.}
-        Overall, the \mg{mofop}, the \mg{mopoe} and the \mg{mopgfm} method perform similarly.
+        \\textbf{Generation classification accuracy for different epochs over the test set, averaged over all combinations of input modalites and all output modalities.}
+        All methods were trained with 3 modalities.
         ',
         )}
 \end{sansmath}
 
-
-
-\begin{sansmath}
-    \py{pytex_fig('thesis/scripts/plots/nbr_mods_comparison_gen.py',
-        conf='thesis/main.conf',
-        label='nbr mods comp gen',
-        caption='
-        \\textbf{Generation classification accuracy for different epochs.}
-        Overall, the \mg{mofop}, the \mg{mopoe} and the \mg{mopgfm} method perform similarly.
-        ',
-        )}
-\end{sansmath}
-
-
-%\begin{sansmath}
-%\py{pytex_subfigs(
-%[
-%{'script':'thesis/scripts/plots/epoch_comparison_lr.py', 'label':'vccv','conf':'thesis/4*2.conf', 'options_pre':'{.48\\textwidth}',
-%'options_pre_caption':'\\vspace{-1.5em}\\',
-%'options_post':'\\vspace{1em}',
-%'caption':''
-%,},
-%{'script':'thesis/scripts/plots/epoch_comparison_gen.py', 'label':'sccv','conf':'thesis/4*2.conf', 'options_pre':'{.48\\textwidth}',
-%'options_pre_caption':'\\vspace{-1.5em}\\',
-%'options_post':'\\vspace{1em}',
-%'caption':''
-%,},
-%{'script':'thesis/scripts/plots/nbr_mods_comparison_lr.py', 'label':'vcfb','conf':'thesis/4*2.conf', 'options_pre':'{.48\\textwidth}',
-%'options_pre_caption':'\\vspace{-1.5em}\\',
-%'options_post':'\\vspace{1em}',
-%'caption':''
-%,},
-%{'script':'thesis/scripts/plots/nbr_mods_comparison_gen.py', 'label':'scfb','conf':'thesis/4*2.conf', 'options_pre':'{.48\\textwidth}',
-%'options_pre_caption':'\\vspace{-1.5em}\\',
-%'options_post':'\\vspace{1em}',
-%'caption':''
-%,},
-%],
-%caption='
-%',
-%label='fig:vc',
-%)}
-%\end{sansmath}
-
+\paragraph{Comparison across missing modalities, reconstruction and random generation}
+For the generation coherence accuracy of missing modalities the \mg{mopgfm} performs the best, followed by the \mg{mogfm\_amortized} and \mg{iwmogfm} methods.
+For the reconstruction of modalities, both the \mg{mogfm\_amortized} and \mg{iwmogfm} methods perform the best, followed by the \mg{mopgfm} and \mg{mofop} methods.
+For the generation of random samples, the \mg{moe} provides a much higher coherence accuracy score than all other methods, implying that the \mg{moe} learns a joint posterior that corresponds better to the prior than the other methods.
+Since the \mg{iwmogfm} and \mg{mogfm\_amortized} were not trained with a regularization term in the objective that pushes their joint posterior to match the prior, their decoder networks do not recognize samples from the latter which explains the low accuracy for randomly generated images.
+Interestingly, the coherence accuracy of randomly generated samples with the \mg{mofop} method is very low, suggesting that a higher regularization parameter $\beta$ might be needed.
 \py{
     pytex_tab(
     script='thesis/scripts/gen_eval_tab.py',
@@ -192,8 +169,32 @@ In particular, we find that the \mg{iwmogfm} method has the best performance whe
     )
 }
 
+\paragraph{Scalability with the number of modalities}
+Overall, the \mg{mopgfm}, the \mg{mopoe} and the \mg{moe} methods scale equally well with the number of modalities, the \mg{mopgfm} yielding better performance than the \mg{mopoe}, which itself performs better than the \mg{moe} (\cref{fig:nbr mods comp gen}).
+For models trained on one modality, the coherence score is evaluated as self coherence only (\cref{subsubsec:gen_coh}), which is an easier task than coherence across generated samples.
+This explains the slight dip in performance for all methods trained with 2 modalities.
 
 
+\begin{sansmath}
+    \py{pytex_fig('thesis/scripts/plots/nbr_mods_comparison_gen.py',
+        conf='thesis/main.conf',
+        label='nbr mods comp gen',
+        caption='
+        \\textbf{Generation classification accuracy for models trained with different number of modalities.}
+        The average over all classification accuracies is taken, across all possible combinations of input modalities and all output modalities, for three modalities from the PolyMNIST dataset. All models were trained for 500 epochs.
+        ',
+        )}
+\end{sansmath}
+
+\subsection{Evaluation of the Ggeneration Quality}
+Evaluating the generation quality (\cref{subsubsec:gen_qual}), we find that overall the methods making use of the generalized $f$-mean perform the best.
+The \mg{mopgfm} yields the best prd score for the generation of missing modalities, while both the \mg{mogfm\_amortized} and \mg{iwmogfm} perform best on the reconstruction of modalities.
+Interestingly, the \mg{mopoe} method provides prd scores with a higher variance than the other methods.
+The \mg{poe} yields the best prd score for randomly generated samples followed by the \mg{mopoe}, however a qualitative evaluation of randomly generated samples in \cref{fig:rand gen polymnist} shows that while the \mg{mopoe} generates the digits well, there is not much variance in the backgrounds.
+The modalitiy specific information (the background) of the randomly generated images from the \mg{mopoe} actually seem to only correspond to an average of all pixels of the background image correspond to each modality.
+The same can be seen for the randomly generated images of the \mg{mopgfm} and the \mg{moe}.
+The background has a much higher variance for the \mg{poe} method and a slightly higher variance for the \mg{mofop} method.
+Examples of generated samples for each method can be found in \cref{chap:gen ex polymnist}.
 \py{
     pytex_tab(
     script='thesis/scripts/prd_tab.py',
@@ -209,4 +210,6 @@ In particular, we find that the \mg{iwmogfm} method has the best performance whe
 
 \section{Mimic-CXR}
 %todo
+% lzeig dass generieren von missing modalities besonders schlecht ist
+% zeig dass die Modelle auch bei reconstruction details nicht generieren können (nicht genug kapazität):
 % vergeleiche qualitativ examamples, vlt such ein beispiel mit offensichtlicher krankheit

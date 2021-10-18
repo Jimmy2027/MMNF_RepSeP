@@ -12,7 +12,8 @@ In this case the modality specific information is harder to learn than the share
 Examples from the PolyMNIST dataset are shown in \cref{fig:PolyMNIST}.
 In total there are 60,000 tuples of training examples and 10,000 tuples of test examples.
 The PolyMNIST dataset is useful to study how the number of modalities impacts the performance of multi modal methods, since an abritrary amount of modalities can easily be generated.
-We present our results for the PolyMNIST dataset in \cref{subsec: results polymnist}, for which we trained each method for 5 times for 500 epochs.
+
+We present our results for the PolyMNIST dataset in \cref{subsec: results polymnist}, for which we trained each method 5 times for 500 epochs.
 All results are presented as averages over the 5 runs, accompanied with the standard deviations.
 If the number of modalities is not explicitely specified, the model was trained with three modalities from the PolyMNIST dataset.
 
@@ -27,46 +28,59 @@ If the number of modalities is not explicitely specified, the model was trained 
 \end{figure}
 
 \subsection{MIMIC-CXR-JPG}
+The MIMIC-CXR Database \cite{johnson2019mimic} is a large publicly available dataset of chest radiographs with free-text radiology reports containing 377,110 images corresponding to 227,835 radiographic studies performed at the Beth Israel Deaconess Medical Center in Boston, MA.
+In this work, three modalities were extracted from the database: frontal and lateral chest radiographs together with their corresponding text reports (\cref{fig:mimic}).
+Only datapoints where all three modalities are present were selected.
+Every sample is labeled with one or more of the following categories: 'Atelectasis', 'Cardiomegaly', 'Consolidation', 'Edema', 'Enlarged Cardiomediastinum', 'Fracture', 'Lung Lesion', 'Lung Opacity', 'Pleural Effusion', 'Pleural Other', 'Pneumonia', 'Pneumothorax', 'Support Devices'.
+For our purposes, all images were resized to (128, 128).
+
+\paragraph{Text preprocessing}
+Every word that occurs at least 3 times in all the text reports is mapped to an index.
+Using this mapping each sentence is encoded into a sequence of indices.
+All sentences with a word count above 128 are truncated and all sentences consisting of less words are padded with a padding token "$<pad>$" such that all text samples are of equal length (128 words).
 
 \begin{figure}[h!]
     \centering
-    \includegraphics[width=0.9\textwidth]{data/static/mimic_dataset_sample}
-    \caption{The PolyMNIST dataset consists of sets of MNIST
-    digits where each set consists of M images
-    with the same digit label but different backgrounds
-    and different styles of hand writing for M different modalities.}
-    \label{fig:PolyMNIST}
+    \includegraphics[width=0.8\textwidth]{data/static/mimic_dataset_sample}
+    \vspace{-1cm}
+    \caption{An example from the MIMIC-CXR-JPG dataset is shown: the frontal view image together with the corresponding lateral view image and the text report.}
+    \label{fig:mimic}
 \end{figure}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 
 \section{Metrics}
 In order to compare the proposed methods in a meaningful manner, we make use of three metrics that each quantifies the performance of a different aspect of the mmVAE.
 Namely, we compare the quality of the learned latent representation, the coherence of the generated samples and the quality of the generated samples, as described in the follwing sections.
 
-\subsection{Evaluation of the Latent Representation}
+\subsection{Evaluation of the Latent Representation} \label{subsec:lr metric}
 To evaluate if the different mmVAEs are able to extract characteristic information and compress it in the latent representation in a meaningful manner, we evaluate the separability of the latent space via linear classifiers.
 If the classifier can separate the latent space into the corresponding classes, we conclude that the posterior approximations are meaningful.
 One classifier for each class and for each latent space is trained on the 1000 encoded samples from the training set and tested on the test set.
-Note that this can be seen as a variant of the disentanglement metric from \cite{beta_vae} where each class is a different generative factor.
+Note that this can be seen as a variant of the disentanglement metric from \citep{beta_vae} where each class is a different generative factor.
 If the dimensions of latent representation are independent and interpretable, there will be less variance in the samples belonging to the same class and thus make them separable from the rest with low capacity classifiers.
-It has been shown in \cite{locatello_challenging_2019} that this disentanglement metric correlates with other disentanglement metrics.
+It has been shown in \citep{locatello_challenging_2019} that this disentanglement metric correlates with other disentanglement metrics.
 
-\subsection{Evaluation of the generation coherence}
+\subsection{Evaluation of the Generation Coherence}
 \label{subsubsec:gen_coh}
 To evaluate if the method is able to separate the shared information from the modality specific information, we verify that all generated tuples belong to the same class using pretrained classifiers.
 For conditional generation, the conditionally generated samples have to be coherent to the input samples.
 The coherence accuracy is the ratio of coherent samples divided by the number of generated samples.
 For every data type, we train a neural network classifier in a supervised way and the architecture is identical to the encoder except from the last layer.
 
-\subsection{Evaluation of the generation quality}
+When comparing the coherence accuracy for methods trained on only one modality, the coherence is evaluated by verifying if the generated sample belongs to the same class than the input sample.
+
+\subsection{Evaluation of the Generation Quality}
 \label{subsubsec:gen_qual}
-To evaluate the quality of the generated samples, we make use of the precision-recall score from \cite{precision_recall_distributions}.
+To evaluate the quality of the generated samples, we make use of the precision-recall score from \citep{precision_recall_distributions}.
 The Precision and Recall for Disitributions (prd) metric is similar to the Fréchet Inception Distance (FID) \citep{heusel_gans_2017}, but disentangles the quality of generated samples from the coverage of the target distribution.
 The prd metric reduces the problem of comparing a distribution Q (the distribution of generated samples) to a reference distribution P (the distribution of true images) into a one dimensional problem by applying a pre-trained classifier trained on natural images and to compare \^{P} and \^{Q} at a feature level.
 The embeddings are then clustered such that the histogram over the cluster assignments can be meaningfully compared.
 Here we compute the prd score by taking the area under the precision-recall curve.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 
 \section{Hyperparameter Selection}
 \label{sec:Hyperparameter Selection}
@@ -99,9 +113,12 @@ The parameters used for each method in our experiments are shown in \cref{tab:pa
 
 \section{General Setup}
 All parameter values for the experiments studied in \cref{chap:results} can be found in \cref{tab:params}.
+All methods were trained with a learning rate of $5e-4$.
 We chose to use few normalizing flows to reduce training time and because that yielded more stable results.
 We adapted the parameters of the \mg{PoE} and the \mg{MoE} method to match those selected for the \mg{MoPoE} with the hyperoptimization.
 Only the dimension of the latent representation (class dim) of the \mg{PoE} was reduced since the performance of the \mg{PoE} dropped significantly with a higher dimension.
+All methods are trained with one importance sample from the joint posterior if not specified otherwise, except for the \mg{iwmogfm}, which is trained with two importance samples (\cref{subsubsec:iwMogfM}).
+All parameters for the \mg{iwmogfm} and \mg{mogfm\_amortized} methods have been chosen without any hyperoptimization.
 
 \py{
     pytex_tab(
@@ -119,6 +136,7 @@ Only the dimension of the latent representation (class dim) of the \mg{PoE} was 
 
 \section{Reproducibility}
 Advances in scientific research are contingent on reproducibility and verifiability of previous work.
-To ensure this, we make the framework used to train all models evaluated in this work available as an open source python package \citep{mmvae_github}, tested with continuous integration using \citep{travis} and kept up to date with \citep{dependabot}.
+To this end, we make the framework used to train all models evaluated in this work available as an open source python package \citep{mmvae_github}, tested with continuous integration using \citep{travis} and kept up to date with \citep{dependabot}.
 We publish this thesis as a reproducible self publishing document \citep[\href{https://github.com/TheChymera/RepSeP}{RepSeP}]{repsep} made available on GitHub \citep{mmnf_repsep}.
 Using \LaTeX and PythonTeX \citep{pytex}, we make all steps described herein easily reexecutable and extendable.
+It is thus easy to reproduce all figures using different parameters for each method for future work.

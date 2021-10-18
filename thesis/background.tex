@@ -1,10 +1,11 @@
 \chapter{Background}
 Our methods build on concepts and previous work on variational autoencoders (VAEs), self supervised multi modal generative learning paradigms and normalizing flows, which we introduce in this section.
 
+
 \section{Variational Autoencoder}
 \label{subsec:vae}
-The VAE, first introduced by \cite{kingma_auto-encoding_2014} and \cite{rezende_stochastic_2014}, consists of an encoder network and a decoder network.
-In contrast to a typical auto encoder network, the VAE is trained such that it's learned representation has the structure of a prior distribution.
+The VAE, first introduced by \citep{kingma_auto-encoding_2014} and \citep{rezende_stochastic_2014}, consists of an encoder network and a decoder network.
+In contrast to a typical auto encoder network, the VAE is trained such that its learned representation has the structure of a prior distribution.
 The most popular choice for a prior is the standard Gaussian distribution $\mathcal{N}(0,\textbf{I})$, which we also use in this work.
 The latent representation being a distribution, the decoder part can generate unseen data by sampling from it.
 The model is trained such that it maximizes the log-likelihood ($\log p(x)$) of the data by maximizing the Evidence Lower BOund (ELBO):
@@ -21,7 +22,7 @@ The model is trained such that it maximizes the log-likelihood ($\log p(x)$) of 
 \end{equation}
 
 The ELBO consists of two parts: the reconstruction loss which pushes the generated samples to resemble the real data and a regularization term which forces the latent representation to be structured like the prior.
-In \cite{beta_vae}, the authors introduce the hyperparameter $\beta$, which allows to weight the regularization term in the VAE objective:
+In \citep{beta_vae}, the authors introduce the hyperparameter $\beta$, which allows to weight the regularization term in the VAE objective:
 \begin{equation}
     \label{eq:vaeelbo}
     \mathcal{L}_{ELBO} = \mathbb{E} _{q(z|x)}[\log p(x|z)] - \beta D_{KL}\left( q(z|x)\ ||\ p(z)\right)
@@ -31,24 +32,19 @@ A lower $\beta$ gives the model more freedom in learning the latent representati
 "Disentangled" here means that each dimension in the learned latent representation is independent of each other, and represents a latent factor that corresponds to a different attribute in the data.
 In images of animals for example, one dimension in the latent representation could represent the color of the fur, while another might correspond to the color of the eyes.
 Both the color of the fur and the color of the eyes are independent, and so should be the corresponding latent variables.
-
-A structured and disentangled representation leads to better interpretability and is widely believed to lead to better results in down-stream tasks, however this claim has been challenged in \cite{locatello_challenging_2019} where the authors could not find evidence for it.
+A structured and disentangled representation leads to better interpretability and is widely believed to lead to better results in down-stream tasks, however this claim has been challenged in \citep{locatello_challenging_2019} where the authors could not find evidence for it.
 
 The $\beta$ allows to weight the trade-off introduced by the modified training objective that punishes reconstruction quality in order to encourage disentanglement within the latent representations \citep{burgess_understanding_2018}.
-
-
-%todo benefits of disentanglement? no shared information between dimension -> maximum information in latent representation?
-
-%It is widely believed that disentanglement leads to a better latent representation
 Disentanglement is a popular objective in representation learning and has been addressed in recent works \parencite{chen_isolating_2019, locatello_challenging_2019}.
-In this work, we also make use of $\beta$ as a hyperparameter that we tune for each method.
+In this work, we also make use of $\beta$ as a hyperparameter that we adapt for each method.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 
 \section{Multi Modal VAEs}
 \label{subsec:Multi Modal VAEs}
 In order for the VAE model to learn a representation which captures the underlying factors of multiple modalities, several adaptations to the objective in \cref{vaeelbo} need to be made.
-The first approach that scales with the number of modalities, allows for a coherent joint generation over all modalities and cross-generation across individual modalities, the \mg{MVAE}, was introduced in \cite{poe}.
+The first approach that scales with the number of modalities, allows for a coherent joint generation over all modalities and cross-generation across individual modalities, the \mg{MVAE}, was introduced in \citep{poe}.
 The MVAE makes the assumption that the joint posterior is a product of uni modal posteriors, also called a Product-of-Experts (PoE) \parencite{hinton_training_2002}:
 
 \begin{equation}
@@ -106,17 +102,10 @@ For gaussian posteriors, the PoE in \cref{eq:subsetmopoe} can be computed in clo
     \lmopoe \leq \mathbb{E}_{q_{\phi}(\textbf{z}|\mathbb{X})}[\log (p_{\theta}(\mathbb{X}|\textbf{z}))] - \frac{1}{2^M} \sum _{\mathbb{X}_s \in \mathcal{P}(\mathbb{X})} D_{KL}\biggl( \tilde{q}_{\phi}(\textbf{z}|\mathbb{X}_s)\ ||\ p_{\theta}(\textbf{z})\biggr)
 \end{equation}
 
-In this work, the \mg{MoPoE} is taken as the current state of the art for scalable, self supervised, multi modal generative models and is used as baseline.
-We also compare to the \mg{PoE} which is seen as the gold standard for aggregating information across modalities and the \mg{MoE} for learning each modality equaly well.
 
-\smallskip
-
-Next to the function with which the uni modal posteriors are merged, other methods have been proposed to improve mmVAEs.
-In \cite{daun_disent}, the authors propose to split the latent space into modality specific and shared information in order to disentangle them in a purely self-supervised manner.
-The aggregation of modalities should only happen over the shared information and thus it makes sense to separate it from the modality specific information in order to simplify the aggregation.
-For this, the authors add a new term to the mmVAE objective, which disentangles the shared representations with the modality specific representations and encourages mutual information between representations that contain shared information.
-This has been shown to improve the conditional generation of missing modalities, however the results from \cite{sutter_multimodal_2020} point out that independent of that separation, the generation coherence differs between different merging functions.
-The goal of this work is solely to improve the merging function, which is why we forgo this method even though we expect the separation of shared and modality specific information to improve our results.
+It has been shown in \citep{sutter_multimodal_2020} that the joint generation coherence of the \mg{MoE} surpasses that of the \mg{MoPoE}, suggesting that a more flexible aggregation function might be needed to further improve results.
+In this work, the \mg{MoPoE} is taken as the current state of the art for scalable, self supervised, multi modal generative models and is used as baseline to compare our methods against.
+We also compare to the \mg{PoE} which is seen as the gold standard for aggregating information across modalities and the \mg{MoE} for learning each modality equally well and obtaining an informative joint posterior.
 
 
 \begin{lemma}[Joint Approximation Function \citep{sutter_multimodal_2020}]
@@ -130,6 +119,7 @@ The goal of this work is solely to improve the merging function, which is why we
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+
 \section{Normalizing Flows}
 \label{subsec: Normalizing Flows}
 Normalizing flows \parencite{papamakarios_normalizing_2019} represent an approach for defining invertible and differentiable transformations of probability distributions.
@@ -138,9 +128,9 @@ In this work, we make use of normalizing flows both as a simple parameterizable 
 
 In practice, flow-based models are typically constructed by implementing a diffeomorphic transformation T (or $T^{-1}$) with a neural network.
 Because invertible and differentiable transforms are composable, complex transformations can be built by composing multiple instances of simpler ones: $T=T_K \circ \cdots \circ T_1$.
-The density of the transformed posterior $\tilde{q_{\phi}}$ can easily be obtained with the change of variable formula \parencite{bogachev2007measure}:
+The density of the transformed posterior $\tilde{q}_{\phi}$ can easily be obtained with the change of variable formula \parencite{bogachev2007measure}:
 \begin{equation}
-    \tilde{q_{\phi}} = T(q_{\phi}) \where q_{\phi} \sim p_{q_{\phi}}(q_{\phi}) = \mathcal{N}(\mu_{\phi}, \sigma^2_{\phi})
+    \tilde{q}_{\phi} = T(q_{\phi}) \where q_{\phi} \sim p_{q_{\phi}}(q_{\phi}) = \mathcal{N}(\mu_{\phi}, \sigma^2_{\phi})
 \end{equation}
 \begin{equation}
     \label{eq:changeofvariables}
@@ -156,12 +146,11 @@ The transformed posterior can be a much more faithfull approximation of the true
 \smallskip
 
 In this work, we make use of chained coupling blocks as normalizing flows, implemented by the \textcolor{dg}{\texttt{Framework for Easily Invertible Architectures}} (FrEIA).
-Coupling blocks were first introduced by Dinh et al. in \cite{dinh_nice_2015} for their Nonlinear Independent Components Estimation (NICE) method.
+Coupling blocks were first introduced in \citep{dinh_nice_2015} for their Nonlinear Independent Components Estimation (NICE) method.
 Chained coupling blocks are constructed such that at every block, the data is split into two halves.
 One half is transformed by a simple linear transformation with parameters depending on the other half.
 The transformed half is then concatenated with the other, unchanged half.
 This process is shown in \cref{fig:coupling block}.
-
 This transformation has a Jacobian which determinant is easily computable since it is triangular, which gives: $\det Df(x) = \det D\hat{f}(x^B | \Theta (x^A))$.
 Affine coupling blocks have been shown to provide good results, especially for image data \citep{dinh_density_2017}
 
@@ -173,6 +162,7 @@ Affine coupling blocks have been shown to provide good results, especially for i
 \end{figure}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 
 \section{Importance Weighted Autoencoder} \label{subsec:iwvae}
 It has been shown that the tightness of the ELBO in \cref{eq:vaeelbo} can be improved by sampling multiple samples from the posterior at each step \parencite{burda_importance_2016}, which results in the following lower bound:
@@ -191,5 +181,5 @@ The MMVAE from \parencite{shi2019variational} adapts this for multi modal data:
 \end{equation}
 which is a valid lower bound of the multi modal log likelihood $\log p(\xset)$.
 
-In our work, we make use of this importance sampling training paradigm to improve the tightness of the ELBO and to approximate the KL-divergence between the posterior and the prior by comparing samples from both (see \cref{sec:methods})).
+In our work, we make use of this importance sampling training paradigm to improve the tightness of the ELBO and to approximate the KL-divergence between the posterior and the prior (see \cref{subsubsec:iwMogfM})).
 

@@ -7,13 +7,13 @@
     "moe",
     "mopgfm",
     "poe",
-    "iwmogfm_amortized",
+    "mogfm_amortized",
     "mofop",
     "iwmogfm",
     "mopoe"
   ],
   "max_epoch": {
-    "polymnist": 499,
+    "polymnist": 500,
     "mimic": 149
   }
 }

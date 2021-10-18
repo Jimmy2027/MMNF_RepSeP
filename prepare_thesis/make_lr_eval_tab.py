@@ -40,6 +40,6 @@ def df_maker(epoch: int):
 
 if __name__ == '__main__':
     config = json2dict(Path('conf.json'))
-    lr_eval_df = pd.DataFrame(data=df_maker(epoch=config['max_epoch']['polymnist']))
+    lr_eval_df = pd.DataFrame(data=df_maker(epoch=config['max_epoch']['polymnist'] - 1))
 
     lr_eval_df.to_csv(Path(__file__).parent.parent / 'data/thesis/lr_eval.csv', index=False)
