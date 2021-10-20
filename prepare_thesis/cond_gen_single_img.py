@@ -27,7 +27,7 @@ def save_plots(_id, experiment_dir: Path, save_path, method: str):
 if __name__ == '__main__':
     config = json2dict(Path('conf.json'))
     for dataset in ['mimic']:
-        for method in ['mofop']:
+        for method in ['mopoe', 'mofop']:
             # for method in config['methods']:
             save_path = data_dir / dataset / f'{method}/cond_gen_single_imgs'
             save_path.mkdir(parents=True, exist_ok=True)

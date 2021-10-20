@@ -1,28 +1,31 @@
 \chapter{Introduction}
 % in recent years, the field of deep learning has seen a shift from uni modal learning towards multi modal learning.
+%motivation for multi modal learning
 The availability of multiple data types provides a rich source of information and holds promise for learning representations that generalise well across multiple modalities \citep{baltrusaitis_multimodal_2019}.
 Similar to how humans learn and extract information from their surroundings using an aggregation of their senses, a machine learning model can learn from multiple data types.
 Multimodal data naturally grants self-supervision in the form of shared information connecting the different data types.
 It also serves as an inherent regularization which forces the model to learn more robust features from the data, since these features need to be connected between modalities.
 This may lead to more interpretable features for humans since they also infer from multiple modalities.
-
 A model that can generate any of the learned modalities, given any subset of modalities can be used for translation between modalities for example, such as image captioning.
 It can also find applications in the medical domain, where the model could generate, conditioned on images and medical data of a patient, a text describing the medical condition of a patient.
 %Self-supervised training paradigms are especially useful in the medical domain since there labeled data is expensive to acquire and thus very scarce.
 % examples: (\citep{dorent_hetero-modal_2019}, \citep{calixto_latent_2019})
 
+% motivation for generative models
 However, the understanding of different modalities and the interplay between data types are non-trivial research questions and longstanding goals in machine learning research \citep{ngiam_multimodal_nodate}.
 While fully supervised approaches have been applied successfully \citep{karpathy_deep_2015,tsai_learning_2018}, the labeling of multiple data types remains time-consuming and expensive.
 Therefore, models that efficiently learn from multiple data types in a self-supervised fashion are much more widely applicable for real world problems.
-%Therefore, it requires models that efficiently learn from multiple data types in a self-supervised fashion.
-Learning the joint distribution of multiple data types without supervision can be done with self-supervised, generative models.
 In the medical domain, for example, self-supervised training paradigms are especially useful since there labeled data is expensive to acquire and thus very scarce.
+%Therefore, it requires models that efficiently learn from multiple data types in a self-supervised fashion.
+Generative models represent a natural way to learn underlying generative factors of the data, in a self-supervised fashion.
 
-Self supervised, multi modal generative models have been applied to toy datasets \citep{shi_variational_2019, sutter_generalized_2020, poe} and real world data \citep{klug_multimodal_nodate}, however results have shown that current methods are not able to aggregate well enough over the modalities to generate coherent samples.
+
+
+Self-supervised, multi modal generative models have been applied to toy datasets \citep{poe, shi_variational_2019, sutter_generalized_2020} and real world data \citep{klug_multimodal_nodate}, however results have shown that current methods are not able to aggregate well enough over the modalities to generate coherent samples.
 For the model to generate coherent samples, it needs to extract and fuse information from the multiple data types.
 An image captioning model for example, needs to extract information from the image and generate text from it when generating the caption for an image of a green apple.
 Captions such as "A red apple." or "A yellow truck." would not be coherent with the image of a green apple.
 
 In previous work, the aggregation over modalities is done with multiple, fixed, pre-selected methods, each coming with advantages and disadvantages.
 Here, we generalise previous work by implementing the aggregation over modalities using a generic function with trainable parameters.
-We show that this more flexible way to fuse the information between modalities improves the ability of the model to generate coherent samples across modalities.
+We show that this more flexible way to fuse the information between modalities improves the ability of the model to generate coherent samples across data types.

@@ -34,12 +34,33 @@ print(rsync_command)
 
 exp_uids = json2dict(experiment_uids_path)
 
+# get experiments for iw comparison
+iw_comp_out_dir = data_dir / 'experiments/iw_comp'
+iw_comp_out_dir.mkdir(exist_ok=True)
+for method, d in exp_uids['iw_comparison'].items():
+    method_dir = iw_comp_out_dir / method
+    method_dir.mkdir(exist_ok=True)
+    for K_nbr, uids in d.items():
+        for uid in uids:
+            dest_dir = method_dir / uid
+            if not dest_dir.exists() and uid:
+                if uid in db_uids:
+                    get_exp_dir(_id=uid, dest_dir=dest_dir)
+                else:
+                    try:
+                        unzip_to(path_to_zip_file=Path(conf['local_leomed_exp_dir']) / (uid + '.zip'),
+                                 dest_path=dest_dir,
+                                 verbose=True)
+                    except Exception as e:
+                        print(e)
+
 # for dataset in exp_uids:
+# for dataset in ['mimic']:
 for dataset in ['mimic']:
     dataset_data_dir = data_dir / 'experiments' / dataset
     dataset_data_dir.mkdir(exist_ok=True)
 
-    for method in ['mopoe']:
+    for method in ['mopgfm']:
         method_data_dir = dataset_data_dir / method
         method_data_dir.mkdir(exist_ok=True)
         # for method in ['mopgfm']:

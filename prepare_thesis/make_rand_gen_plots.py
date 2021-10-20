@@ -7,7 +7,7 @@ from mmvae_hub.experiment_vis.utils import load_experiment
 from mmvae_hub.utils.plotting import plot
 from modun.file_io import json2dict
 
-data_dir = Path(__file__).parent.parent / 'data/thesis'
+data_dir = Path(__file__).parent.parent / 'data/thesis/polymnist'
 exp_uids = json2dict(data_dir / 'experiment_uids.json')
 
 num_samples = 30

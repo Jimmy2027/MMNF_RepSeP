@@ -11,8 +11,8 @@
 
 \section{Hyperoptimization Results}
 
-The results for the optimization of the hyperparameters described in \cref{sec:Hyperparameter Selection} can be seen in \cref{fig:mopoe hyperopt} for the \mg{MoPoE} method and \cref{fig:mopgfm hyperopt} for the \mg{Mopgfm} method.
-Note that every figure in \cref{fig:mopoe hyperopt} and \cref{fig:mopgfm hyperopt} represents results in function of a parameter, however all other parameters are not fixed and might vary for every point.
+The results for the optimization of the hyperparameters described in \cref{sec:Hyperparameter Selection} can be seen in \cref{fig:mopoe hyperopt} for the \mg{MoPoE} method and in \cref{fig:mopgfm hyperopt1} and \cref{fig:mopgfm hyperopt1} for the \mg{Mopgfm} method.
+Note that every figure in \cref{fig:mopoe hyperopt}, \cref{fig:mopgfm hyperopt1} and \cref{fig:mopgfm hyperopt2} represents results in function of a parameter, however all other parameters are not fixed and might vary for every point.
 
 \paragraph{MoPoE Results} Descriptively, we find that the \mg{MoPoE} performs best on the PolyMNIST dataset with a learning rate $\approx 5e-4$ and a latent dimension of 1280.
 The performance of the \mg{MoPoE} seems to be robust to a change of $\beta$ in the range of 1.1 to 2.1.
@@ -22,25 +22,25 @@ The performance of the \mg{MoPoE} seems to be robust to a change of $\beta$ in t
 In practice, we have also experienced that models with a high number of normalizing flows can provide better performance but are more unstable.
 The \mg{Mopgfm} seems to perform best with a $\beta$ between 1.5 and 2.4.
 
-Overall the hyperoptimization results show that while the \mg{MoPoE} presents results that are much more stable (from \cref{subfig:mopoe_lr_rate}, one can infer that the only true variance in the objective value is due to a high learning rate), the highest achieved scores are lover than those achieved by the \mg{Mopgfm} method.
+Overall the hyperoptimization results show that while the \mg{MoPoE} presents results that are much more stable (from \cref{subfig:mopoe_lr_rate}, one can infer that the only true variance in the objective value is due to a high learning rate), the highest achieved scores are lower than those achieved by the \mg{Mopgfm} method.
 
 
 \begin{figure}
     \centering
-    \begin{subfigure}[b]{0.49\textwidth}
+    \begin{subfigure}[b]{0.9\textwidth}
         \centering
         \includegraphics[width=\textwidth]{data/static/mopoe_lr_rate}
         \caption{Results shown in function of the learning rate}
         \label{subfig:mopoe_lr_rate}
     \end{subfigure}
     \hfill
-    \begin{subfigure}[b]{0.49\textwidth}
+    \begin{subfigure}[b]{0.9\textwidth}
         \centering
         \includegraphics[width=\textwidth]{data/static/mopoe_class_dim}
         \caption{Results shown in function of the dimension of the latent representation}
     \end{subfigure}
     \hfill
-    \begin{subfigure}[b]{0.5\textwidth}
+    \begin{subfigure}[b]{0.9\textwidth}
         \centering
         \includegraphics[width=\textwidth]{data/static/mopoe_beta}
         \caption{Results shown in function of $\beta$}
@@ -51,32 +51,37 @@ Overall the hyperoptimization results show that while the \mg{MoPoE} presents re
 
 \begin{figure}
     \centering
-    \begin{subfigure}[b]{0.49\textwidth}
+    \begin{subfigure}[b]{0.9\textwidth}
         \centering
         \includegraphics[width=\textwidth]{data/static/mopgfm_nbr_cup_layers}
         \caption{Results shown in function of the number of coupling layers in each flow}
     \end{subfigure}
     \hfill
-    \begin{subfigure}[b]{0.49\textwidth}
+    \begin{subfigure}[b]{0.9\textwidth}
         \centering
         \includegraphics[width=\textwidth]{data/static/mopgfm_coupling_dim}
-        \caption{Results shown in function of the couling layer dimension}
+        \caption{Results shown in function of the coupling layer dimension}
     \end{subfigure}
-    \hfill
-    \begin{subfigure}[b]{0.49\textwidth}
+    \caption{Hyperoptimization run results for the \mg{Mopgfm} in function of the number of coupling layers and coupling layer dimension. Every subfigure presents results in function of one parameter, with all other parameters varying.}
+    \label{fig:mopgfm hyperopt1}
+\end{figure}
+
+\begin{figure}
+    \centering
+    \begin{subfigure}[b]{0.9\textwidth}
         \centering
         \includegraphics[width=\textwidth]{data/static/mopgfm_nbr_flows}
         \caption{Results shown in function of the number of flows}
         \label{subfig:mopgfm_nbr_flows}
     \end{subfigure}
     \hfill
-    \begin{subfigure}[b]{0.49\textwidth}
+    \begin{subfigure}[b]{0.9\textwidth}
         \centering
         \includegraphics[width=\textwidth]{data/static/mopgfm_beta}
         \caption{Results shown in function of $\beta$}
     \end{subfigure}
-    \caption{Hyperoptimization run results for the \mg{Mopgfm} method. Every subfigure presents results in function of one parameter, with all other parameters varying.}
-    \label{fig:mopgfm hyperopt}
+    \caption{Hyperoptimization run results for the \mg{Mopgfm} method in function of the number of flows and $\beta$. Every subfigure presents results in function of one parameter, with all other parameters varying.}
+    \label{fig:mopgfm hyperopt2}
 \end{figure}
 
 
@@ -89,8 +94,10 @@ Evaluating the separability of the latent representation (\cref{subsec:lr metric
 The two methods that do not regularize the latent representation with the KL-divergence (\mg{iwmogfm}, \mg{mogfm\_amortized}) perform worse than those that do, except for the \mg{moe} and \mg{poe} methods.
 The two latter methods have the worst performance overall.
 
+
 \begin{sansmath}
     \py{pytex_fig('thesis/scripts/plots/epoch_comparison_lr.py',
+        options_pre='\\hspace*{-0.4cm}',
         conf='thesis/main.conf',
         label='ep comp lr',
         caption='
@@ -100,12 +107,12 @@ The two latter methods have the worst performance overall.
         )}
 \end{sansmath}
 
-\paragraph{Evaluation across subset posteriors}
+\paragraph{Evaluation across subset posterior approximations}
 \Cref{tab:lr eval} compares the classification accuracies of linear classifiers trained on each subset posterior.
 Overall, we see that the classification accuracy improves when more modalities make up the latent representation which shows that all methods are able to aggregate the modalities.
 In particular, we find that the \mg{iwmogfm} method has the best performance when all modalities are given.
 Comparatively, the \mg{mopgfm} is able to optimize the uni modal posteriors better than the \mg{mopoe} and the \mg{mofop}, yielding an average accuracy of \py{boilerplate.get_unimodal_lr_score(method = 'mopgfm')} compared to \py{boilerplate.get_unimodal_lr_score(method = 'mopoe')} and \py{boilerplate.get_unimodal_lr_score(method = 'mofop')}.
-Our results show that the $m0$ modality is the hardest modality to learn from and as expected the \mg{poe} struggles the most to optimize for it.
+Our results show that the $m0$ modality is the most difficult modality to learn from and as expected the \mg{poe} struggles the most to optimize for it.
 It has the lowest accuracy on the subset containing only the $m0$ modality but compensates with the other modalities in the multi modal subsets.
 Similarly, both the \mg{iwmogfm} and \mg{mogfm\_amortized} yield their lowest score on the $m0$ subset, while their performance improves significantly on the multi modal subsets.
 
@@ -114,18 +121,19 @@ Similarly, both the \mg{iwmogfm} and \mg{mogfm\_amortized} yield their lowest sc
     script='thesis/scripts/lr_eval_tab.py',
     options_pre='\\centering \\resizebox{0.99\\textwidth}{!}{',
     options_post='}',
-    caption='Linear classification accuracy of all subset posteriors for the test set.\\
+    caption='Linear classification accuracy of all subset posterior approximations for the test set.\\
     ',
     label='lr eval',
     )
 }
 
 \paragraph{Scalability with the number of modalities}
-\Cref{fig:nbr mods comp lr} shows a comparison of how well each method scales with number of modalities it is trained on, using the linear classification metric (\cref{subsec:lr metric}).
+\Cref{fig:nbr mods comp lr} shows a comparison of how well each method scales with the number of modalities it is trained on, using the linear classification metric (\cref{subsec:lr metric}).
 Again, we see that the \mg{mofop}, the \mg{mopoe} and the \mg{mopgfm} scale equally well with the number of modalities, the latter yielding a slightly better score for 1 modality.
 
 \begin{sansmath}
     \py{pytex_fig('thesis/scripts/plots/nbr_mods_comparison_lr.py',
+        options_pre='\\hspace*{-0.4cm}',
         conf='thesis/main.conf',
         label='nbr mods comp lr',
         caption='
@@ -144,6 +152,7 @@ Overall, all methods making use of normalizing flow yield higher scores than the
 
 \begin{sansmath}
     \py{pytex_fig('thesis/scripts/plots/epoch_comparison_gen.py',
+        options_pre='\\hspace*{-0.4cm}',
         conf='thesis/main.conf',
         label='ep comp gen',
         caption='
@@ -162,9 +171,11 @@ Interestingly, the coherence accuracy of randomly generated samples with the \mg
 \py{
     pytex_tab(
     script='thesis/scripts/gen_eval_tab.py',
-    options_pre='\\centering \\resizebox{0.7\\textwidth}{!}{',
+    options_pre='\\centering \\resizebox{0.8\\textwidth}{!}{',
     options_post='}',
-    caption='Generation coherence for the Test set.
+    caption='Coherence accuracy values evaluated for the generation of missing modalities, reconstruction of modalities and random generation on the Test set, for a model trained with 3 modalities.
+    The coherence score for missing modalities is the average of all generation coherence accuracies for every subset of input modalities that does not contain the generated modality.
+    Similarly, the coherence score for reconstruction is the average of all generation coherence accuracies for every subset of input modalities that \emph{does} contain the generated modality.
     ',
     )
 }
@@ -177,38 +188,83 @@ This explains the slight dip in performance for all methods trained with 2 modal
 
 \begin{sansmath}
     \py{pytex_fig('thesis/scripts/plots/nbr_mods_comparison_gen.py',
+        options_pre='\\hspace*{-0.4cm}',
         conf='thesis/main.conf',
         label='nbr mods comp gen',
         caption='
         \\textbf{Generation classification accuracy for models trained with different number of modalities.}
-        The average over all classification accuracies is taken, across all possible combinations of input modalities and all output modalities, for three modalities from the PolyMNIST dataset. All models were trained for 500 epochs.
+        The average over all classification accuracies is taken, across all possible combinations of input modalities and all output modalities, for three modalities from the PolyMNIST dataset.
         ',
         )}
 \end{sansmath}
 
-\subsection{Evaluation of the Ggeneration Quality}
+\subsection{Evaluation of the Generation Quality}
 Evaluating the generation quality (\cref{subsubsec:gen_qual}), we find that overall the methods making use of the generalized $f$-mean perform the best.
 The \mg{mopgfm} yields the best prd score for the generation of missing modalities, while both the \mg{mogfm\_amortized} and \mg{iwmogfm} perform best on the reconstruction of modalities.
 Interestingly, the \mg{mopoe} method provides prd scores with a higher variance than the other methods.
 The \mg{poe} yields the best prd score for randomly generated samples followed by the \mg{mopoe}, however a qualitative evaluation of randomly generated samples in \cref{fig:rand gen polymnist} shows that while the \mg{mopoe} generates the digits well, there is not much variance in the backgrounds.
 The modalitiy specific information (the background) of the randomly generated images from the \mg{mopoe} actually seem to only correspond to an average of all pixels of the background image correspond to each modality.
 The same can be seen for the randomly generated images of the \mg{mopgfm} and the \mg{moe}.
-The background has a much higher variance for the \mg{poe} method and a slightly higher variance for the \mg{mofop} method.
+%The same can be seen in \cref{fig: m1__m2} where generated samples from the \mg{mopoe} always contain the same background color.
+Overall the \mg{poe} method captures best the modality specific information and provides the highest variance in the background of generated images.
+
 Examples of generated samples for each method can be found in \cref{chap:gen ex polymnist}.
 \py{
     pytex_tab(
     script='thesis/scripts/prd_tab.py',
-    options_pre='\\centering \\resizebox{0.7\\textwidth}{!}{',
+    options_pre='\\centering \\resizebox{0.8\\textwidth}{!}{',
     options_post='}',
-    caption='Area under the Precision and Recall curve of the PRD score \citep{precision_recall_distributions}.\\
+    caption='
+    Area under the Precision and Recall curve of the PRD metric \citep{precision_recall_distributions} evaluated for the generation of missing modalities, reconstruction of modalities and random generation on the Test set, for a model trained with 3 modalities.
+    The prd score for missing modalities is the average of all prd scores for every subset of input modalities that does not contain the generated modality.
+    Similarly, the prd score for reconstruction is the average of all prd scores for every subset of input modalities that \emph{does} contain the generated modality.
     ',
     )
 }
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+\subsection{Comparison across different number of importance samples} \label{subsec:iw_comp}
+Comparing how the \mg{mopoe}, the \mg{mopgfm} and the \mg{moe} perform with different number of importance samples (K) (\cref{subsec:iwvae}) reveals that for the generation coherence (\cref{fig:iw comp coh}) and the generation quality (\cref{fig:iw comp prd}), the performance of all three methods improves with a higher K.
+The evaluation on those two metrics also shows that the \mg{mopgfm} performs better than the \mg{mopoe} or the \mg{moe} for any K.
+Interestingly, the generation coherence of the \mg{moe} scales particularly well with a higher K, even surpassing the performance of the \mg{mopoe} for $K=3$ and $K=5$.
+The improvement in the separability of the latent representation for a higher K is less clear (\cref{fig:iw comp lr}).
+A comparison of generated samples across different number of importance samples is shown in \Cref{chap:gen ex iw}.
+%Evaluating the generation coherence (\cref{fig:iw comp coh}) and the generation quality (\cref{fig:iw comp prd}) shows that the \mg{mopgfm} performs better the \mg{mopoe} or the \mg{moe} for any K.
 
-\section{Mimic-CXR}
+
+
+
+
+
+\begin{sansmath}
+    \py{pytex_fig('thesis/scripts/plots/iw_comp_coh.py',
+        options_pre='\\hspace*{-0.4cm}',
+        conf='thesis/main.conf',
+        label='iw comp coh',
+        caption='
+        \\textbf{Generation classification accuracy for models trained with different number of importance samples, evaluated on the PolyMNIST test set.}
+        The average over all classification accuracies is taken, across all possible combinations of input modalities and all output modalities, for three modalities from the PolyMNIST dataset. All methods were trained with 3 modalities.
+        ',
+        )}
+\end{sansmath}
+
+
+\section{Mimic-CXR} \label{sec:mimic res}
+A qualitative evaluation of generated samples from the MIMIC-CXR dataset reveals that the models are not able to capture smaller details in both the modality specific and the shared information.
+\Cref{fig:mimic_lat_pa_example} shows that the generated samples from the \mg{mopoe} and \mg{mofop} methods are extremely blurry and while approximately portraying the shape of the patient and its organs, smaller details like the ribs are lost.
+In \cref{fig:mimic_lat_pa_example}, the patient also has a support device, which is not represented in the generated samples.
+\Cref{fig: PA_text__Lateral} shows that the quality of generated missing modalities is even worse, the generated Lateral modality being so blurred that it is hardly recognizable.
+
+\begin{figure}[h!]
+    \centering
+    \resizebox{0.85\textwidth}{!}{%
+        \py{pytex_printonly(script='thesis/scripts/tikz_graphs/mimic_lat_pa_example.py', data = '')}
+    }
+    \caption{Comparison of conditionally generated PA samples from the \mg{mopoe} and the \mg{mofop} method.
+    The generated samples are conditioned on images from a patient with a support device.}
+    \label{fig:mimic_lat_pa_example}
+\end{figure}
 %todo
 % lzeig dass generieren von missing modalities besonders schlecht ist
 % zeig dass die Modelle auch bei reconstruction details nicht generieren können (nicht genug kapazität):

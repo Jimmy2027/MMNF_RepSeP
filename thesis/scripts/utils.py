@@ -1,11 +1,11 @@
 METHODS = ["moe",
            "mopgfm",
            "poe",
-           "iwmogfm_amortized",
+           "mogfm_amortized",
            "mofop",
            "iwmogfm",
            "mopoe"]
 
 method_mapping = {
-    'iwmogfm_amortized': r'iwmogfm amortized',
+    'mogfm_amortized': r'mogfm amortized',
 }

@@ -28,7 +28,7 @@ def df_maker():
         yield {
             k: v
             for k, v in args.items()
-            if k not in ['eval_freq', 'beta_warmup', 'min_beta', 'num_mods', 'num_flows', 'K', 'initial_learning_rate']
+            if k not in ['eval_freq', 'beta_warmup', 'min_beta', 'num_mods', 'num_flows', 'K']
         }
 
 
@@ -39,9 +39,10 @@ df = pd.DataFrame(data=df_maker()).astype({'coupling_dim': pd.Int16Dtype(), 'num
              'max_beta': 'beta',
              'coupling_dim': 'Coupling Dim',
              'num_gfm_flows': 'Nbr Flows',
+             'initial_learning_rate': 'Learning Rate',
              'nbr_coupling_block_layers': 'Nbr Coupling Block layers',
              'end_epoch': 'End Epoch'})
 df = df.set_index('Method')
 
-print(df.to_latex(escape=True).replace('<NA>', r'').replace('\\toprule', '').replace('\\midrule', '').replace(
-    '\\bottomrule', '').replace('lrrrrrrr', 'cccccccc'))
+print(df[sorted(df.columns)].to_latex(escape=True).replace('<NA>', r'').replace('\\toprule', '').replace('\\midrule', '').replace(
+    '\\bottomrule', '').replace('lrrrrrr', 'ccccccc'))

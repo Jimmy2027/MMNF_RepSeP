@@ -1,6 +1,7 @@
 import numpy as np
 from pathlib import Path
 
+import pandas as pd
 from matplotlib import pyplot as plt
 from mmvae_hub.utils.utils import json2dict
 from modun.iter_utils import _cycle, chunks
@@ -55,3 +56,43 @@ def dict_elements_to_array(d: dict, exclude: str = None):
             for nbr_mod in value:
                 d[mod][nbr_mod] = np.array(d[mod][nbr_mod])
     return d
+
+
+def plot_iw_comp(metric: str):
+    if metric == 'coherence_eval':
+        title = 'Evaluation of the generation coherence'
+        kw = 'coherence_'
+        y_label = 'Generation Coherence Accuracy'
+
+    elif metric == 'lat_eval':
+        title = 'Evaluation of the separability of the latent representation'
+        kw = 'lr_'
+        y_label = 'Linear Classification Accuracy'
+
+    elif metric == 'prd':
+        title = 'Evaluation of the generation quality'
+        kw = 'prd_'
+        y_label = 'Area under the Precision and Recall curve'
+
+    iw_comp_df = pd.read_csv('data/thesis/iw_comp.csv')
+    lr_columns = [col for col in iw_comp_df.columns if col.startswith(kw)]
+
+    x_label = "K"
+    x_steps = ["1", "3", "5"]
+
+    methods = iw_comp_df.method.tolist()
+
+    d = {}
+    for method in methods:
+        d[method] = iw_comp_df.loc[iw_comp_df['method'] == method][lr_columns].values[0].tolist()
+
+    markers = _cycle(['o', 's', 'v', 'p', '*', 'h'])
+
+    for method in iw_comp_df.method:
+        plt.plot(x_steps, d[method], marker=next(markers))
+
+    plt.title(title)
+    plt.xlabel(x_label)
+    plt.ylabel(ylabel=y_label)
+
+    plt.legend(methods)

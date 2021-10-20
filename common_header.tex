@@ -27,7 +27,8 @@
 \definecolor{vlg}{gray}{0.9}
 
 % new commands
-\newcommand{\mg}[1]{\textcolor{mg}{\texttt{#1}}}
+%\newcommand{\mg}[1]{\textcolor{mg}{\texttt{#1}}}
+\newcommand{\mg}[1]{#1}
 \newcommand{\dg}[1]{\textcolor{dg}{\texttt{#1}}}
 \newcommand{\xdensity}{\textit{p}_x (\textbf{x})}
 \newcommand{\zm}{\textbf{z}_m}
@@ -41,9 +42,9 @@
 \newcommand{\xsubset}{\mathbb{X}_s}
 \newcommand{\xseti}{\mathbb{X}^{(i)}}
 \newcommand{\xsetm}{\mathbb{X}_m}
-\newcommand{\samplem}{\textbf{x}_m}
+\newcommand{\samplem}{x_m}
 
-\newcommand{\unimodalpost}{q_{\phi_m}(\textbf{z}|\samplem)}
+\newcommand{\unimodalpost}{q_{\phi_m}(\textbf{z}|\xsetm)}
 
 \newcommand{\approxdistri}{q_{\phi_i}(\textbf{z}|\xseti)}
 \newcommand{\approxdistr}{q_{\phi, \psi}(\textbf{z}|\xset)}

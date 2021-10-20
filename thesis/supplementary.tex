@@ -15,3 +15,30 @@
 
 \chapter{Qualitative comparison of generated Mimic-CXR samples}
 %\input{thesis/gen_comp_mimic}
+
+\chapter{Qualitative comparison across different number of importance samples} \label{chap:gen ex iw}
+\begin{sansmath}
+    \py{pytex_fig('thesis/scripts/plots/iw_comp_lr.py',
+        options_pre='\\hspace*{-0.4cm}',
+        conf='thesis/main.conf',
+        label='iw comp lr',
+        caption='
+        \\textbf{Linear classification accuracy for different importance samples over the PolyMNIST test set, averaged over all subsets.}
+        All methods were trained with 3 modalities.
+        ',
+        )}
+\end{sansmath}
+
+\begin{sansmath}
+    \py{pytex_fig('thesis/scripts/plots/iw_comp_prd.py',
+        options_pre='\\hspace*{-0.4cm}',
+        conf='thesis/main.conf',
+        label='iw comp prd',
+        caption='
+        \\textbf{Area under the Precision and Recall curve of the PRD metric \citep{precision_recall_distributions}, evaluated on the PolyMNIST test set.}
+        All methods were trained with 3 modalities.
+        ',
+        )}
+\end{sansmath}
+
+%\input{thesis/gen_comp_iw_comp}

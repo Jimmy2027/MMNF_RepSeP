@@ -1,2 +1,33 @@
-% todo say that it would be interesting to compare how increasing capacity of encoder/decoder model would increase performance in comparison with increasing number of flows for flow methods
 \chapter{Conclusion \& Discussion}
+We have implemented and tested new methods that provide a more flexible way to aggregate over multiple modalities in multi modal VAEs, using the generalized $f$-mean.
+Evaluating three metrics on the PolyMNIST dataset has shown that these methods improve results, especially for the coherence and the quality of the generated samples.
+This indicates that the generalized $f$-mean is able to better merge the information from each modality into a joint distribution than previous, fixed aggregation functions.
+However, a study of how well the methods scale with the number of modalities has shown that the methods utilizing normalizing flows scale less than those that do not.
+We hypothesise that this comes from the fact that each modalitiy is transformed with the same normalizing flow, such that with more modalities, the task of the flow to learn a meaningful mapping for each modality becomes increasingly difficult.
+We believe that this can be compensated with a higher amount of chained transformations, but which comes at a higher computational cost.
+
+\paragraph{MofoP \& MopgfM}
+As introduced in \cref{subsec:mofopoe}, the \mg{mofop} builds on the \mg{mopoe} by transforming each subset posterior approximation with a normalizing flow.
+While providing a more flexible joint posterior approximation, this does not make the aggregation over modalities more flexible, since the subset distributions are obtained with PoEs and the joint distribution with a MoE over subsets.
+We implemented and tested this method in comparison to our methods that utilize the generalized $f$-mean, to evaluate if the improved performance of those is due to a more flexible joint posterior distribution or a more flexible aggregation over modalities.
+The \mg{mopgfm} provides a good comparison for this matter, since it utilizes the generalized $f$-mean, but uses a normal distributed posterior approximation.
+It thus has a flexible aggregation over modalities but does not have a more flexible joint posterior distribution.
+A comparison between the \mg{mofop} and the \mg{mopgfm} has shown that in general the \mg{mopgfm} performs only slightly better than the \mg{mofop}, indicating that both a more flexible joint posterior distribution and a more flexible aggregation function are able to improve results on the PolyMNIST dataset.
+This shows that transforming the subset posterior approximation of the \mg{mopgfm} with normalizing flows to obtain a more flexible joint posterior distribution should further improve its results.
+Of course, this comes at the cost of increased computational cost and training time.
+
+\paragraph{mogfm\_amortized \& iwmogfm}
+The \mg{mogfm\_amortized} and the \mg{iwmofgm} provide a way to obtain both, a more flexible aggregation function and a more flexible joint posterior approximation.
+The two methods make use of a modified objective to steer the joint posterior approximation towards a distribution that can be evaluated, but we have found this to be too unstable in practice.
+However, our results have shown that both methods are able to learn a good joint posterior distribution, even without the KL-divergence as regularization term in the objective (i.e. with $\beta = 0$).
+While this results in a very high generation coherence and quality, this also results in a less structured joint posterior distribution since both methods yield lower linear classification accuracies (\cref{subsec:lr metric}).
+In addition, since the joint posterior distribution of both methods cannot be evaluated explicitly, one cannot generate new data by sampling from it.
+Overall the \mg{mogfm\_amortized} and the \mg{iwmofgm} provide very promising results and it would be interesting to evaluate in a more extensive study, if the weight of the regularization term in the objective can be adapted such that the learned posterior distribution of both methods matches a prior distribution.
+
+
+A qualitative evaluation on the challenging MIMIC-CXR dataset shows that the methods are not able to extract meaningful information from the three provided modalitities.
+Independent of a more flexible joint posterior distribution and a more flexible aggregation over modalities, the generated samples are extremely blurry and fail to show details in both the modality specific and shared information.
+We argue that further adaptations to the training paradigm are needed to capture small details in real world datasets.
+Especially for medical images where the shared information between the modalities are pathologies that are sometimes hardly recognizable, even for human experts.
+In \citep{dorent_hetero-modal_2019}, the authors show with their modified MVAE model, that aggregating over the modalities on multiple scales provides high quality results for the segmentation of brain tumours.
+This could be adapted for our more flexible aggregation function in future work.

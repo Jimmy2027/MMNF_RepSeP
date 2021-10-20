@@ -23,7 +23,66 @@ def get_cond_gen_plot(method: str, which: str):
     return f'\\includegraphics{{data/{method}/cond_gen_plots/{img_name}.png}}'
 
 
-def make_cond_gen_fig(which: str, methods: List[str], dataset: str):
+def make_cond_gen_fig_iw_comp(which: str, methods: List[str], dataset: str='polymnist'):
+    nbr_examples = {
+        "polymnist": 10,
+    }
+
+    split = which.split('__')
+    in_mods = split[0]
+    out_mod = split[-1]
+
+    input_samples_dir = Path(f'data/thesis/iw_comp/{methods[0]}/cond_gen_plots/K3/input_samples')
+
+    def get_cond_gen_samples_path(K: int, method: str):
+        if K == 1:
+            return Path(f'data/thesis/{dataset}/{method.replace("iw", "")}/cond_gen_plots/{in_mods}')
+        else:
+            return Path(f'data/thesis/iw_comp/{method}/cond_gen_plots/K{K}/{in_mods}')
+
+    pic = tikz.Picture()
+    plot_xshift_base = 3.5
+
+    yshift = 0
+    for in_mod in in_mods.split('_'):
+        xshift = plot_xshift_base
+        for class_idx in range(nbr_examples[dataset]):
+            img_name = f"{in_mod}_{class_idx}"
+            pic.set_node(
+                text=f'\\includegraphics[width=2cm]{{{input_samples_dir / img_name}}}',
+                options=f'xshift={xshift}cm, yshift=-{yshift}cm',
+                name=f'inmod_{img_name}',
+            )
+
+            xshift += 2.1
+        yshift += 2
+
+    pic.set_node(text=r'\Large{\textbf{Input}}', options=f'yshift=-{np.floor(yshift / (2 * 2))}cm')
+
+    yshift += 1.5
+
+    for K in [1, 3, 5]:
+        for method in methods:
+
+            pic.set_node(text=fr'\Large{{\textbf{{{tex_escape(method)} (K={K})}}}}', options=f'yshift=-{yshift}cm')
+
+            xshift = plot_xshift_base
+            for class_idx in range(nbr_examples[dataset]):
+                img_name = f"{out_mod}_{class_idx}"
+
+                pic.set_node(
+                    text=f'\\includegraphics[width=2cm]{{{get_cond_gen_samples_path(K, method) / img_name}}}',
+                    options=f'xshift={xshift}cm, yshift=-{yshift}cm',
+                    name=f'outmod_{img_name}',
+                )
+
+                xshift += 2.1
+            yshift += 2.1
+        yshift += 0.5
+    return pic.make()
+
+
+def make_cond_gen_fig_polymnist(which: str, methods: List[str], dataset: str):
     nbr_examples = {
         "polymnist": 10,
         "mimic": 5
@@ -57,7 +116,7 @@ def make_cond_gen_fig(which: str, methods: List[str], dataset: str):
     yshift += 1.5
 
     for method in methods:
-        if method == 'iwmogfm_amortized':
+        if method == 'mogfm_amortized':
             pic.set_node(text=fr'\Large{{\textbf{{iwmogfm}}}}\\\Large{{\textbf{{amortized}}}}',
                          options=f'yshift=-{yshift}cm, align=center')
         else:
@@ -78,6 +137,7 @@ def make_cond_gen_fig(which: str, methods: List[str], dataset: str):
 
     return pic.make()
 
+
 def make_cond_gen_fig_mimic(which: str, methods: List[str], dataset: str):
     nbr_examples = {
         "polymnist": 10,
@@ -97,7 +157,7 @@ def make_cond_gen_fig_mimic(which: str, methods: List[str], dataset: str):
     for in_mod in in_mods.split('_'):
         xshift = plot_xshift_base
         if in_mod == 'text':
-            width= 3
+            width = 3
         else:
             width = 2
         for class_idx in range(nbr_examples[dataset]):
@@ -124,7 +184,7 @@ def make_cond_gen_fig_mimic(which: str, methods: List[str], dataset: str):
 
         xshift = plot_xshift_base
         if out_mod == 'text':
-            width= 3
+            width = 3
         else:
             width = 2
         for class_idx in range(nbr_examples[dataset]):
@@ -156,10 +216,10 @@ def get_unimodal_lr_score(method: str):
 
 if __name__ == '__main__':
     # get_cond_gen_plot(method=r'joint\_elbo', which='m0__m0')
-    # print(make_cond_gen_fig(which='m0_m1__m0', methods=['mopoe','mopgfm', 'moe', 'poe','mofop', 'iwmogfm_amortized', 'iwmogfm2'], dataset = 'polymnist'))
+    print(make_cond_gen_fig_iw_comp(which='m0_m1__m0', methods=['iwmopoe','iwmopgfm', 'iwmoe']))
     # get_lr_score('mopoe')
     # get_lr_score('mofop')
     # get_lr_score('mopgfm')
-    print(get_unimodal_lr_score(method='mopoe'))
-    print(get_unimodal_lr_score(method='mopgfm'))
-    print(get_unimodal_lr_score(method='mofop'))
+    # print(get_unimodal_lr_score(method='mopoe'))
+    # print(get_unimodal_lr_score(method='mopgfm'))
+    # print(get_unimodal_lr_score(method='mofop'))
