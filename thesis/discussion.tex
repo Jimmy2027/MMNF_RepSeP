@@ -4,7 +4,7 @@ Evaluating three metrics on the PolyMNIST dataset has shown that these methods i
 This indicates that the generalized $f$-mean is able to better merge the information from each modality into a joint distribution than previous, fixed aggregation functions.
 However, a study of how well the methods scale with the number of modalities has shown that the methods utilizing normalizing flows scale less than those that do not.
 We hypothesise that this comes from the fact that each modalitiy is transformed with the same normalizing flow, such that with more modalities, the task of the flow to learn a meaningful mapping for each modality becomes increasingly difficult.
-We believe that this can be compensated with a higher amount of chained transformations, but which comes at a higher computational cost.
+We argue that this can be compensated with a higher amount of chained transformations, but which comes at a higher computational cost.
 
 \paragraph{MofoP \& MopgfM}
 As introduced in \cref{subsec:mofopoe}, the \mg{mofop} builds on the \mg{mopoe} by transforming each subset posterior approximation with a normalizing flow.
@@ -31,3 +31,6 @@ We argue that further adaptations to the training paradigm are needed to capture
 Especially for medical images where the shared information between the modalities are pathologies that are sometimes hardly recognizable, even for human experts.
 In \citep{dorent_hetero-modal_2019}, the authors show with their modified MVAE model, that aggregating over the modalities on multiple scales provides high quality results for the segmentation of brain tumours.
 This could be adapted for our more flexible aggregation function in future work.
+
+Overall, we have shown that the generalized $f$-mean provides a great tool to improve the objective of multi modal VAEs.
+In future work, it would be interesting to evaluate theoretical properties of the more flexible aggregation function and how it impacts the tightness of the modified ELBO.

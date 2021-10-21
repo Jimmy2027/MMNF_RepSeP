@@ -24,7 +24,7 @@ The PolyMNIST dataset is useful to study how the number of modalities impacts th
 \end{figure}
 
 \subsection{MIMIC-CXR Database}
-The MIMIC-CXR Database \cite{johnson2019mimic} is a large publicly available dataset of chest radiographs with free-text radiology reports containing 377,110 images corresponding to 227,835 radiographic studies performed at the Beth Israel Deaconess Medical Center in Boston, MA.
+The MIMIC-CXR Database \citep{johnson2019mimic} is a large publicly available dataset of chest radiographs with free-text radiology reports containing 377,110 images corresponding to 227,835 radiographic studies performed at the Beth Israel Deaconess Medical Center in Boston, MA.
 In this work, three modalities were extracted from the database: frontal and lateral chest radiographs together with their corresponding text reports (\cref{fig:mimic}).
 Only datapoints where all three modalities are present were selected.
 Every sample is labeled with one or more of the following categories: 'Atelectasis', 'Cardiomegaly', 'Consolidation', 'Edema', 'Enlarged Cardiomediastinum', 'Fracture', 'Lung Lesion', 'Lung Opacity', 'Pleural Effusion', 'Pleural Other', 'Pneumonia', 'Pneumothorax', 'Support Devices'.
@@ -121,7 +121,6 @@ For our methods that make use of normalizing flows, we add three additional hype
 For the optimization of those, we fixed the dimension of the latent representation and the learning rate according to what gave the best results for the \mg{MoPoE} method.
 Namely, a latent representation of dimension 1280 and a learning rate of $5e-4$.
 The results can be seen in \cref{fig:mopgfm hyperopt1} and \cref{fig:mopgfm hyperopt2}.
-The parameters used for each method in our experiments are shown in \cref{tab:params}.
 
 
 \section{General Setup}

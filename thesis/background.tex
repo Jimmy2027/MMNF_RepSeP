@@ -46,20 +46,20 @@ In this work, we also make use of $\beta$ as a hyperparameter that we adapt for 
 \label{subsec:Multi Modal VAEs}
 In order for the VAE model to learn a representation which captures the underlying factors of multiple modalities, several adaptations to the objective in \cref{vaeelbo} need to be made.
 The first approach that scales with the number of modalities, allows for a coherent joint generation over all modalities and cross-generation across individual modalities, the MVAE, was introduced in \citep{poe}.
-The MVAE makes the assumption that the joint posterior is a product of uni modal posteriors, also called a Product-of-Experts (PoE) \parencite{hinton_training_2002}:
+The MVAE makes the assumption that the joint posterior of data containing M modalities $\mathbb{X} = \{ \xset _m\}_{m=1}^M$ is a product of uni modal posteriors, also called a Product-of-Experts (PoE) \parencite{hinton_training_2002}:
 
 \begin{equation}
-    p(z|x_1,\ldots,x_M) \propto \prod ^M _{i=1} q(z|x_i)
+    p(z|\xset_1,\ldots,\xset_M) \propto \prod ^M _{m=1} q(z|\xset_m)
 \end{equation}
 
 The PoE has the advantage of aggregating information across any subset of uni modal posteriors which allows for missing modalities.
 However, the product of experts does not train the individual inference networks and they don't learn to handle missing data at test time.
 To address this issue, the MVAE requires a sub-sampling of uni modal log-likelihoods, which no longer guarantees a valid lower bound on the joint log-likelihood \parencite{wu_multimodal_2019}.
 
-Another approach was proposed with the MMVAE in \cite{shi2019variational}, which models the joint posterior as a mixture of uni modal posteriors, i.e. a mixture of experts (MoE):
+Another approach was proposed with the MMVAE in \citep{shi2019variational}, which models the joint posterior as a mixture of uni modal posteriors, i.e. a mixture of experts (MoE):
 
 \begin{equation}
-    p(z|x_1,\ldots,x_M) = \frac{1}{M} \sum _{i=1} q(z|x_i)
+    p(z|\xset_1,\ldots,\xset_M) = \frac{1}{M} \sum _{m=1} q(z|\xset_m)
 \end{equation}
 
 The MoE has the advantage of optimizing each inference network individually, however it does not merge the information between posteriors since only uni modal posteriors are considered during training.

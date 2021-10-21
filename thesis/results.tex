@@ -90,7 +90,7 @@ Overall the hyperoptimization results show that while the \mg{MoPoE} presents re
 \subsection{Evaluation of the Latent Representation}
 
 \paragraph{Evaluation over epochs}
-Evaluating the separability of the latent representation (\cref{subsec:lr metric}) for models trained on 3 modalities, we find that the \mg{mofop}, the \mg{mopgfm} and the \mg{mopoe} perform similarly, yielding on average a linear classification accuracy of \py{boilerplate.get_lr_score(method='mofop')}, \py{boilerplate.get_lr_score(method='mopgfm')} and \py{boilerplate.get_lr_score(method='mopoe')} respectively for all subsets after 400 training epochs (see \cref{fig:ep comp lr}).
+Evaluating the separability of the latent representation (\cref{subsec:lr metric}) for models trained on 3 modalities, we find that the \mg{mofop}, the \mg{mopgfm} and the \mg{mopoe} perform similarly, yielding on average a linear classification accuracy of \py{boilerplate.get_lr_score(method='mofop')}, \py{boilerplate.get_lr_score(method='mopgfm')} and \py{boilerplate.get_lr_score(method='mopoe')} respectively for all subsets after 500 training epochs (see \cref{fig:ep comp lr}).
 The two methods that do not regularize the latent representation with the KL-divergence (\mg{iwmogfm}, \mg{mogfm\_amortized}) perform worse than those that do, except for the \mg{moe} and \mg{poe} methods.
 The two latter methods have the worst performance overall.
 
