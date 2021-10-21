@@ -78,9 +78,10 @@ We compare the coherence accuracy for the generation of missing modalities, reco
 \subsection{Evaluation of the Generation Quality}
 \label{subsubsec:gen_qual}
 To evaluate the quality of the generated samples, we make use of the precision-recall score from \citep{precision_recall_distributions}.
-The Precision and Recall for Disitributions (prd) metric is similar to the Fréchet Inception Distance (FID) \citep{heusel_gans_2017}, but disentangles the quality of generated samples from the coverage of the target distribution.
+The Precision and Recall for Disitributions (prd) metric is similar to the Fréchet Inception Distance (FID) \citep{heusel_gans_2017}, but disentangles the quality of generated samples (precision) from the coverage of the target distribution (recall).
 The prd metric reduces the problem of comparing a distribution Q (the distribution of generated samples) to a reference distribution P (the distribution of true images) into a one dimensional problem by applying a pre-trained classifier trained on natural images and to compare \^{P} and \^{Q} at a feature level.
 The embeddings are then clustered such that the histogram over the cluster assignments can be meaningfully compared.
+Failing to produce samples from a cluster with many samples from the true distribution will hurt recall, and producing samples in clusters without many real samples will hurt precision \citep{precision_recall_distributions}.
 Here we compute the prd score by taking the area under the precision-recall curve.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
