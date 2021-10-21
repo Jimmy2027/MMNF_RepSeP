@@ -9,7 +9,6 @@ In contrast to a typical auto encoder network, the VAE is trained such that its 
 The most popular choice for a prior is the standard Gaussian distribution $\mathcal{N}(0,\textbf{I})$, which we also use in this work.
 The latent representation being a distribution, the decoder part can generate unseen data by sampling from it.
 The model is trained such that it maximizes the log-likelihood of the data ($\log p(x)$) by maximizing the Evidence Lower BOund (ELBO):
-% todo sag dass man oft eine gaussian nimmt als posterior und prior, und dass wir das in unseren methoden auch benutzen.
 \begin{equation}
     \label{vaeelbo}
     \begin{split}
