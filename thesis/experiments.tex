@@ -127,8 +127,8 @@ The parameters used for each method in our experiments are shown in \cref{tab:pa
 \section{General Setup}
 
 \subsection{PolyMNIST}
-We present our results for the PolyMNIST dataset in \cref{subsec: results polymnist}, for which we trained each method 3 times for 500 epochs.
-All results are presented as averages over the 3 runs, accompanied with the standard deviations.
+We present our results for the PolyMNIST dataset in \cref{subsec: results polymnist}, for which we trained each method 2 times for 500 epochs.
+All results are presented as averages over the 2 runs, accompanied with the standard deviations.
 If the number of modalities is not explicitely specified, the model was trained with three modalities from the PolyMNIST dataset.
 All parameter values for the experiments on the PolyMNIST dataset studied in \cref{subsec: results polymnist} can be found in \cref{tab:params_poly}.
 To reduce training time we chose to use a small number of chained transformations (Nbr Flows) for all normalizing flow methods.
@@ -180,5 +180,6 @@ We refer to the published codebase for more details on the implementation of the
 Advances in scientific research are contingent on reproducibility and verifiability of previous work.
 To this end, we make the framework used to train all models evaluated in this work available as an open source python package \citep{mmvae_github}, tested with continuous integration using \citep{travis} and kept up to date with \citep{dependabot}.
 We publish this thesis as a reproducible self publishing document \citep[\href{https://github.com/TheChymera/RepSeP}{RepSeP}]{repsep} made available on GitHub \citep{mmnf_repsep}.
+All data used to produce this document, including the trained models are made available on Zenodo \citep{mmnfdataset}.
 Using \LaTeX\ and PythonTeX \citep{pytex}, we make all steps described herein easily reexecutable and extendable.
 It is thus easy to reproduce all figures using different parameters for each method for future work.

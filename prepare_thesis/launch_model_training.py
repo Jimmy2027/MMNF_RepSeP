@@ -4,7 +4,8 @@ from mmvae_hub.leomed_utils.launch_jobs import launch_leomed_jobs
 from mmvae_hub.utils.setup.filehandling import get_experiment_uid
 from mmvae_hub.utils.utils import json2dict, dict2json
 
-end_epoch = 500
+conf = json2dict(Path(__file__).parent / 'conf.json')
+end_epoch = conf['max_epoch']['polymnist']
 eval_freq = 500
 nbr_repeats = 5
 
@@ -140,7 +141,7 @@ mopoe_mimic_args = {
     "min_beta": 0,
     "max_beta": 1.,
     "beta_warmup": 50,
-    "end_epoch": 150,
+    "end_epoch": conf['max_epoch']['mimic'],
     "eval_freq": 50,
 }
 
@@ -151,7 +152,7 @@ mofop_mimic_args = {
     "min_beta": 0,
     "max_beta": 1.,
     "beta_warmup": 50,
-    "end_epoch": 150,
+    "end_epoch": conf['max_epoch']['mimic'],
     "eval_freq": 50,
     "coupling_dim": 64,
     "num_flows": 3,
@@ -165,7 +166,7 @@ mopgfm_mimic_args = {
     "min_beta": 0,
     "max_beta": 1.,
     "beta_warmup": 50,
-    "end_epoch": 150,
+    "end_epoch": conf['max_epoch']['mimic'],
     "eval_freq": 50,
     "coupling_dim": 64,
     "num_gfm_flows": 3,

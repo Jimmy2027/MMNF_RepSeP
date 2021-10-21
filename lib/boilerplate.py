@@ -117,7 +117,7 @@ def make_cond_gen_fig_polymnist(which: str, methods: List[str], dataset: str):
 
     for method in methods:
         if method == 'mogfm_amortized':
-            pic.set_node(text=fr'\Large{{\textbf{{iwmogfm}}}}\\\Large{{\textbf{{amortized}}}}',
+            pic.set_node(text=fr'\Large{{\textbf{{mogfm}}}}\\\Large{{\textbf{{amortized}}}}',
                          options=f'yshift=-{yshift}cm, align=center')
         else:
             pic.set_node(text=fr'\Large{{\textbf{{{tex_escape(method)}}}}}', options=f'yshift=-{yshift}cm')

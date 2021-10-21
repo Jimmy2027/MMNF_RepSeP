@@ -1,10 +1,10 @@
 \chapter{Introduction}
 % in recent years, the field of deep learning has seen a shift from uni modal learning towards multi modal learning.
 %motivation for multi modal learning
-The availability of multiple data types provides a rich source of information and holds promise for learning representations that generalise well across multiple modalities \citep{baltrusaitis_multimodal_2019}.
+%The availability of multiple data types provides a rich source of information and holds promise for learning representations that generalise well across multiple modalities \citep{baltrusaitis_multimodal_2019}.
 Similar to how humans learn and extract information from their surroundings using an aggregation of their senses, a machine learning model can learn from multiple data types.
-Multimodal data naturally grants self-supervision in the form of shared information connecting the different data types.
-It also serves as an inherent regularization which forces the model to learn more robust features from the data, since these features need to be connected between modalities.
+Multimodal data naturally grants self-super-\\vision in the form of shared information connecting the different data types.
+It also serves as an inherent regularization which forces the model to learn more robust features from the data, since these features need to be connected between modalities \citep{baltrusaitis_multimodal_2019}.
 This may lead to more interpretable features for humans since they also infer from multiple modalities.
 A model that can generate any of the learned modalities, given any subset of modalities can be used for translation between modalities for example, such as image captioning.
 It can also find applications in the medical domain, where the model could generate, conditioned on images and medical data of a patient, a text describing the medical condition of a patient.
@@ -14,7 +14,7 @@ It can also find applications in the medical domain, where the model could gener
 % motivation for generative models
 However, the understanding of different modalities and the interplay between data types are non-trivial research questions and longstanding goals in machine learning research \citep{ngiam_multimodal_nodate}.
 While fully supervised approaches have been applied successfully \citep{karpathy_deep_2015,tsai_learning_2018}, the labeling of multiple data types remains time-consuming and expensive.
-Therefore, models that efficiently learn from multiple data types in a self-supervised fashion are much more widely applicable for real world problems.
+Models that efficiently learn from multiple data types in a self-supervised fashion are much more widely applicable for real world problems.
 In the medical domain, for example, self-supervised training paradigms are especially useful since there labeled data is expensive to acquire and thus very scarce.
 %Therefore, it requires models that efficiently learn from multiple data types in a self-supervised fashion.
 Generative models represent a natural way to learn underlying generative factors of the data, in a self-supervised fashion.
